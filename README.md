@@ -1,17 +1,11 @@
 # pedwm_projeto
 
-A new Flutter project.
+Aplicação Flutter para gestão de tempo/projetos com banco SQLite modelado a partir do diagrama do trabalho.
 
-## Getting Started
+## Banco de dados
 
-This project is a starting point for a Flutter application.
+- Schema SQL: `database/schema.sql`
+- Inicialização no app: `lib/database/db_schema.dart` + `lib/database/app_database.dart`
+- Exemplo de repositório: `lib/database/repositories/project_repository.dart`
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Detalhes e comandos de criação manual em: `database/README.md`.

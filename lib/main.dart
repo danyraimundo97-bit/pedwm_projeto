@@ -1,7 +1,26 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+import 'database/app_database.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (_supportsSqlite()) {
+    await AppDatabase.instance.database;
+  }
   runApp(const TimePlannerApp());
+}
+
+bool _supportsSqlite() {
+  if (kIsWeb) return false;
+  return switch (defaultTargetPlatform) {
+    TargetPlatform.android => true,
+    TargetPlatform.iOS => true,
+    TargetPlatform.macOS => true,
+    TargetPlatform.linux => false,
+    TargetPlatform.windows => false,
+    TargetPlatform.fuchsia => false,
+  };
 }
 
 class TimePlannerApp extends StatelessWidget {
@@ -14,9 +33,42 @@ class TimePlannerApp extends StatelessWidget {
       title: 'Time Planner',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: .fromSeed(seedColor: Colors.indigo),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
       ),
       home: const MainNavigationScreen(),
+    );
+  }
+}
+
+class DashboardView extends StatelessWidget {
+  const DashboardView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text('Dashboard'),
+    );
+  }
+}
+
+class ProjectListView extends StatelessWidget {
+  const ProjectListView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text('Projects'),
+    );
+  }
+}
+
+class ReportTimeView extends StatelessWidget {
+  const ReportTimeView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text('Report Time'),
     );
   }
 }
