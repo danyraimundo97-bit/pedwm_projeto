@@ -1,0 +1,424 @@
+classDiagram
+    %% ==========================================
+    %% CAMADA DE DOMÍNIO (Entidades Core e Builders)
+    %% ==========================================
+    namespace DomainLayer {
+        class User {
+            +Guid Id
+            +String Name
+            +UserRole Role
+            +PromoteToManager() void
+        }
+
+        class Team {
+            +Guid Id
+            +String Name
+        }
+
+        %% --- HIERARQUIA 1: GESTÃO DE TEMPO ---
+        class ProjectBase {
+            <<abstract>>
+            #Guid Id
+            #String Title
+            #DateTime StartDate
+            #DateTime EndDate
+        }
+
+        class Project {
+            +Int BudgetHours
+            +Guid ManagerId
+            +Guid TeamId
+        }
+
+        class Holiday {
+            +HolidayType Type
+        }
+
+        class Training {
+            +String CourseName
+            +Int Hours
+        }
+
+        %% --- BUILDERS (CRTP Generics) ---
+        class ProjectBaseBuilder~TBuilder~ {
+            <<abstract>>
+            #String _title
+            #DateTime _startDate
+            #DateTime _endDate
+            +WithTitle(String title) TBuilder
+            +WithDates(DateTime start, DateTime end) TBuilder
+        }
+
+        class ProjectBuilder {
+            -Int _budgetHours
+            -Guid _managerId
+            +WithBudget(Int hours) ProjectBuilder
+            +ManagedBy(Guid managerId) ProjectBuilder
+            +Build() Project
+        }
+
+        class HolidayBuilder {
+            -HolidayType _type
+            +WhichType(HolidayType type) HolidayBuilder
+            +Build() Holiday
+        }
+
+        class TrainingBuilder {
+            -String _courseName
+            -Int _hours
+            +WhichCourse(String course) TrainingBuilder
+            +WithDuration(Int hours) TrainingBuilder
+            +Build() Training
+        }
+
+        %% --- HIERARQUIA 2: TAREFAS ---
+        class TaskBase {
+            <<abstract>>
+            #Guid Id
+            #String Title
+            #TaskStatus Status
+            #Guid ProjectId
+            +MarkAsDone() void
+        }
+
+        class FeatureTask {
+            +Int StoryPoints
+        }
+
+        class BugTask {
+            +BugSeverity Severity
+            +String Environment
+        }
+
+        %% --- BUILDERS DE TAREFAS (CRTP como ProjectBaseBuilder) ---
+        class TaskBaseBuilder~TBuilder, TTask~ {
+            <<abstract>>
+            #String _title
+            #Guid _projectId
+            +WithTitle(String title) TBuilder
+            +InProject(Guid projectId) TBuilder
+        }
+
+        class BugTaskBuilder {
+            -BugSeverity _severity
+            +WithSeverity(BugSeverity severity) BugTaskBuilder
+            +Build() BugTask
+        }
+        
+        class FeatureTaskBuilder {
+            -Int _storyPoints
+            +WithStoryPoints(Int points) FeatureTaskBuilder
+            +Build() FeatureTask
+        }
+
+        %% --- EVENTOS DE DOMÍNIO ---
+        class UserPromotedEvent {
+            +Guid UserId
+            +UserRole PreviousRole
+            +DateTime OccurredAt
+        }
+
+        class TaskCompletedEvent {
+            +Guid TaskId
+            +Guid ProjectId
+            +DateTime OccurredAt
+        }
+
+        class Notification {
+            +Guid Id
+            +Guid UserId
+            +NotificationType Type
+            +String Message
+        }
+    }
+
+    %% Relacionamentos Herança Domínio
+    ProjectBase <|-- Project 
+    ProjectBase <|-- Holiday 
+    ProjectBase <|-- Training 
+    TaskBase <|-- FeatureTask 
+    TaskBase <|-- BugTask 
+
+    %% Relacionamentos Herança Builders (CRTP)
+    ProjectBaseBuilder~TBuilder~ <|-- ProjectBuilder
+    ProjectBaseBuilder~TBuilder~ <|-- HolidayBuilder
+    ProjectBaseBuilder~TBuilder~ <|-- TrainingBuilder
+    TaskBaseBuilder~TBuilder, TTask~ <|-- BugTaskBuilder
+    TaskBaseBuilder~TBuilder, TTask~ <|-- FeatureTaskBuilder
+
+    %% Relacionamentos Builder -> Instanciação
+    ProjectBuilder ..> Project : Build()
+    HolidayBuilder ..> Holiday : Build()
+    TrainingBuilder ..> Training : Build()
+    BugTaskBuilder ..> BugTask : Build()
+    FeatureTaskBuilder ..> FeatureTask : Build()
+
+    %% Estrutura e Associações Explícitas
+    Project "1" *-- "0..*" TaskBase : Contém
+    Project "1" --> "1" User : Manager
+    Project "1" --> "1" Team : Team
+    Team "1" o-- "0..*" User : Tem
+
+    %% ==========================================
+    %% CAMADA DE APLICAÇÃO (Casos de Uso e Design Patterns)
+    %% ==========================================
+    namespace ApplicationLayer {
+        %% --- CQRS Commands e Handlers ---
+        class CreateUserCommand {
+            <<Command>>
+            +String Name
+            +UserRole Role
+        }
+
+        class CreateUserHandler {
+            <<Handler>>
+            +HandleAsync(CreateUserCommand cmd) Task~User~
+        }
+
+        class CreateTeamCommand {
+            <<Command>>
+            +String Name
+        }
+
+        class CreateTeamHandler {
+            <<Handler>>
+            +HandleAsync(CreateTeamCommand cmd) Task~Team~
+        }
+
+        class CreateProjectCommand {
+            <<Command>>
+            +String Type
+            +String Title
+            +DateTime StartDate
+            +DateTime EndDate
+            +Int BudgetHours
+            +Guid ManagerId
+            +Guid TeamId
+        }
+
+        class CreateProjectHandler {
+            <<Handler>>
+            +HandleAsync(CreateProjectCommand cmd) Task~ProjectBase~
+        }
+
+        class CreateTaskCommand {
+            <<Command>>
+            +String Type
+            +String Title
+            +Guid ProjectId
+        }
+
+        class CreateTaskHandler {
+            <<Handler>>
+            +HandleAsync(CreateTaskCommand cmd) Task~TaskBase~
+        }
+
+        class TaskFactory {
+            <<Factory>>
+            -Dictionary~String, Func~ _buildersMap
+            +CreateFromCommand(CreateTaskCommand cmd) TaskBase
+        }
+
+        class ProjectFactory {
+            <<Factory>>
+            -Dictionary~String, Func~ _buildersMap
+            +CreateFromCommand(CreateProjectCommand cmd) ProjectBase
+        }
+
+        class INotificationDeliveryStrategy {
+            <<interface>>
+            +SendAsync(User user, Notification notification) Task
+        }
+
+        class NotificationSender {
+            +DeliverAsync(User user, Notification notif) Task
+        }
+
+        class IUserRepository {
+            <<interface>>
+            +GetByIdAsync(Guid id) Task~User~
+            +SaveAsync(User user) Task
+        }
+
+        class ITaskRepository {
+            <<interface>>
+            +GetByProjectAsync(Guid projectId) Task~IEnumerable~TaskBase~~
+            +SaveAsync(TaskBase task) Task
+        }
+
+        class IProjectRepository {
+            <<interface>>
+            +GetByIdAsync(Guid id) Task~ProjectBase~
+            +GetByTeamAsync(Guid teamId) Task~IEnumerable~Project~~
+            +SaveAsync(ProjectBase project) Task
+        }
+
+        class ITeamRepository {
+            <<interface>>
+            +GetByIdAsync(Guid id) Task~Team~
+            +SaveAsync(Team team) Task
+        }
+    }
+
+    %% Relacionamentos CQRS e Factory
+    CreateUserHandler o-- IUserRepository : Usa
+    CreateUserHandler ..> CreateUserCommand : Processa
+    CreateTeamHandler o-- ITeamRepository : Usa
+    CreateTeamHandler ..> CreateTeamCommand : Processa
+    CreateProjectHandler o-- ProjectFactory : Usa
+    CreateProjectHandler o-- IProjectRepository : Usa
+    CreateProjectHandler ..> CreateProjectCommand : Processa
+    ProjectFactory ..> ProjectBuilder : Usa
+    ProjectFactory ..> HolidayBuilder : Usa
+    ProjectFactory ..> TrainingBuilder : Usa
+    ProjectFactory ..> ProjectBase : Retorna
+    CreateTaskHandler o-- TaskFactory : Usa
+    CreateTaskHandler o-- ITaskRepository : Usa
+    CreateTaskHandler ..> CreateTaskCommand : Processa
+    TaskFactory ..> BugTaskBuilder : Usa
+    TaskFactory ..> FeatureTaskBuilder : Usa
+    TaskFactory ..> TaskBase : Retorna
+
+    NotificationSender o-- INotificationDeliveryStrategy : Usa
+
+    %% ==========================================
+    %% CAMADA DE INFRAESTRUTURA (Repositories e Implementações)
+    %% ==========================================
+    namespace InfrastructureLayer {
+        class UserRepository {
+            +GetByIdAsync(Guid id) Task~User~
+            +SaveAsync(User user) Task
+        }
+
+        class TaskRepository {
+            +GetByProjectAsync(Guid projectId) Task~IEnumerable~TaskBase~~
+            +SaveAsync(TaskBase task) Task
+        }
+
+        class ProjectRepository {
+            +GetByIdAsync(Guid id) Task~ProjectBase~
+            +GetByTeamAsync(Guid teamId) Task~IEnumerable~Project~~
+            +SaveAsync(ProjectBase project) Task
+        }
+
+        class TeamRepository {
+            +GetByIdAsync(Guid id) Task~Team~
+            +SaveAsync(Team team) Task
+        }
+
+        class WebSocketDeliveryStrategy {
+            +SendAsync(User user, Notification notification) Task
+        }
+
+        class EmailDeliveryStrategy {
+            +SendAsync(User user, Notification notification) Task
+        }
+    }
+
+    IUserRepository <|.. UserRepository : Implementa
+    ITaskRepository <|.. TaskRepository : Implementa
+    IProjectRepository <|.. ProjectRepository : Implementa
+    ITeamRepository <|.. TeamRepository : Implementa
+    INotificationDeliveryStrategy <|.. WebSocketDeliveryStrategy : Implementa
+    INotificationDeliveryStrategy <|.. EmailDeliveryStrategy : Implementa
+
+    %% ==========================================
+    %% CAMADA DE APRESENTAÇÃO (GraphQL API e DTOs)
+    %% ==========================================
+    namespace PresentationLayer {
+        %% --- Input DTOs ---
+        class CreateTaskDto {
+            <<DTO>>
+            +String Type
+            +String Title
+            +Guid ProjectId
+        }
+
+        class CreateUserDto {
+            <<DTO>>
+            +String Name
+            +UserRole Role
+        }
+
+        class CreateTeamDto {
+            <<DTO>>
+            +String Name
+        }
+
+        class CreateProjectDto {
+            <<DTO>>
+            +String Type
+            +String Title
+            +DateTime StartDate
+            +DateTime EndDate
+            +Int BudgetHours
+            +Guid ManagerId
+            +Guid TeamId
+        }
+        
+        %% --- Output DTOs ---
+        class UserDto {
+            <<DTO>>
+            +Guid Id
+            +String Name
+            +UserRole Role
+        }
+
+        class TeamDto {
+            <<DTO>>
+            +Guid Id
+            +String Name
+        }
+
+        class ProjectDto {
+            <<DTO>>
+            +Guid Id
+            +String Title
+            +DateTime StartDate
+            +DateTime EndDate
+            +String Type
+            +Int BudgetHours
+            +Guid ManagerId
+            +Guid TeamId
+        }
+
+        class TaskDto {
+            <<DTO>>
+            +Guid Id
+            +String Title
+            +TaskStatus Status
+            +Guid ProjectId
+            +String Type
+            +Int StoryPoints
+            +BugSeverity Severity
+            +String Environment
+        }
+        
+        class NotificationDto {
+            <<DTO>>
+            +String Message
+            +String ActionUrl
+        }
+        
+        class Mapster {
+            <<lib>>
+            +Adapt~TSource, TDest~(source) TDest
+        }
+    }
+
+    CreateUserDto ..> Mapster : Adapt
+    Mapster ..> CreateUserCommand : gera
+    CreateTeamDto ..> Mapster : Adapt
+    Mapster ..> CreateTeamCommand : gera
+    CreateProjectDto ..> Mapster : Adapt
+    Mapster ..> CreateProjectCommand : gera
+    CreateTaskDto ..> Mapster : Adapt
+    Mapster ..> CreateTaskCommand : gera
+    TaskFactory ..> CreateTaskCommand : Recebe
+    Notification ..> Mapster : Adapt
+    Mapster ..> NotificationDto : gera
+    WebSocketDeliveryStrategy ..> Mapster : usa para DTO
+
+    %% Eventos de Domínio (origem)
+    User ..> UserPromotedEvent : Raise em PromoteToManager
+    TaskBase ..> TaskCompletedEvent : Raise em MarkAsDone

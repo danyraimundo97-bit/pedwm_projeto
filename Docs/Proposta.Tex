@@ -1,0 +1,97 @@
+\documentclass{llncs}
+
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+
+\begin{document}
+
+\title{Real-Time Collaborative System for Project Planning and Hour Reporting}
+
+% Replace with actual author names and details
+\author{Dany Raimundo (8250047) \and João Mendes (8250051)}
+\institute{
+    School of Technology and Management (ESTG), \\
+    Polytechnic Institute of Porto (IPP), Felgueiras, Portugal
+}
+
+\maketitle
+
+\begin{abstract}
+The objective of this project is to develop a real-time collaborative system for Project Planning and Hour Reporting. The solution utilizes a Flutter mobile/web frontend and a C\# .NET backend, following the Clean Architecture paradigm to ensure a strict separation of concerns. Communication is driven by GraphQL for data management and WebSockets for real-time team presence. This approach fulfills the core objectives of implementing modern design patterns and emerging web/mobile technologies.
+\end{abstract}
+
+\section{Architecture: Clean Architecture}
+The project is structured into independent layers, ensuring maintainability and scalability:
+
+\begin{itemize}
+    \item \textbf{Domain Layer (Core):} Contains the business entities (\texttt{Project}, \texttt{TimeEntry}) and logic that are independent of any external framework.
+    \item \textbf{Application Layer:} Defines the specific use cases (e.g., \texttt{LogHours}, \texttt{GetProjectSummary}).
+    \item \textbf{Infrastructure/Data Layer:} Implements the Repository Pattern to handle data persistence via Entity Framework and manages external communication.
+    \item \textbf{Presentation Layer:} The Flutter UI (using Provider for state management) and the C\# GraphQL Resolvers.
+\end{itemize}
+
+\section{Class Definitions (Domain Models)}
+The classes defined in Table~\ref{tab:domain_models_revised} represent the technical understanding of the solution required for UML modeling.
+
+\begin{table}[h]
+\caption{Revised Domain Models and Class Definitions}
+\label{tab:domain_models_revised}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}p{4.5cm} >{\raggedright\arraybackslash}p{4.5cm}}
+\toprule
+\textbf{Class} & \textbf{Properties} & \textbf{Purpose} \\
+\midrule
+\textbf{ProjectBase} (Abstract) & \texttt{id, title, startDate, endDate, type} & Abstract foundation for time-allocation entities. \\
+\textbf{Project} & \texttt{budgetHours, clientName, status} & Inherits \texttt{ProjectBase}; handles standard billable work. \\
+\textbf{Holiday} & \texttt{holidayType} & Inherits \texttt{ProjectBase}; represents vacation and official days off, with approval logic in the domain layer. \\
+Training & \texttt{courseName, certificationLink, hours} & Inherits \texttt{ProjectBase}; tracks professional development activities. \\
+User & \texttt{id, name, email, department} & Identifies team members for individual performance tracking. \\
+TimeEntry & \texttt{id, projectId, userId, hours, description, timestamp} & Records individual logged hours and contributions. \\
+PresenceEvent & \texttt{userId, projectId, action} (Editing/Viewing) & Manages real-time presence status via WebSockets. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+\section{Communication Methods (GraphQL \& WebSockets)}
+As mandated by the primary objective, standard REST methods are avoided in favor of a strongly typed schema:
+
+\subsection{GraphQL (Data Operations)}
+\begin{itemize}
+    \item \textbf{Queries (Reads):} \texttt{getProjects}, \texttt{getUserStats(userId)}, \texttt{getTeamStats(teamId)}.
+    \item \textbf{Mutations (Writes):} \texttt{logTime(projectId, hours, description)}, \texttt{createProject(name, budget)}.
+\end{itemize}
+
+The query \texttt{getTeamStats(teamId)} aggregates information over \texttt{ProjectBase} and recorded \texttt{TimeEntry} instances to compute metrics requested in the Moodle specification, such as average project/task duration, distribution of Story Points per team member and per sprint, and the number of active versus completed projects.
+
+\subsection{WebSockets (Real-time Presence)}
+Instead of basic notifications, WebSockets are utilized to handle active presence and resource locking:
+\begin{itemize}
+    \item \textbf{Subscription \texttt{onPresenceChanged}:} Broadcasts which user is currently viewing or editing a specific project.
+    \item \textbf{Subscription \texttt{onTimeLogged}:} Instantly updates the team's ``Total Hours'' dashboard when a teammate submits a record.
+\end{itemize}
+
+\section{Services \& Design Patterns}
+The following software design patterns are integrated to meet the rigorous evaluation criteria:
+\begin{itemize}
+    \item \textbf{Singleton Pattern:} A single \texttt{GraphQLService} instance in Flutter manages the persistent connection to the C\# backend.
+    \item \textbf{Repository Pattern:} Abstracts the data source, allowing the backend to seamlessly switch between different database implementations if needed.
+    \item \textbf{Observer Pattern:} The Flutter UI ``observes'' WebSocket streams to dynamically update the interface without manual user intervention.
+    \item \textbf{Strategy Pattern (Notifications):} The notification subsystem uses interchangeable strategies (e.g., \texttt{EmailNotificationStrategy}, \texttt{InAppNotificationStrategy}) behind a common interface. Depending on user preferences or context (project created, project completed, Story Points threshold reached), the appropriate strategy is selected at runtime without changing the clients.
+    \item \textbf{Factory Pattern (Projects):} A dedicated \texttt{ProjectFactory} is responsible for instantiating the correct subtype of \texttt{ProjectBase} (\texttt{Project}, \texttt{Holiday} ou \texttt{Training}) com base nos dados recebidos pelas mutations GraphQL. Isto centraliza a lógica de criação e mantém a camada de aplicação independente dos tipos concretos.
+\end{itemize}
+
+\section{Current Progress \& Documentation}
+The project timeline and configuration are proceeding as planned:
+\begin{itemize}
+    \item \textbf{GitLab Repository:} Configured at \url{gitlab.estg.ipp.pt} with the instructor (\email{cdf@estg.ipp.pt}) added.
+    \item \textbf{Frontend:} The UI skeleton, featuring Material 3 design guidelines and core navigation layers, is fully prepared.
+    \item \textbf{Timeline \& Story Points:} Tasks are comprehensively mapped until April 9th, with Story Points assigned to each milestone to facilitate individual evaluation and tracking, including the required Story Points chart for visualizing team progress over time.
+    \item \textbf{Formal Rules (Moodle):} All rules from the official Moodle description are being followed, namely: use of GitLab with the professor's e-mail, explicit Story Points tracking with a corresponding chart, and the emphasis on design patterns and modern web/mobile technologies.
+\end{itemize}
+
+\end{document}
