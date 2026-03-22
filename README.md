@@ -177,5 +177,5 @@ Development followed the formal rules of the UC:
 
 ## Related Documentation
 
-- **[Docs/Proposta.Tex](Docs/Proposta.Tex)** — LaTeX source of this technical report (LLNCS format) — [Edit on Overleaf](https://www.overleaf.com/4814399971zgmfnnmbxpsc#e70c0e)
+- **[Docs/Proposta.Tex](Docs/Proposta.Tex)** — LaTeX source of this technical report (LLNCS format) — [Edit on Overleaf](https://www.overleaf.com/read/jtjyrcyhxgpr#f0f141)
 - **[Docs/Diagrama de classes V2.drawio](Docs/Diagrama%20de%20classes%20V2.drawio)** — Class diagram (draw.io source). Open in [diagrams.net](https://app.diagrams.net/) for interactive editing
