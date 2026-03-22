@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'screens/main_navigation_screen.dart';
+import 'theme/app_colors.dart';
 
 void main() {
   runApp(const TimePlannerApp());
@@ -7,54 +9,39 @@ void main() {
 class TimePlannerApp extends StatelessWidget {
   const TimePlannerApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Time Planner',
-      theme: ThemeData(
+      theme: ThemeData.dark().copyWith(
         useMaterial3: true,
-        colorScheme: .fromSeed(seedColor: Colors.indigo),
+        colorScheme: ColorScheme.dark(
+          primary: AppColors.accent,
+          surface: AppColors.background,
+          onSurface: AppColors.textPrimary,
+        ),
+        scaffoldBackgroundColor: AppColors.background,
+        navigationBarTheme: NavigationBarThemeData(
+          backgroundColor: AppColors.cardBg,
+          indicatorColor: Colors.transparent,
+          iconTheme: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return const IconThemeData(color: AppColors.navSelected);
+            }
+            return const IconThemeData(color: AppColors.navUnselected);
+          }),
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return const TextStyle(
+                color: AppColors.navSelected,
+                fontWeight: FontWeight.w600,
+              );
+            }
+            return const TextStyle(color: AppColors.navUnselected);
+          }),
+        ),
       ),
       home: const MainNavigationScreen(),
-    );
-  }
-}
-
-class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
-
-  @override
-  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
-}
-
-class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _currentIndex = 0;
-
-  // These are our "Dummy" screens
-  final List<Widget> _screens = [
-    const DashboardView(),
-    const ProjectListView(),
-    const ReportTimeView(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("ESTG Time Planner"),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.analytics), label: "Dashboard"),
-          BottomNavigationBarItem(icon: Icon(Icons.folder), label: "Projects"),
-          BottomNavigationBarItem(icon: Icon(Icons.add_task), label: "Report"),
-        ],
-      ),
     );
   }
 }
