@@ -171,12 +171,11 @@ Development followed the formal rules of the UC:
 
 - **Version Control:** Repository at [GitHub](https://github.com/danyraimundo97-bit/pedwm_projeto), with documentation and full architecture visualisation.
 - **Individual Assessment:** Tasks estimated and monitored using [GitHub Projects](https://github.com/users/danyraimundo97-bit/projects/1).
-- **Architecture Modelling:** The complete UML architecture diagram is available for interactive viewing and high resolution. Open the draw.io source file in [Docs/Images](Docs/Images) via [diagrams.net](https://app.diagrams.net/) (File → Open from → URL or GitHub).
+- **Architecture Modelling:** The complete UML architecture diagram is available for interactive viewing and high resolution. Open the draw.io source file in **[Docs/Diagrama de classes V2.drawio](Docs/Diagrama%20de%20classes%20V2.drawio)** via [diagrams.net](https://app.diagrams.net/) (File → Open from → URL or GitHub).
 
 ---
 
 ## Related Documentation
 
 - **[Docs/Proposta.Tex](Docs/Proposta.Tex)** — LaTeX source of this technical report (LLNCS format) — [Edit on Overleaf](https://www.overleaf.com/4814399971zgmfnnmbxpsc#e70c0e)
-- **[Docs/Diagrama de classes V2.drawio](Docs/Diagrama de classes V2.drawio)** — Architecture diagrams (draw.io source files and PNG exports). Open `.drawio` files in [diagrams.net](https://app.diagrams.net/) for interactive editing
-- **[Docs/README.md](Docs/README.md)** — Compilation instructions and documentation overview (Portuguese)
+- **[Docs/Diagrama de classes V2.drawio](Docs/Diagrama%20de%20classes%20V2.drawio)** — Class diagram (draw.io source). Open in [diagrams.net](https://app.diagrams.net/) for interactive editing
