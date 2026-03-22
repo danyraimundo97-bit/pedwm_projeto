@@ -178,5 +178,5 @@ Development followed the formal rules of the UC:
 ## Related Documentation
 
 - **[Docs/Proposta.Tex](Docs/Proposta.Tex)** — LaTeX source of this technical report (LLNCS format) — [Edit on Overleaf](https://www.overleaf.com/4814399971zgmfnnmbxpsc#e70c0e)
-- **[Docs/Images](Docs/Diagrama de classes V2.drawio)** — Architecture diagrams (draw.io source files and PNG exports). Open `.drawio` files in [diagrams.net](https://app.diagrams.net/) for interactive editing
+- **[Docs/Diagrama de classes V2.drawio](Docs/Diagrama de classes V2.drawio)** — Architecture diagrams (draw.io source files and PNG exports). Open `.drawio` files in [diagrams.net](https://app.diagrams.net/) for interactive editing
 - **[Docs/README.md](Docs/README.md)** — Compilation instructions and documentation overview (Portuguese)
