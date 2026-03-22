@@ -4,94 +4,184 @@
 \usepackage{hyperref}
 \usepackage{booktabs}
 \usepackage{tabularx}
+\usepackage{float}
+\usepackage{hyperref}
 
 \begin{document}
 
-\title{Real-Time Collaborative System for Project Planning and Hour Reporting}
+\title{Real-Time Collaborative System for Team and Task Management}
+\subtitle{Relatório Técnico de Arquitetura e Implementação}
 
-% Replace with actual author names and details
-\author{Dany Raimundo (8250047) \and João Mendes (8250051)}
+\author{Dany Raimundo (8250047) \and João Mendes (8250051) \and Magson Chostak (8250657)}
 \institute{
-    School of Technology and Management (ESTG), \\
-    Polytechnic Institute of Porto (IPP), Felgueiras, Portugal
+    Escola Superior de Tecnologia e Gestão (ESTG), \\
+    Instituto Politécnico do Porto (IPP), Felgueiras, Portugal
 }
 
 \maketitle
 
 \begin{abstract}
-The objective of this project is to develop a real-time collaborative system for Project Planning and Hour Reporting. The solution utilizes a Flutter mobile/web frontend and a C\# .NET backend, following the Clean Architecture paradigm to ensure a strict separation of concerns. Communication is driven by GraphQL for data management and WebSockets for real-time team presence. This approach fulfills the core objectives of implementing modern design patterns and emerging web/mobile technologies.
+O presente documento detalha a arquitetura e implementação de um sistema colaborativo em tempo real para Gestão de Equipas e Tarefas. Desenvolvida no âmbito da unidade curricular de Paradigmas Emergentes para o Desenvolvimento Web e Mobile, a solução integra uma aplicação \textit{frontend} em Flutter e um \textit{backend} em C\# .NET. A arquitetura baseia-se no paradigma \textit{Clean Architecture}, garantindo uma separação rigorosa de responsabilidades. A comunicação serão feitas atraves de GraphQL para operações transacionais e métricas complexas, e WebSockets para reatividade em tempo real. A adoção de padrões de desenho avançados, como CQRS, Builder (com CRTP), Factory e Strategy, reflete o alinhamento total com os objetivos de avaliação estipulados.
 \end{abstract}
 
-\section{Architecture: Clean Architecture}
-The project is structured into independent layers, ensuring maintainability and scalability:
+\section{Stack Tecnológica e Ferramentas}
+A seleção da \textit{stack} tecnológica foi guiada pela necessidade de suportar uma arquitetura limpa e escalável e motivada pelo interesse académico. A Tabela~\ref{tab:tech_stack} detalha as tecnologias adotadas em cada camada do sistema e a respetiva justificação arquitetural.
 
-\begin{itemize}
-    \item \textbf{Domain Layer (Core):} Contains the business entities (\texttt{Project}, \texttt{TimeEntry}) and logic that are independent of any external framework.
-    \item \textbf{Application Layer:} Defines the specific use cases (e.g., \texttt{LogHours}, \texttt{GetProjectSummary}).
-    \item \textbf{Infrastructure/Data Layer:} Implements the Repository Pattern to handle data persistence via Entity Framework and manages external communication.
-    \item \textbf{Presentation Layer:} The Flutter UI (using Provider for state management) and the C\# GraphQL Resolvers.
-\end{itemize}
-
-\section{Class Definitions (Domain Models)}
-The classes defined in Table~\ref{tab:domain_models_revised} represent the technical understanding of the solution required for UML modeling.
-
-\begin{table}[h]
-\caption{Revised Domain Models and Class Definitions}
-\label{tab:domain_models_revised}
+\begin{table}[H]
+\caption{Stack Tecnológica e Ferramentas de Desenvolvimento}
+\label{tab:tech_stack}
 \centering
-\renewcommand{\arraystretch}{1.3}
-\begin{tabular}{>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}p{4.5cm} >{\raggedright\arraybackslash}p{4.5cm}}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3cm} >{\raggedright\arraybackslash}p{4cm} >{\raggedright\arraybackslash}p{5cm}}
 \toprule
-\textbf{Class} & \textbf{Properties} & \textbf{Purpose} \\
+\textbf{Camada / Domínio} & \textbf{Tecnologia} & \textbf{Propósito e Justificação} \\
 \midrule
-\textbf{ProjectBase} (Abstract) & \texttt{id, title, startDate, endDate, type} & Abstract foundation for time-allocation entities. \\
-\textbf{Project} & \texttt{budgetHours, clientName, status} & Inherits \texttt{ProjectBase}; handles standard billable work. \\
-\textbf{Holiday} & \texttt{holidayType} & Inherits \texttt{ProjectBase}; represents vacation and official days off, with approval logic in the domain layer. \\
-Training & \texttt{courseName, certificationLink, hours} & Inherits \texttt{ProjectBase}; tracks professional development activities. \\
-User & \texttt{id, name, email, department} & Identifies team members for individual performance tracking. \\
-TimeEntry & \texttt{id, projectId, userId, hours, description, timestamp} & Records individual logged hours and contributions. \\
-PresenceEvent & \texttt{userId, projectId, action} (Editing/Viewing) & Manages real-time presence status via WebSockets. \\
+\textbf{Frontend (Mobile/Web)} & Flutter \& Dart & Criação de uma interface multiplataforma fluida.\\
+\textbf{Backend (Core)} & C\# .NET & Framework robusta para a implementação da \textit{Clean Architecture}, CQRS e padrões de desenho orientados a objetos. \\
+\textbf{Persistência de Dados} & SQL \& Entity Framework Core & Mapeamento objeto-relacional (ORM), para suportar a gravação das entidades de domínio e a herança polimórfica das tarefas. \\
+\textbf{API \& Dados} & GraphQL (HotChocolate) & Substituição do paradigma REST clássico para permitir \textit{queries} flexíveis e polimórficas de métricas e tarefas. \\
+\textbf{Tempo Real} & WebSockets (SignalR) & Estabelecimento de canais bidirecionais para alertas de presença e atualização instantânea de \textit{dashboards}. \\
+\textbf{Mapeamento de Objetos} & Mapster & Transcrição eficiente e automática entre \textit{DTOs} e Entidades de Domínio. \\
+\textbf{Testes de API} & Postman / Insomnia & Validação e demonstração independente das \textit{queries} e \textit{mutations} do \textit{backend}. \\
+\textbf{Controlo de Versões} & GitHub & Gestão do código fonte, integração do docente no repositório e rastreabilidade de \textit{Story Points}. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\newpage
+\section{Arquitetura do Sistema: Clean Architecture}
+O projeto foi estruturado em quatro camadas independentes, promovendo o encapsulamento, a testabilidade e a escalabilidade do sistema:
 
-\section{Communication Methods (GraphQL \& WebSockets)}
-As mandated by the primary objective, standard REST methods are avoided in favor of a strongly typed schema:
-
-\subsection{GraphQL (Data Operations)}
 \begin{itemize}
-    \item \textbf{Queries (Reads):} \texttt{getProjects}, \texttt{getUserStats(userId)}, \texttt{getTeamStats(teamId)}.
-    \item \textbf{Mutations (Writes):} \texttt{logTime(projectId, hours, description)}, \texttt{createProject(name, budget)}.
+    \item \textbf{Domain Layer (Core):} O coração do sistema. Contém as regras de negócio puras e as entidades principais (como Utilizadores, Projetos e Tarefas). É aqui que se centralizam os mecanismos estruturais para garantir que os dados assumem sempre um estado válido e seguro na sua instanciação, recorrendo a \textit{Builders} tipados com CRTP para assegurar a reutilização de código e o estrito cumprimento do princípio DRY.
+    \item \textbf{Application Layer:} Responsável pela orquestração dos casos de uso através do padrão CQRS. Define \textit{Commands} e \textit{Handlers}, as \textit{Factories} polimórficas e o contrato das estratégias de notificação. Define também as interfaces dos repositórios.
+\item \textbf{Infrastructure Layer:} É a camada encarregue de lidar com os detalhes físicos e de infraestrutura. Para a persistência de dados, utiliza o \textbf{Entity Framework Core (EF Core)} como ORM (\textit{Object-Relational Mapper}), garantindo a tradução fluida e segura das entidades de domínio para a base de dados relacional. É também nesta camada que residem os repositórios concretos e os serviços de entrega de mensagens (como os \textit{WebSockets}).
+    \item \textbf{Presentation Layer:} Expõe a API GraphQL. Gere a receção de pedidos transcrevendo os \textit{Input DTOs} em \textit{Commands} (via Mapster), e expõe as subscrições de WebSockets para o cliente Flutter.
 \end{itemize}
 
-The query \texttt{getTeamStats(teamId)} aggregates information over \texttt{ProjectBase} and recorded \texttt{TimeEntry} instances to compute metrics requested in the Moodle specification, such as average project/task duration, distribution of Story Points per team member and per sprint, and the number of active versus completed projects.
+\section{Objetivos do Projeto}
+O objetivo central deste projeto consiste na conceção e desenvolvimento de um sistema colaborativo, a operar em tempo real, dedicado à gestão integrada de projetos, acompanhamento de tarefas e reporte detalhado de horas de trabalho.
 
-\subsection{WebSockets (Real-time Presence)}
-Instead of basic notifications, WebSockets are utilized to handle active presence and resource locking:
+A solução foi desenhada para dar resposta às necessidades operacionais e de sincronização de equipas, focando-se nas seguintes vertentes funcionais:
+
 \begin{itemize}
-    \item \textbf{Subscription \texttt{onPresenceChanged}:} Broadcasts which user is currently viewing or editing a specific project.
-    \item \textbf{Subscription \texttt{onTimeLogged}:} Instantly updates the team's ``Total Hours'' dashboard when a teammate submits a record.
+    \item \textbf{Gestão de Projetos e Tarefas:} Permitir a criação, organização e monitorização do estado de vários projetos e das respetivas tarefas, garantindo uma visão clara sobre a que atividades cada membro da equipa está atribuído.
+    
+    \item \textbf{Reporte de Horas (Timesheets):} Facilitar o registo rigoroso do tempo investido pelos utilizadores nas diferentes tarefas e categorias de projeto, permitindo cruzar as horas reportadas com o orçamento de tempo (\textit{budget}) estipulado.
+    
+    \item \textbf{Presença e Colaboração em Tempo Real:} Proporcionar um ambiente interativo onde é possível identificar, de forma instantânea, o contexto de cada membro da equipa. O sistema permite distinguir em tempo real se um utilizador está ativamente a reportar horas numa tarefa específica ou se está apenas a visualizar os detalhes de um projeto naquele momento.
+    
+    \item \textbf{Monitorização de Esforço e Atribuições:} Oferecer à equipa e aos gestores uma visão global sobre a distribuição do trabalho, permitindo saber exatamente onde (em que tarefas) as horas estão a ser gastas, por quem foram reportadas e qual a taxa de progresso das atividades atribuídas.
 \end{itemize}
 
-\section{Services \& Design Patterns}
-The following software design patterns are integrated to meet the rigorous evaluation criteria:
+\section{Modelo de Domínio e Polimorfismo}
+O sistema foi modelado em torno de duas hierarquias principais de herança, permitindo um tratamento polimórfico eficiente tanto na alocação de tempo como na gestão operacional.
+
+\subsection{Hierarquia de Gestão de Projetos (\texttt{ProjectBase})}
+A classe abstrata \texttt{ProjectBase} unifica todas as entidades que requerem alocação temporal e esforço da equipa.
+
+\begin{table}[H]
+\caption{Mapeamento da Hierarquia de Gestão de Tempo}
+\label{tab:projectbase}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3cm} >{\raggedright\arraybackslash}p{4.5cm} >{\raggedright\arraybackslash}p{4.5cm}}
+\toprule
+\textbf{Classe} & \textbf{Propriedades Relevantes} & \textbf{Responsabilidade no Domínio} \\
+\midrule
+\textbf{ProjectBase} (Abstract) & \texttt{Id, Title, StartDate, EndDate} & Base abstrata que partilha as propriedades temporais obrigatórias. \\
+\textbf{Project} & \texttt{BudgetHours, ManagerId, TeamId} & Representa trabalho faturável ou de desenvolvimento core gerido por um GP. \\
+\textbf{Holiday} & \texttt{Type} (Fixed/Optional) & Entidade para reporte de dias de ausência oficial. \\
+\textbf{Training} & \texttt{CourseName, Hours} & Entidade para tracking de desenvolvimento profissional. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% SUGESTÃO: Inserir aqui o diagrama da Clean Architecture
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Images/Project Structure.drawio.png}
+    \caption{Diagrama UML correspondente a hierarquia da classe de projetos}
+    \label{fig:clean_arch}
+\end{figure}
+
+\subsection{Hierarquia de Gestão de Tarefas (\texttt{TaskBase})}
+As tarefas operacionais herdam de \texttt{TaskBase}, permitindo métricas consolidadas de desempenho de equipa.
+
+\begin{table}[H]
+\caption{Mapeamento da Hierarquia de Gestão de Tarefas}
+\label{tab:taskbase}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3cm} >{\raggedright\arraybackslash}p{4.5cm} >{\raggedright\arraybackslash}p{4.5cm}}
+\toprule
+\textbf{Classe} & \textbf{Propriedades Relevantes} & \textbf{Responsabilidade no Domínio} \\
+\midrule
+\textbf{TaskBase} (Abstract) & \texttt{Id, Title, Status, ProjectId} & Base comum; encapsula métodos de negócio como \texttt{MarkAsDone()}. \\
+\textbf{FeatureTask} & \texttt{StoryPoints} & Unidade de desenvolvimento cujo peso é medido para cálculo de velocidade. \\
+\textbf{BugTask} & \texttt{Severity, Environment} & Unidade de correção prioritária associada a um ambiente específico. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% SUGESTÃO: Inserir aqui o diagrama de classes UML
+\begin{figure}[H]
+    \centering
+ \includegraphics[width=0.9\textwidth]{Images/Project.drawio.png}
+    \caption{Diagrama UML correspondente a hierarquia da classe de tarefas}
+    \label{fig:uml_classes}
+\end{figure}
+
+\section{Modelo de Entidades e Domínio}
+O modelo de dados foi desenhado para representar os requisitos de negócio, para garantirmos a integridade relacional da informação. A arquitetura assenta nas seguintes entidades e relações principais:
+
 \begin{itemize}
-    \item \textbf{Singleton Pattern:} A single \texttt{GraphQLService} instance in Flutter manages the persistent connection to the C\# backend.
-    \item \textbf{Repository Pattern:} Abstracts the data source, allowing the backend to seamlessly switch between different database implementations if needed.
-    \item \textbf{Observer Pattern:} The Flutter UI ``observes'' WebSocket streams to dynamically update the interface without manual user intervention.
-    \item \textbf{Strategy Pattern (Notifications):} The notification subsystem uses interchangeable strategies (e.g., \texttt{EmailNotificationStrategy}, \texttt{InAppNotificationStrategy}) behind a common interface. Depending on user preferences or context (project created, project completed, Story Points threshold reached), the appropriate strategy is selected at runtime without changing the clients.
-    \item \textbf{Factory Pattern (Projects):} A dedicated \texttt{ProjectFactory} is responsible for instantiating the correct subtype of \texttt{ProjectBase} (\texttt{Project}, \texttt{Holiday} ou \texttt{Training}) com base nos dados recebidos pelas mutations GraphQL. Isto centraliza a lógica de criação e mantém a camada de aplicação independente dos tipos concretos.
+    \item \textbf{Estrutura Organizacional (User e Team):} Os utilizadores (\textit{Users}) assumem papéis específicos (\textit{Roles}) e encontram-se agrupados em equipas (\textit{Teams}). 
+    
+    \item \textbf{Núcleo de Gestão (Project):} Atua como a entidade agregadora do trabalho. Cada projeto possui um orçamento de horas (\textit{BudgetHours}), periodos temporais (\textit{StartDate} e \textit{EndDate}), é gerido por um responsável (\textit{Manager}) e encontra-se atribuído a uma equipa.
+    
+    \item \textbf{Polimorfismo de Tarefas (FeatureTask e BugTask):} A modelação reflete a natureza distinta das atividades de engenharia. As tarefas associam-se a projetos, mas dividem-se logicamente em: novas funcionalidades (\textit{FeatureTasks}, estimadas através de \textit{Story Points}) e correções de anomalias (\textit{BugTasks}, que exigem o registo da severidade e do ambiente afetado).
+    
+    \item \textbf{Sistema de Alertas (Notification):} Entidade dedicada ao registo persistente de eventos e mensagens direcionadas aos utilizadores, para servir de histórico para as notificações em tempo real ou email.
 \end{itemize}
 
-\section{Current Progress \& Documentation}
-The project timeline and configuration are proceeding as planned:
+\begin{figure}[H]
+    \centering
+ \includegraphics[width=0.9\textwidth]{Images/EntityModel.png}
+    \caption{Modelo de entidades}
+    \label{fig:uml_classes}
+\end{figure}
+
+
+\section{Justificação dos Padrões de Desenho Aplicados}
+A solução implementa múltiplos \textit{Design Patterns} para resolver problemas estruturais complexos, garantindo que o sistema se mantém eficiente, coeso e altamente escalável:
+
 \begin{itemize}
-    \item \textbf{GitLab Repository:} Configured at \url{gitlab.estg.ipp.pt} with the instructor (\email{cdf@estg.ipp.pt}) added.
-    \item \textbf{Frontend:} The UI skeleton, featuring Material 3 design guidelines and core navigation layers, is fully prepared.
-    \item \textbf{Timeline \& Story Points:} Tasks are comprehensively mapped until April 9th, with Story Points assigned to each milestone to facilitate individual evaluation and tracking, including the required Story Points chart for visualizing team progress over time.
-    \item \textbf{Formal Rules (Moodle):} All rules from the official Moodle description are being followed, namely: use of GitLab with the professor's e-mail, explicit Story Points tracking with a corresponding chart, and the emphasis on design patterns and modern web/mobile technologies.
+    \item \textbf{Builder Pattern com CRTP (Domain Layer):} Utilizado para evitar construtores complexos com múltiplos parâmetros e garantir as regras de negócio durante a criação de objetos. A adoção do padrão CRTP (\textit{Curiously Recurring Template Pattern}) permitiu partilhar a lógica de construção entre diferentes tipos de entidades de tempo e tarefas, eliminando a duplicação de código de forma fluente.
+    
+    \item \textbf{Factory Pattern (Application Layer):} Atua como o motor central de decisão polimórfica. Ao receber um pedido do exterior, a fábrica avalia o tipo de entidade pretendida e invoca o \textit{Builder} correspondente de forma automática. Isto liberta a interface de utilizador e a API de conterem lógicas condicionais complexas.
+    
+    \item \textbf{Strategy Pattern (Infrastructure/Application):} Aplicado ao sistema de envio de notificações. Permite que a aplicação de enviar notificações por, comunicação em tempo real via WebSockets ou envio de e-mail.
+    
+    \item \textbf{Singleton Pattern (Infrastructure / Cross-Cutting):} Utilizado para a gestão centralizada do registo de eventos do sistema (\textit{Logs}). Garante a existência de uma instância única global, o que previne conflitos e condições de corrida no acesso aos ficheiros de registo, minimizando também o consumo de memória durante a execução.
+    
+    \item \textbf{CQRS (Command Query Responsibility Segregation):} Adotado para separar explicitamente as operações de escrita e alteração de estado das operações exclusivas de leitura de dados. Esta divisão otimiza o desempenho das consultas para os \textit{dashboards} e espelha perfeitamente a natureza bidirecional da API GraphQL.
+\end{itemize}
+
+\section{Tecnologias Core e Integração}
+O sistema foi concebido em torno das duas tecnologias exigidas:
+
+\subsection{GraphQL (Data Operations \& Mapping)}
+Utilizado para expor uma API estritamente tipada, cuja implementação no \textit{backend} .NET é suportada pela \textit{framework} \textbf{HotChocolate}. O cliente Flutter submete \textit{Input DTOs}, que são automaticamente mapeados para \textit{Commands} internos ao utilizar a biblioteca \textbf{Mapster}. O \textit{backend} processa estas \textit{mutations} de forma polimórfica e devolve \textit{Output DTOs} desenhados à medida das necessidades da Interface de Utilizador (UI).
+
+\subsection{WebSockets (Real-Time Communication)}
+Empregues para assegurar o contexto colaborativo exigido num sistema de gestão de equipas. A \texttt{WebSocketDeliveryStrategy} garante que alterações de estado nas tarefas e alertas de presença sejam refletidos nos quadros virtuais de todos os elementos da equipa de forma instantânea.
+
+\section{Gestão do Projeto }
+\begin{itemize}
+    \item \textbf{Controlo de Versões:} Repositório estabelecido em \url{https://github.com/danyraimundo97-bit/pedwm_projeto}, com a documentação e visualização de toda a arquitetura
+    \item \textbf{Aferição Individual:} As tarefas foram estimadas e monitorizadas utilizando o gestor de tarefas no github \url{https://github.com/users/danyraimundo97-bit/projects/1}.
+    \item \textbf{Modelação Arquitetural:} Devido à extensão da representação da arquitetura do projeto, o diagrama UML completo foi exportado para visualização interativa e em alta resolução. Os ficheiros fonte estão em \url{https://github.com/danyraimundo97-bit/pedwm_projeto/tree/main/Docs/Images} e podem ser editados em \url{https://app.diagrams.net/} (File $\rightarrow$ Open from $\rightarrow$ URL ou GitHub).
+    
 \end{itemize}
 
 \end{document}

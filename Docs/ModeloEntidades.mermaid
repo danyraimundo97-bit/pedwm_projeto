@@ -1,0 +1,57 @@
+erDiagram
+    %% ==========================================
+    %% MODELO DE ENTIDADES - PEDWM
+    %% ==========================================
+
+    User {
+        guid Id PK
+        string Name
+        string Role
+    }
+
+    Team {
+        guid Id PK
+        string Name
+    }
+
+    Project {
+        guid Id PK
+        string Title
+        datetime StartDate
+        datetime EndDate
+        int BudgetHours
+        guid ManagerId FK
+        guid TeamId FK
+    }
+
+    FeatureTask {
+        guid Id PK
+        string Title
+        string Status
+        guid ProjectId FK
+        int StoryPoints
+    }
+
+    BugTask {
+        guid Id PK
+        string Title
+        string Status
+        guid ProjectId FK
+        string Severity
+        string Environment
+    }
+
+    Notification {
+        guid Id PK
+        guid UserId FK
+        string Type
+        string Message
+    }
+
+    %% Relacionamentos (lado 1 para lado N)
+    Team ||--o{ User : "tem membros"
+    User ||--o{ Project : "gerencia"
+    Team ||--o{ Project : "contém projetos"
+    Project ||--o{ FeatureTask : "contém"
+    Project ||--o{ BugTask : "contém"
+    User ||--o{ Notification : "recebe"
