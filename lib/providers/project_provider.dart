@@ -33,7 +33,7 @@ class ProjectProvider extends ChangeNotifier {
         budgetHours: 50, consumedHours: 32, completionPercentage: 0,
         tasks: [
 TaskModel(id: 't2', title: "Fix Login Crash", status: TaskStatus.fromString("ToDo"), type: TaskType.fromString("Bug"), estimate: 3, severity: "Critical"),
-TaskModel(id: 't5', title: "Typo in Settings", status: TaskStatus.fromString("OnGoing"), type: TaskType.fromString("Bug"), estimate: 1, severity: "Low"),
+TaskModel(id: 't5', title: "Typo in Settings", status: TaskStatus.fromString("Active"), type: TaskType.fromString("Bug"), estimate: 1, severity: "Low"),
         ],
       ),
       ProjectModel(
@@ -44,7 +44,7 @@ TaskModel(id: 't5', title: "Typo in Settings", status: TaskStatus.fromString("On
         budgetHours: 40, consumedHours: 18, completionPercentage: 0,
         tasks: [
           TaskModel(id: 't3', title: "Update Flutter SDK", status: TaskStatus.fromString("Completed"), type: TaskType.fromString("Feature"), estimate: 5),
-          TaskModel(id: 't4', title: "Profile Image Upload", status: TaskStatus.fromString("OnGoing"), type: TaskType.fromString("Feature"), estimate: 13),
+          TaskModel(id: 't4', title: "Profile Image Upload", status: TaskStatus.fromString("Active"), type: TaskType.fromString("Feature"), estimate: 13),
         ],
       ),
    ];
