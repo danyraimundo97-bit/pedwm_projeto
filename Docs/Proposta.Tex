@@ -24,6 +24,8 @@
 O presente documento detalha a arquitetura e implementação de um sistema colaborativo em tempo real para Gestão de Equipas e Tarefas. Desenvolvida no âmbito da unidade curricular de Paradigmas Emergentes para o Desenvolvimento Web e Mobile, a solução integra uma aplicação \textit{frontend} em Flutter e um \textit{backend} em C\# .NET. A arquitetura baseia-se no paradigma \textit{Clean Architecture}, garantindo uma separação rigorosa de responsabilidades. A comunicação serão feitas atraves de GraphQL para operações transacionais e métricas complexas, e WebSockets para reatividade em tempo real. A adoção de padrões de desenho avançados, como CQRS, Builder (com CRTP), Factory e Strategy, reflete o alinhamento total com os objetivos de avaliação estipulados.
 \end{abstract}
 
+\newpage
+
 \section{Stack Tecnológica e Ferramentas}
 A seleção da \textit{stack} tecnológica foi guiada pela necessidade de suportar uma arquitetura limpa e escalável e motivada pelo interesse académico. A Tabela~\ref{tab:tech_stack} detalha as tecnologias adotadas em cada camada do sistema e a respetiva justificação arquitetural.
 
@@ -48,6 +50,8 @@ A seleção da \textit{stack} tecnológica foi guiada pela necessidade de suport
 \end{tabular}
 \end{table}
 
+\newpage
+
 \section{Arquitetura do Sistema: Clean Architecture}
 O projeto foi estruturado em quatro camadas independentes, promovendo o encapsulamento, a testabilidade e a escalabilidade do sistema:
 
@@ -57,6 +61,8 @@ O projeto foi estruturado em quatro camadas independentes, promovendo o encapsul
 \item \textbf{Infrastructure Layer:} É a camada encarregue de lidar com os detalhes físicos e de infraestrutura. Para a persistência de dados, utiliza o \textbf{Entity Framework Core (EF Core)} como ORM (\textit{Object-Relational Mapper}), garantindo a tradução fluida e segura das entidades de domínio para a base de dados relacional. É também nesta camada que residem os repositórios concretos e os serviços de entrega de mensagens (como os \textit{WebSockets}).
     \item \textbf{Presentation Layer:} Expõe a API GraphQL. Gere a receção de pedidos transcrevendo os \textit{Input DTOs} em \textit{Commands} (via Mapster), e expõe as subscrições de WebSockets para o cliente Flutter.
 \end{itemize}
+
+\newpage
 
 \section{Objetivos do Projeto}
 O objetivo central deste projeto consiste na conceção e desenvolvimento de um sistema colaborativo, a operar em tempo real, dedicado à gestão integrada de projetos, acompanhamento de tarefas e reporte detalhado de horas de trabalho.
@@ -72,6 +78,8 @@ A solução foi desenhada para dar resposta às necessidades operacionais e de s
     
     \item \textbf{Monitorização de Esforço e Atribuições:} Oferecer à equipa e aos gestores uma visão global sobre a distribuição do trabalho, permitindo saber exatamente onde (em que tarefas) as horas estão a ser gastas, por quem foram reportadas e qual a taxa de progresso das atividades atribuídas.
 \end{itemize}
+
+\newpage
 
 \section{Modelo de Domínio e Polimorfismo}
 O sistema foi modelado em torno de duas hierarquias principais de herança, permitindo um tratamento polimórfico eficiente tanto na alocação de tempo como na gestão operacional.

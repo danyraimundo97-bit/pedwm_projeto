@@ -50,6 +50,7 @@ enum TaskType {
 class TaskModel {
   final String id;
   final String title;
+  final String description;
   final TaskStatus status;
   final TaskType type;
   final int estimate; // Story points or hours
@@ -58,6 +59,7 @@ class TaskModel {
   TaskModel({
     required this.id,
     required this.title,
+    required this.description,
     required this.status,
     required this.type,
     required this.estimate,
@@ -67,6 +69,7 @@ class TaskModel {
   TaskModel copyWith({
     String? id,
     String? title,
+    String? description,
     TaskStatus? status,
     TaskType? type,
     int? estimate,
@@ -75,7 +78,8 @@ class TaskModel {
     return TaskModel(
       id: id ?? this.id,
       title: title ?? this.title,
-      status: status ?? TaskStatus.Unknown,
+      description: description ?? this.description,
+      status: status ?? this.status,
       type: type ?? this.type,
       estimate: estimate ?? this.estimate,
       severity: severity ?? this.severity,

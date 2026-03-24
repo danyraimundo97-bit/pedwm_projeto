@@ -68,7 +68,7 @@ class ProjectDetailsView extends StatelessWidget {
                           
                           // 2. WE WRAP THE CONTENT IN A LIST TILE WITH ONTAP
                           child: ListTile(
-                            onTap: () => _showStatusUpdateSheet(context, project.id, task),
+                            onTap: () => _showTaskDetailSheet(context, project.id, task),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             leading: Container(
                               padding: const EdgeInsets.all(10),
@@ -117,33 +117,66 @@ class ProjectDetailsView extends StatelessWidget {
     );
   }
 
-  // 3. THE MODERN BOTTOM SHEET METHOD
-  void _showStatusUpdateSheet(BuildContext context, String projectId, TaskModel task) {
+  void _showTaskDetailSheet(BuildContext context, String projectId, TaskModel task) {
     final statuses = TaskStatus.labels;
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: AppColors.cardBg,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (bottomSheetContext) {
+        final bottomInset = MediaQuery.paddingOf(bottomSheetContext).bottom;
         return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomInset),
             child: Column(
-              mainAxisSize: MainAxisSize.min, // Takes only as much space as it needs
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Update Task Status",
-                  style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+                Text(
+                  task.title,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 16),
-                
-                // Map our statuses to clickable rows
+                const SizedBox(height: 12),
+                Text(
+                  'Description',
+                  style: TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  task.description.trim().isEmpty ? 'No description.' : task.description,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Status',
+                  style: TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 8),
                 ...statuses.map((status) {
                   final isCurrent = task.status.label == status;
                   return ListTile(
+                    contentPadding: EdgeInsets.zero,
                     title: Text(
                       status,
                       style: TextStyle(
@@ -153,10 +186,11 @@ class ProjectDetailsView extends StatelessWidget {
                     ),
                     trailing: isCurrent ? const Icon(Icons.check_circle, color: AppColors.accent) : null,
                     onTap: () {
-                      // Call our provider method!
-                      context.read<ProjectProvider>().updateTaskStatus(projectId, task.id, TaskStatus.fromString(status));
-                      
-                      // Close the bottom sheet
+                      context.read<ProjectProvider>().updateTaskStatus(
+                            projectId,
+                            task.id,
+                            TaskStatus.fromString(status),
+                          );
                       Navigator.pop(bottomSheetContext);
                     },
                   );
