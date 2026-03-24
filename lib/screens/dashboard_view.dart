@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import 'package:provider/provider.dart';
+import '../providers/project_provider.dart';
 
 class DashboardView extends StatelessWidget {
   const DashboardView({super.key});
@@ -375,12 +377,9 @@ class DashboardView extends StatelessWidget {
     );
   }
 
-  Widget _buildProjectsSection(BuildContext context) {
-    final projects = [
-      ("Web Platform", 0.75),
-      ("Mobile App", 0.45),
-      ("API Integration", 0.90),
-    ];
+Widget _buildProjectsSection(BuildContext context) {
+    // 1. LISTEN TO THE PROVIDER
+    final provider = context.watch<ProjectProvider>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,24 +395,30 @@ class DashboardView extends StatelessWidget {
                     color: AppColors.textPrimary,
                   ),
             ),
-            TextButton(
-              onPressed: () {},
+           TextButton(
+              onPressed: () {
+                // TODO: Later we will add logic here to jump to the Projects Tab (Index 1)
+              },
               child: Text(
                 "See all",
-                style: TextStyle(
-                  color: AppColors.accent,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w500),
               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        ...projects.map((p) => _buildProjectTile(
-              context,
-              name: p.$1,
-              progress: p.$2,
-            )),
+        
+        // 2. SHOW LOADING SPINNER OR REAL DATA
+        if (provider.isLoading)
+          const Center(child: CircularProgressIndicator())
+        else if (provider.projects.isEmpty)
+          const Center(child: Text("No projects found", style: TextStyle(color: AppColors.textMuted)))
+        else
+          ...provider.projects.map((p) => _buildProjectTile(
+                context,
+                name: p.title, // USING REAL DATA!
+                progress: p.completionPercentage, // USING REAL DATA!
+              )),
       ],
     );
   }

@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'screens/main_navigation_screen.dart';
 import 'theme/app_colors.dart';
+import 'providers/project_provider.dart';
 
 void main() {
-  runApp(const TimePlannerApp());
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => ProjectProvider())],
+      child: const TimePlannerApp(),
+    ),
+  );
 }
 
 class TimePlannerApp extends StatelessWidget {
@@ -23,7 +30,7 @@ class TimePlannerApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.background,
         navigationBarTheme: NavigationBarThemeData(
           backgroundColor: AppColors.cardBg,
-          indicatorColor: Colors.transparent,
+          indicatorColor: AppColors.transparent,
           iconTheme: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
               return const IconThemeData(color: AppColors.navSelected);
