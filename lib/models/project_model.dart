@@ -35,20 +35,20 @@ class ProjectModel {
   final String id;
   final String title;
   final String description;
-  final ProjectStatus status;
   final int budgetHours;
-  final int consumedHours;
-  final double completionPercentage;
-  final List<TaskModel> tasks; // NEW FIELD!
+  final List<TaskModel> tasks;
+  ProjectStatus status;
+  double consumedHours;
+  double completionPercentage;
 
   ProjectModel({
     required this.id,
     required this.title,
     required this.description,
-    required this.status,
     required this.budgetHours,
-    required this.consumedHours,
-    required this.completionPercentage,
-    required this.tasks, // NEW FIELD!
+    required this.tasks,
+    this.status = ProjectStatus.Unknown,
+    this.completionPercentage = 0, // TODO: Mudar depois para final quando tiver a chamada para o backend
+    this.consumedHours = 0, // TODO: Mudar depois para final quando tiver a chamada para o backend
   });
 }

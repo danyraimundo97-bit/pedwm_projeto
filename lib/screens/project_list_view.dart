@@ -177,15 +177,16 @@ class ProjectListView extends StatelessWidget {
                   color: AppColors.textMuted,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  "${p.tasks.where((t) => t.status == TaskStatus.Completed).length} / ${p.tasks.length} Tasks", // DADO REAL
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                Expanded(
+                  child: Text(
+                    "${p.consumedHours} / ${p.budgetHours} h · ${p.tasks.where((t) => t.status == TaskStatus.Completed).length} / ${p.tasks.length} tasks",
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ),
-                const Spacer(),
                 Text(
-                  "${(p.completionPercentage * 100).round()}%", // DADO REAL
+                  "${(p.completionPercentage * 100).round()}%",
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.accent,

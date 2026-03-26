@@ -54,6 +54,7 @@ class TaskModel {
   final TaskStatus status;
   final TaskType type;
   final int estimate; // Story points or hours
+  final int loggedHours;
   final String? severity;
 
   TaskModel({
@@ -63,6 +64,7 @@ class TaskModel {
     required this.status,
     required this.type,
     required this.estimate,
+    this.loggedHours = 0,
     this.severity,
   });
 
@@ -73,6 +75,7 @@ class TaskModel {
     TaskStatus? status,
     TaskType? type,
     int? estimate,
+    int? loggedHours,
     String? severity,
   }) {
     return TaskModel(
@@ -82,6 +85,7 @@ class TaskModel {
       status: status ?? this.status,
       type: type ?? this.type,
       estimate: estimate ?? this.estimate,
+      loggedHours: loggedHours ?? this.loggedHours,
       severity: severity ?? this.severity,
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dashboard_view.dart';
+import 'monthly_hours_view.dart';
 import 'project_list_view.dart';
-import 'report_time_view.dart';
 import '../theme/app_colors.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -14,16 +14,14 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
 
-  // These are our "Dummy" screens
   final List<Widget> _screens = [
     const DashboardView(),
     const ProjectListView(),
-    const ReportTimeView(),
+    const MonthlyHoursView(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final isDashboard = _currentIndex == 0;
     return Scaffold(
       body: _screens[_currentIndex],
         backgroundColor: AppColors.background,
@@ -40,12 +38,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           NavigationDestination(
             icon: Icon(Icons.folder_outlined),
             selectedIcon: Icon(Icons.folder),
-            label: "Projects"
+            label: "Projects",
           ),
           NavigationDestination(
-            icon: Icon(Icons.add_task_outlined),
-            selectedIcon: Icon(Icons.add_task),
-            label: "Report")
+            icon: Icon(Icons.calendar_month_outlined),
+            selectedIcon: Icon(Icons.calendar_month),
+            label: "Hours",
+          ),
         ],
       ),
     );
