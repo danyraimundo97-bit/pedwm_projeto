@@ -38,5 +38,8 @@
                 File.AppendAllText(_logFilePath, logEntry);
             }
         }
+
+        //TODO: Poderíamos adicionar métodos adicionais para diferentes níveis de log (ex: LogInfo, LogWarning, LogError) e incluir mais detalhes (ex: stack trace para erros)
+        //TODO: Poderíamos implementar uma rotação de ficheiros para evitar que o ficheiro de log cresça indefinidamente (ex: criar um novo ficheiro a cada dia ou quando atingir um certo tamanho)
     }
 }

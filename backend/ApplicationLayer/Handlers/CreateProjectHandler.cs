@@ -30,6 +30,11 @@ namespace ApplicationLayer.Handlers
             // Criar o projeto (Usa a Factory e o Builder)
             var project = _factory.CreateFromCommand(command);
 
+            //TODO: Criar service e passar a lógica de criação para lá, para manter o Handler mais limpo e focado apenas em orquestrar as chamadas
+            //TODO: Dentro do service, poderíamos adicionar validações adicionais (ex: verificar se as datas são válidas, se o gestor existe, etc) e lançar exceções específicas para cada tipo de erro, que o Handler poderia capturar e tratar de forma adequada (ex: devolver mensagens de erro claras para o cliente)
+            //TODO: Poderíamos também adicionar logging detalhado dentro do service para acompanhar o processo de criação do projeto (ex: início, validações, sucesso, falhas)
+            //TODO: Poderíamos implementar uma abordagem de Domain Events, onde o projeto emitiria um evento "ProjectCreated" após ser criado, e um handler separado para esse evento seria responsável por enviar a notificação, desacoplando ainda mais as responsabilidades
+
             // Guardar na Base de Dados (Repository)
             await _repository.SaveAsync(project);
 
