@@ -56,6 +56,8 @@ class TaskModel {
   final int estimate; // Story points or hours
   final int loggedHours;
   final String? severity;
+  /// When null, task is unassigned (PM/Admin dashboards show backlog).
+  final String? assigneeUserId;
 
   TaskModel({
     required this.id,
@@ -66,6 +68,7 @@ class TaskModel {
     required this.estimate,
     this.loggedHours = 0,
     this.severity,
+    this.assigneeUserId,
   });
 
   TaskModel copyWith({
@@ -77,6 +80,8 @@ class TaskModel {
     int? estimate,
     int? loggedHours,
     String? severity,
+    String? assigneeUserId,
+    bool updateAssignee = false,
   }) {
     return TaskModel(
       id: id ?? this.id,
@@ -87,6 +92,7 @@ class TaskModel {
       estimate: estimate ?? this.estimate,
       loggedHours: loggedHours ?? this.loggedHours,
       severity: severity ?? this.severity,
+      assigneeUserId: updateAssignee ? assigneeUserId : (assigneeUserId ?? this.assigneeUserId),
     );
   }
 }

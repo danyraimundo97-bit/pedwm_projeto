@@ -4,21 +4,56 @@ import 'package:provider/provider.dart';
 import '../models/hours_log_entry.dart';
 import '../providers/project_provider.dart';
 import '../theme/app_colors.dart';
+import '../widgets/month_tasks_dialog.dart';
 
 /// Monthly overview: tap a month to see tasks with hours logged.
 class MonthlyHoursView extends StatefulWidget {
   const MonthlyHoursView({super.key});
+
   @override
   State<MonthlyHoursView> createState() => _MonthlyHoursViewState();
 }
+
 class _MonthlyHoursViewState extends State<MonthlyHoursView> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      context.read<ProjectProvider>().loadMonthlyHoursStats();
+      await context.read<ProjectProvider>().loadMonthlyHoursStats();
+      if (!mounted) return;
+      final err = context.read<ProjectProvider>().monthlyStatsError;
+      if (err != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(err)),
+        );
+      }
     });
+  }
+
+  Future<void> _onRefresh() async {
+    await context.read<ProjectProvider>().loadMonthlyHoursStats();
+    if (!mounted) return;
+    final err = context.read<ProjectProvider>().monthlyStatsError;
+    if (err != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+    }
+  }
+
+  void _openMonthTasksDialog(BuildContext context, DateTime month, String monthLabel) {
+    final future = context.read<ProjectProvider>().loadMonthDetailForDialog(month);
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => MonthTasksDialog(
+        monthLabel: monthLabel,
+        future: future,
+      ),
+    );
+  }
+
+  String _capitalize(String s) {
+    if (s.isEmpty) return s;
+    return s[0].toUpperCase() + s.substring(1);
   }
 
   @override
@@ -31,176 +66,102 @@ class _MonthlyHoursViewState extends State<MonthlyHoursView> {
       color: AppColors.background,
       child: SafeArea(
         top: false,
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Hours by month',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Projects and tasks where you logged time — tap a month for details',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (provider.isLoading)
-              const SliverFillRemaining(
-                child: Center(
-                  child: CircularProgressIndicator(color: AppColors.accent),
-                ),
-              )
-            else if (stats.isEmpty)
-              SliverFillRemaining(
-                child: Center(
-                  child: Text(
-                    'No time entries yet.',
-                    style: TextStyle(color: AppColors.textMuted),
-                  ),
-                ),
-              )
-            else
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final row = stats[index];
-                      final label = _capitalize(monthFmt.format(row.month));
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _MonthCard(
-                          label: label,
-                          stats: row,
-                          onTap: () => _openMonthTasksDialog(context, row.month, label),
-                        ),
-                      );
-                    },
-                    childCount: stats.length,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _capitalize(String s) {
-    if (s.isEmpty) return s;
-    return s[0].toUpperCase() + s.substring(1);
-  }
-
-  Future<void> _openMonthTasksDialog(BuildContext context, DateTime month, String monthLabel) async {
-    final provider = context.read<ProjectProvider>();
-    await provider.loadTaskHoursBreakdownForMonth(month);
-    if (!context.mounted) return;
-
-    final rows = provider.taskHoursBreakdownForMonth;
-
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: AppColors.cardBg,
-          surfaceTintColor: Colors.transparent,
-          title: Text(
-            monthLabel,
-            style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
-          ),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: rows.isEmpty
-                ? const Text(
-                    'No tasks for this month.',
-                    style: TextStyle(color: AppColors.textSecondary),
-                  )
-                : ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 360),
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemCount: rows.length,
-                      separatorBuilder: (context, index) => Divider(
-                        height: 1,
-                        color: AppColors.textMuted.withValues(alpha: 0.25),
+        child: RefreshIndicator(
+          color: AppColors.accent,
+          onRefresh: _onRefresh,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hours by month',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
                       ),
-                      itemBuilder: (context, i) {
-                        final r = rows[i];
-                        return _TaskHoursRow(row: r);
-                      },
+                      const SizedBox(height: 4),
+                      Text(
+                        'Projects and tasks where you logged time — tap a month for details',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (provider.monthlyStatsError != null && !provider.isLoadingMonthlyStats)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Material(
+                      color: AppColors.error.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline, color: AppColors.error, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                provider.monthlyStatsError!,
+                                style: const TextStyle(color: AppColors.error, fontSize: 13),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _TaskHoursRow extends StatelessWidget {
-  final TaskHoursInMonth row;
-
-  const _TaskHoursRow({required this.row});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  row.taskTitle,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
+                ),
+              if (provider.isLoadingMonthlyStats && stats.isEmpty)
+                const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(color: AppColors.accent),
+                  ),
+                )
+              else if (!provider.isLoadingMonthlyStats && stats.isEmpty)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      provider.monthlyStatsError != null
+                          ? 'Pull down to retry.'
+                          : 'No time entries yet.',
+                      style: const TextStyle(color: AppColors.textMuted),
+                    ),
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final row = stats[index];
+                        final label = _capitalize(monthFmt.format(row.month));
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _MonthCard(
+                            label: label,
+                            stats: row,
+                            onTap: () => _openMonthTasksDialog(context, row.month, label),
+                          ),
+                        );
+                      },
+                      childCount: stats.length,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  row.projectTitle,
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
-          const SizedBox(width: 8),
-          Text(
-            '${row.hours} h',
-            style: const TextStyle(
-              color: AppColors.accent,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
