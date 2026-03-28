@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../models/task_model.dart';
+import '../providers/auth_provider.dart';
 import '../providers/project_provider.dart';
 import '../theme/app_colors.dart';
 
-/// Opens the task detail sheet (description, log hours, status).
+/// Opens the task detail sheet (description, assignee, log hours, status).
 Future<void> showTaskDetailBottomSheet(
   BuildContext context, {
   required String projectId,
@@ -65,8 +66,8 @@ class _TaskDetailBottomSheetState extends State<TaskDetailBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ProjectProvider>(
-      builder: (context, provider, _) {
+    return Consumer2<ProjectProvider, AuthProvider>(
+      builder: (context, provider, auth, _) {
         final projectIndex = provider.projects.indexWhere((p) => p.id == widget.projectId);
         if (projectIndex == -1) return const SizedBox.shrink();
         final project = provider.projects[projectIndex];
@@ -74,6 +75,7 @@ class _TaskDetailBottomSheetState extends State<TaskDetailBottomSheet> {
         if (taskIndex == -1) return const SizedBox.shrink();
         final task = project.tasks[taskIndex];
         final statuses = TaskStatus.labels;
+        final assigneeLabel = _assigneeDisplayName(auth, task.assigneeUserId);
 
         final bottomInset = MediaQuery.paddingOf(context).bottom;
 
@@ -110,6 +112,56 @@ class _TaskDetailBottomSheetState extends State<TaskDetailBottomSheet> {
                     height: 1.4,
                   ),
                 ),
+                const SizedBox(height: 24),
+                Text(
+                  'Assignee',
+                  style: TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (auth.canManageProjectsAndTasks)
+                  DropdownButtonFormField<String?>(
+                    value: task.assigneeUserId,
+                    dropdownColor: AppColors.cardBgLighter,
+                    style: const TextStyle(color: AppColors.textPrimary),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: AppColors.cardBgLighter,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    ),
+                    items: [
+                      const DropdownMenuItem<String?>(
+                        value: null,
+                        child: Text('Unassigned', style: TextStyle(color: AppColors.textPrimary)),
+                      ),
+                      ...auth.users.map(
+                        (u) => DropdownMenuItem<String?>(
+                          value: u.id,
+                          child: Text(u.name, style: const TextStyle(color: AppColors.textPrimary)),
+                        ),
+                      ),
+                    ],
+                    onChanged: (id) {
+                      context.read<ProjectProvider>().updateTaskAssignee(
+                            widget.projectId,
+                            widget.taskId,
+                            id,
+                          );
+                    },
+                  )
+                else
+                  Text(
+                    assigneeLabel,
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                  ),
                 const SizedBox(height: 24),
                 Text(
                   'Logged time',
@@ -195,5 +247,13 @@ class _TaskDetailBottomSheetState extends State<TaskDetailBottomSheet> {
         );
       },
     );
+  }
+
+  static String _assigneeDisplayName(AuthProvider auth, String? userId) {
+    if (userId == null) return 'Unassigned';
+    for (final u in auth.users) {
+      if (u.id == userId) return u.name;
+    }
+    return 'Unknown user';
   }
 }

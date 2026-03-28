@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pedwm_projeto/models/task_model.dart';
-import 'package:provider/provider.dart'; // Importar o Provider
+import 'package:provider/provider.dart';
 import '../theme/app_colors.dart';
-import '../providers/project_provider.dart'; // Importar o teu Provider
-import '../models/project_model.dart'; // Importar o Modelo
+import '../providers/auth_provider.dart';
+import '../providers/project_provider.dart';
+import '../models/project_model.dart';
+import 'create_project_view.dart';
 import 'project_details_view.dart';
 
 class ProjectListView extends StatelessWidget {
@@ -12,76 +14,118 @@ class ProjectListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ProjectProvider>();
+    final auth = context.watch<AuthProvider>();
 
-    return Container(
-      color: AppColors.background,
-      child: SafeArea(
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      floatingActionButton: auth.canManageProjectsAndTasks
+          ? FloatingActionButton(
+              onPressed: () => Navigator.push<void>(
+                    context,
+                    MaterialPageRoute<void>(builder: (_) => const CreateProjectView()),
+                  ),
+              backgroundColor: AppColors.accent,
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : null,
+      body: SafeArea(
         top: false,
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Projects",
-                      style: Theme.of(context).textTheme.headlineMedium
-                          ?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Your active projects",
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
+        child: RefreshIndicator(
+          color: AppColors.accent,
+          onRefresh: () async {
+            await provider.refreshProjects();
+            if (context.mounted && provider.projectsError != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(provider.projectsError!)),
+              );
+            }
+          },
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Projects",
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Your active projects",
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (provider.projectsError != null && !provider.isLoadingProjects)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Material(
+                      color: AppColors.error.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline, color: AppColors.error, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                provider.projectsError!,
+                                style: const TextStyle(color: AppColors.error, fontSize: 13),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-
-            // 2. MOSTRAR LOADING, LISTA VAZIA, OU OS DADOS REAIS
-            if (provider.isLoading)
-              const SliverFillRemaining(
-                child: Center(
-                  child: CircularProgressIndicator(color: AppColors.accent),
-                ),
-              )
-            else if (provider.projects.isEmpty)
-              SliverFillRemaining(
-                child: Center(
-                  child: Text(
-                    "No projects found",
-                    style: TextStyle(color: AppColors.textMuted),
                   ),
                 ),
-              )
-            else
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      // Ir buscar o projeto exato à lista
-                      final project = provider.projects[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        // Passar o modelo real para o cartão
-                        child: _buildProjectCard(context, project),
-                      );
-                    },
-                    childCount: provider
-                        .projects
-                        .length, // Usar o tamanho real da lista!
+              if (provider.isLoadingProjects && provider.projects.isEmpty)
+                const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(color: AppColors.accent),
+                  ),
+                )
+              else if (!provider.isLoadingProjects && provider.projects.isEmpty)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      provider.projectsError != null ? 'Pull down to retry.' : 'No projects found',
+                      style: const TextStyle(color: AppColors.textMuted),
+                    ),
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final project = provider.projects[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: _buildProjectCard(context, project),
+                        );
+                      },
+                      childCount: provider.projects.length,
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -114,7 +158,7 @@ class ProjectListView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withOpacity(0.2),
+                    color: AppColors.accent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -155,7 +199,7 @@ class ProjectListView extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withOpacity(0.2),
+                    color: AppColors.accent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -186,7 +230,7 @@ class ProjectListView extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "${(p.completionPercentage * 100).round()}%",
+                  "${(p.completionPercentage.clamp(0, 1) * 100).round()}%",
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.accent,
@@ -198,7 +242,7 @@ class ProjectListView extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
-                value: p.completionPercentage, // DADO REAL
+                value: p.completionPercentage.clamp(0, 1),
                 minHeight: 8,
                 backgroundColor: AppColors.cardBgLighter,
                 valueColor: const AlwaysStoppedAnimation<Color>(

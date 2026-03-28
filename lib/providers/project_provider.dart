@@ -1,187 +1,129 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../models/hours_log_entry.dart';
 import '../models/project_model.dart';
 import '../models/task_model.dart';
-
+import '../data/repositories/task_repository.dart';
+import '../data/repositories/project_repository.dart';
 
 class ProjectProvider extends ChangeNotifier {
   List<ProjectModel> _projects = [];
   final List<HoursLogEntry> _hoursLog = [];
   List<MonthlyHoursStats> _monthlyStats = [];
   List<TaskHoursInMonth> _taskHoursBreakdownForMonth = [];
-  bool _isLoading = true;
+
+  bool _isLoadingProjects = true;
+  bool _isLoadingMonthlyStats = false;
+  int _monthDetailGen = 0;
+
+  String? _projectsError;
+  String? _monthlyStatsError;
 
   List<ProjectModel> get projects => _projects;
-  bool get isLoading => _isLoading;
 
-  //Retrieves the list of months with the hours logged in each month and sorts them by month descending (most recent first).
+  /// Initial / projects tab loading.
+  bool get isLoadingProjects => _isLoadingProjects;
+
+  /// Hours-by-month tab loading.
+  bool get isLoadingMonthlyStats => _isLoadingMonthlyStats;
+
+  /// Last error from [fetchProjectsFromBackend] / [refreshProjects].
+  String? get projectsError => _projectsError;
+
+  /// Last error from [loadMonthlyHoursStats].
+  String? get monthlyStatsError => _monthlyStatsError;
+
   List<MonthlyHoursStats> get monthlyHoursStats => _monthlyStats;
-  //Retrieves the list of tasks with the hours logged in each month and sorts them by month descending (most recent first).
   List<TaskHoursInMonth> get taskHoursBreakdownForMonth => _taskHoursBreakdownForMonth;
 
-  //Loads the list of months with the hours logged in each month and sorts them by month descending (most recent first).
-  Future<void> loadMonthlyHoursStats() async {
-    _isLoading = true;
-    notifyListeners();
-    _monthlyStats = await fetchMonthlyHoursStatsFromBackend();
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  Future<List<MonthlyHoursStats>> fetchMonthlyHoursStatsFromBackend() async {
-// TODO: mudar para ser uma chamada para o backend
-    // Simulate network delay (2 seconds)
-    await Future.delayed(const Duration(seconds: 2)); 
-    return [
-      MonthlyHoursStats(
-        month: DateTime.now(),
-        projectCount: 2,
-        taskCount: 4,
-        totalHours: 20,
-      ),
-      MonthlyHoursStats(
-        month: DateTime.now().subtract(const Duration(days: 30)),
-        projectCount: 6,
-        taskCount: 14,
-        totalHours: 40,
-      ),
-      MonthlyHoursStats(
-        month: DateTime.now().subtract(const Duration(days: 60)),
-        projectCount: 6,
-        taskCount: 10,
-        totalHours: 40,
-      ),
-    ];
-  }
-
-  /// Loads task breakdown for one month. Does not toggle [isLoading] so the
-  /// monthly list is not replaced by a full-screen spinner while fetching.
-  Future<void> loadTaskHoursBreakdownForMonth(DateTime month) async {
-    _taskHoursBreakdownForMonth = await fetchTaskHoursBreakdownForMonthFromBackend(month);
-    notifyListeners();
-  }
-
-  Future<List<TaskHoursInMonth>> fetchTaskHoursBreakdownForMonthFromBackend(DateTime month) async {
-
-    await Future.delayed(const Duration(seconds: 2)); // TODO: mudar para ser uma chamada para o backend
-
-    return [
-      TaskHoursInMonth(
-        projectTitle: "Project 1",
-        taskTitle: "Task 1",
-        hours: 10,
-      ),
-      TaskHoursInMonth(
-        projectTitle: "Project 2",
-        taskTitle: "Task 2",
-        hours: 20,
-      ),
-      TaskHoursInMonth(
-        projectTitle: "Project 3",
-        taskTitle: "Task 3",
-        hours: 30,
-      ),
-    ];
-  }
-  // Constructor automatically fetches data when the app starts
   ProjectProvider() {
-    fetchProjectsFromBackend();
+    fetchProjects();
   }
 
-  // Simulating a GraphQL fetch from your C# Backend
-  Future<void> fetchProjectsFromBackend() async {
-    _isLoading = true;
-    notifyListeners(); // Tells the UI to show a loading spinner
-
-    // Simulate network delay (2 seconds)
-    await Future.delayed(const Duration(seconds: 2));
-
-    // Dummy data acting as our GraphQL response
-    _projects = [
-      ProjectModel(
-        id: '1',
-        title: "Web Platform",
-        description: "GraphQL Integration",
-        status: ProjectStatus.fromString("Active"),
-        budgetHours: 50,
-        consumedHours: 0,
-        completionPercentage: 0,
-        tasks: [
-          TaskModel(
-            id: 't2',
-            title: "Fix Login Crash",
-            description:
-                "App crashes on login when the session cookie is expired. Reproduce: cold start, tap Login with saved credentials.",
-            status: TaskStatus.fromString("ToDo"),
-            type: TaskType.fromString("Bug"),
-            estimate: 3,
-            loggedHours: 20,
-            severity: "Critical",
-          ),
-          TaskModel(
-            id: 't5',
-            title: "Typo in Settings",
-            description:
-                "Settings > About shows 'Ver': fix label to 'Version'.",
-            status: TaskStatus.fromString("Active"),
-            type: TaskType.fromString("Bug"),
-            estimate: 1,
-            loggedHours: 12,
-            severity: "Low",
-          ),
-        ],
-      ),
-      ProjectModel(
-        id: '2',
-        title: "Mobile App v2",
-        description: "Native features",
-        status: ProjectStatus.fromString("Active"),
-        budgetHours: 40,
-        completionPercentage: 0,
-        tasks: [
-          TaskModel(
-            id: 't3',
-            title: "Update Flutter SDK",
-            description:
-                "Bump to stable 3.x, run flutter pub upgrade, fix deprecations in android/ios configs.",
-            status: TaskStatus.fromString("Completed"),
-            type: TaskType.fromString("Feature"),
-            estimate: 5,
-            loggedHours: 10,
-          ),
-          TaskModel(
-            id: 't4',
-            title: "Profile Image Upload",
-            description:
-                "Allow picking from gallery or camera, crop to square, upload via GraphQL mutation with progress.",
-            status: TaskStatus.fromString("Active"),
-            type: TaskType.fromString("Feature"),
-            estimate: 13,
-            loggedHours: 8,
-          ),
-        ],
-      ),
-    ]; // TODO: mudar para ser uma chamada para o backend (timeEntries)
-    _isLoading = false;
-    notifyListeners(); // Tells the UI: "Data is here, redraw!"
+  Future<void> loadMonthlyHoursStats() async {
+    _isLoadingMonthlyStats = true;
+    _monthlyStatsError = null;
+    notifyListeners();
+    try {
+      _monthlyStats = await fetchMonthlyHoursStatsFromBackend();
+    } catch (e, st) {
+      _monthlyStatsError = _formatError(e);
+      debugPrint('loadMonthlyHoursStats: $e\n$st');
+    } finally {
+      _isLoadingMonthlyStats = false;
+      notifyListeners();
+    }
   }
 
+  /// Loads month task rows for dialogs; ignores stale responses when [month] changes quickly.
+  Future<List<TaskHoursInMonth>> loadMonthDetailForDialog(DateTime month) async {
+    final gen = ++_monthDetailGen;
+    try {
+      final list = await fetchTaskHoursBreakdownForMonthFromBackend(month);
+      if (gen != _monthDetailGen) {
+        return const [];
+      }
+      _taskHoursBreakdownForMonth = list;
+      notifyListeners();
+      return list;
+    } catch (e, st) {
+      if (gen != _monthDetailGen) rethrow;
+      debugPrint('loadMonthDetailForDialog: $e\n$st');
+      rethrow;
+    }
+  }
 
-  void updateTaskStatus(String projectId, String taskId, TaskStatus newStatus) {
+  Future<void> fetchProjects() async {
+    _isLoadingProjects = true;
+    _projectsError = null;
+    notifyListeners();
+    try {
+      _projects = await fetchProjectsFromBackend();
+      dummyUpdateProjects();
+    } catch (e, st) {
+      _projectsError = _formatError(e);
+      debugPrint('fetchProjectsFromBackend: $e\n$st');
+    } finally {
+      _isLoadingProjects = false;
+      notifyListeners();
+    }
+  }
+
+  /// Pull-to-refresh on Projects tab.
+  Future<void> refreshProjects() async {
+    await fetchProjectsFromBackend();
+  }
+
+  String _formatError(Object e) {
+    if (e is Exception) return e.toString().replaceFirst('Exception: ', '');
+    return e.toString();
+  }
+
+  void updateTaskStatus(String projectId, String taskId, TaskStatus newStatus) async {
     final projectIndex = _projects.indexWhere((p) => p.id == projectId);
     if (projectIndex == -1) return;
 
     final project = _projects[projectIndex];
-    //Isto é dummy para testar a UI, depois deve ser uma chamada para o backend
     final taskIndex = project.tasks.indexWhere((t) => t.id == taskId);
     if (taskIndex == -1) return;
 
     final updatedTask = project.tasks[taskIndex].copyWith(status: newStatus);
-
     project.tasks[taskIndex] = updatedTask;
+    await updateTaskStatusInBackend(projectId, taskId, newStatus);
+    notifyListeners();
+  }
 
-    // TO DO: fazer a chamada para o backend
-
+  void updateTaskAssignee(String projectId, String taskId, String? assigneeUserId) async {
+    final projectIndex = _projects.indexWhere((p) => p.id == projectId);
+    if (projectIndex == -1) return;
+    final project = _projects[projectIndex];
+    final taskIndex = project.tasks.indexWhere((t) => t.id == taskId);
+    if (taskIndex == -1) return;
+    project.tasks[taskIndex] = project.tasks[taskIndex].copyWith(
+      updateAssignee: true,
+      assigneeUserId: assigneeUserId,
+    );
+    await updateTaskAssigneeInBackend(projectId, taskId, assigneeUserId);
     notifyListeners();
   }
 
@@ -208,22 +150,68 @@ class ProjectProvider extends ChangeNotifier {
       ),
     );
 
-    // TODO: fazer a chamada para o backend
     dummyUpdateProjects();
-    //fetchProjectsFromBackend();
     notifyListeners();
   }
 
+//remove this function when the API is implemented
   void dummyUpdateProjects() {
-    _projects.forEach((project) {
-      project.consumedHours = project.tasks.fold(0, (sum, task) => sum + task.loggedHours);
-      project.completionPercentage = (project.consumedHours / project.budgetHours) * 100;
-      if (project.completionPercentage > 100) {
-        project.completionPercentage = 100;
-      }
-      if (project.completionPercentage < 0) {
-        project.completionPercentage = 0;
-      }
-    });
+    for (final project in _projects) {
+      project.consumedHours = project.tasks.fold<double>(0, (sum, task) => sum + task.loggedHours);
+      final cap = project.budgetHours == 0 ? 1 : project.budgetHours;
+      project.completionPercentage = (project.consumedHours / cap).clamp(0, 1);
+    }
+  }
+
+  void addProject ({
+    required String title,
+    required String description,
+    required int budgetHours,
+  }) async {
+    final id = 'p${DateTime.now().millisecondsSinceEpoch}';
+    //TODO: Remove this logic when the API is implemented
+    _projects.add(
+      ProjectModel(
+        id: id,
+        title: title,
+        description: description,
+        budgetHours: budgetHours,
+        tasks: [],
+        status: ProjectStatus.Active,
+        consumedHours: 0,
+        completionPercentage: 0,
+      ),
+    );
+    await createProjectInBackend(title, description, budgetHours);
+    notifyListeners();
+  }
+
+  void addTask({
+    required String projectId,
+    required String title,
+    required String description,
+    required int estimate,
+    required TaskType type,
+    String? severity,
+    String? assigneeUserId,
+  }) async {
+    //TODO: Remove this logic when the API is implemented
+    final projectIndex = _projects.indexWhere((p) => p.id == projectId);
+    if (projectIndex == -1) return;
+    final taskId = 't${DateTime.now().millisecondsSinceEpoch}';
+    final task = TaskModel(
+      id: taskId,
+      title: title,
+      description: description,
+      status: TaskStatus.ToDo,
+      type: type,
+      estimate: estimate,
+      loggedHours: 0,
+      severity: severity,
+      assigneeUserId: assigneeUserId,
+    );
+    _projects[projectIndex].tasks.add(task);
+    await createTaskInBackend(projectId, title, description, estimate, type, severity, assigneeUserId);
+    notifyListeners();
   }
 }
