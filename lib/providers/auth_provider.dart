@@ -1,85 +1,73 @@
 import 'package:flutter/foundation.dart';
 import '../models/app_user.dart';
-import '../models/team_model.dart';
 import '../models/user_role.dart';
+import '../data/repositories/users_repository.dart' as user_repo;
 
-/// Session + directory (replace with API + real auth).
+/// Session: current user, sign-in/out, permissions derived from [currentUser].
 class AuthProvider extends ChangeNotifier {
-  // TODO: Remover o usuario mock e substituir pela API
-  AppUser _currentUser = const AppUser(
-    id: 'u1',
-    name: 'Jay Majors',
-    email: 'jay@example.com',
-    role: UserRole.projectManager,
-  );
-// TODO: Remover os usuarios mock e substituir pela API
-  final List<AppUser> _users = [
-    const AppUser(id: 'u1', name: 'Jay Majors', email: 'jay@example.com', role: UserRole.projectManager),
-    const AppUser(id: 'u2', name: 'Alex Dev', email: 'alex@example.com', role: UserRole.member),
-    const AppUser(id: 'u3', name: 'Sam Admin', email: 'sam@example.com', role: UserRole.admin),
-  ];
+  AppUser? _currentUser;
 
-// TODO: Remover os teams mock e substituir pela API
-  final List<TeamModel> _teams = [
-    TeamModel(id: 'team1', name: 'Platform Squad', memberUserIds: ['u1', 'u2']),
-  ];
+  /// True while the initial session / [fetchCurrentUser] is in progress.
+  bool _isSessionLoading = true;
 
-  AppUser get currentUser => _currentUser;
-  List<AppUser> get users => List.unmodifiable(_users);
-  List<TeamModel> get teams => List.unmodifiable(_teams);
+  /// Set when session fetch fails (e.g. network); shown on login screen.
+  String? _sessionError;
 
-  bool get isAdmin => _currentUser.role == UserRole.admin;
-  bool get isProjectManager => _currentUser.role == UserRole.projectManager;
+  /// Current user when signed in; null before load completes or after sign-out / failed session.
+  AppUser? get currentUser => _currentUser;
+
+  /// Signed-in user. Only use when [isAuthenticated] is true (e.g. below the session gate).
+  AppUser get user => _currentUser!;
+
+  /// False until the first [fetchCurrentUser] attempt finishes (success or failure).
+  bool get isSessionReady => !_isSessionLoading;
+
+  /// True when [fetchCurrentUser] completed with a user. False if still loading, failed, or signed out.
+  bool get isAuthenticated => _currentUser != null;
+
+  String? get sessionError => _sessionError;
+
+  bool get isAdmin => _currentUser?.role == UserRole.admin;
+  bool get isProjectManager => _currentUser?.role == UserRole.projectManager;
 
   bool get canCreateUsers => isAdmin;
   bool get canCreateTeams => isAdmin;
   bool get canManageProjectsAndTasks => isAdmin || isProjectManager;
   bool get canAddTeamMembers => isAdmin || isProjectManager;
 
+  AuthProvider() {
+    fetchCurrentUser();
+  }
+
 //DEV ONLY
 //This function is used to set the role of the current user for the demo purposes
   void setDemoRole(UserRole role) {
-    _currentUser = _currentUser.copyWith(role: role);
+    final u = _currentUser;
+    if (u == null) return;
+    _currentUser = u.copyWith(role: role);
     notifyListeners();
   }
 
-  void registerUser({
-    required String name,
-    required String email,
-    UserRole role = UserRole.member,
-  }) {
-    final id = 'u${DateTime.now().millisecondsSinceEpoch}';
-    _users.add(AppUser(id: id, name: name, email: email, role: role));
-    dummyUpdateUsers();
+  /// Loads the current session from the backend (or clears it on failure).
+  Future<void> fetchCurrentUser() async {
+    _isSessionLoading = true;
+    _sessionError = null;
     notifyListeners();
+    try {
+      _currentUser = await user_repo.fetchCurrentUserFromBackend();
+    } catch (e, st) {
+      _currentUser = null;
+      _sessionError = e.toString();
+      debugPrint('fetchCurrentUser: $e\n$st');
+    } finally {
+      _isSessionLoading = false;
+      notifyListeners();
+    }
   }
 
-  void createTeam(String name) {
-    final id = 'team${DateTime.now().millisecondsSinceEpoch}';
-    _teams.add(TeamModel(id: id, name: name));
-    dummyUpdateTeams();
-  }
-
-  void addUserToTeam({required String teamId, required String userId}) {
-    final i = _teams.indexWhere((t) => t.id == teamId);
-    if (i == -1) return;
-    final t = _teams[i];
-    if (t.memberUserIds.contains(userId)) return;
-    _teams[i] = TeamModel(
-      id: t.id,
-      name: t.name,
-      memberUserIds: [...t.memberUserIds, userId],
-    );
-    dummyUpdateTeams();
-  }
-
-  void dummyUpdateUsers() {
-    //TODO: Implement the API call to update the users
-    notifyListeners();
-  }
-
-  void dummyUpdateTeams() {
-    //TODO: Implement the API call to update the teams
+  void signOut() {
+    _currentUser = null;
+    _sessionError = null;
     notifyListeners();
   }
 }

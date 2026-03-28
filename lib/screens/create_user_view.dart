@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/user_role.dart';
 import '../providers/auth_provider.dart';
+import '../providers/users_provider.dart';
 import '../theme/app_colors.dart';
 
 class CreateUserView extends StatefulWidget {
@@ -73,12 +74,12 @@ class _CreateUserViewState extends State<CreateUserView> {
             ),
             const Spacer(),
             FilledButton(
-              onPressed: () {
+              onPressed: () async {
                 final name = _name.text.trim();
                 final email = _email.text.trim();
                 if (name.isEmpty || email.isEmpty) return;
-                context.read<AuthProvider>().registerUser(name: name, email: email, role: _role);
-                Navigator.pop(context);
+                await context.read<UsersProvider>().registerUser(name: name, email: email, role: _role);
+                if (context.mounted) Navigator.pop(context);
               },
               child: const Text('Create user'),
             ),

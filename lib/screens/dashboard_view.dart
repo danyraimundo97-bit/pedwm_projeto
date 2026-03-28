@@ -4,6 +4,8 @@ import '../models/project_model.dart';
 import '../models/user_role.dart';
 import '../providers/auth_provider.dart';
 import '../providers/project_provider.dart';
+import '../providers/teams_provider.dart';
+import '../providers/users_provider.dart';
 import '../theme/app_colors.dart';
 import '../utils/dashboard_stats.dart';
 import '../widgets/dashboard_stat_card.dart';
@@ -18,10 +20,10 @@ class DashboardView extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
     final projectProvider = context.watch<ProjectProvider>();
     final projects = projectProvider.projects;
-    final role = auth.currentUser.role;
+    final role = auth.user.role;
     final stats = DashboardStats.compute(
       projects,
-      currentUserId: auth.currentUser.id,
+      currentUserId: auth.user.id,
     );
 
     return Container(
@@ -70,7 +72,7 @@ class _DashboardHeader {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  auth.currentUser.name,
+                  auth.user.name,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
@@ -84,7 +86,7 @@ class _DashboardHeader {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    auth.currentUser.role.label,
+                    auth.user.role.label,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: AppColors.accent,
                           fontWeight: FontWeight.w600,
@@ -156,6 +158,8 @@ class _PortfolioDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final users = context.watch<UsersProvider>();
+    final teams = context.watch<TeamsProvider>();
     final ratio = stats.completedTaskRatio.clamp(0.0, 1.0);
     final sum = stats.tasksInProgress + stats.tasksPending + stats.tasksOnHold;
     final double fIn = sum == 0 ? 1.0 : stats.tasksInProgress / sum;
@@ -234,7 +238,7 @@ class _PortfolioDashboard extends StatelessWidget {
         _ActiveProjectsCard(activeCount: stats.activeProjects),
         if (auth.isAdmin) ...[
           const SizedBox(height: 16),
-          _AdminOrgCard(users: auth.users.length, teams: auth.teams.length),
+          _AdminOrgCard(users: users.users.length, teams: teams.teams.length),
         ],
         const SizedBox(height: 16),
         _ProjectsSection(
@@ -258,7 +262,7 @@ class _MemberDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = context.watch<AuthProvider>().currentUser.id;
+    final uid = context.watch<AuthProvider>().user.id;
     final mine = projects.where((p) => p.tasks.any((t) => t.assigneeUserId == uid)).toList();
     final myRatio = (stats.myActiveTasks + stats.myPendingTasks) == 0
         ? 0.0

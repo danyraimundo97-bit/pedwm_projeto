@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/task_model.dart';
-import '../providers/auth_provider.dart';
+import '../providers/users_provider.dart';
 import '../theme/app_colors.dart';
 
 /// Task row on the project details screen.
@@ -18,8 +18,8 @@ class ProjectTaskTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isBug = task.type == TaskType.Bug;
-    final auth = context.watch<AuthProvider>();
-    final assigneeLabel = _assigneeLabel(auth, task.assigneeUserId);
+    final users = context.watch<UsersProvider>();
+    final assigneeLabel = _assigneeLabel(users, task.assigneeUserId);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -81,9 +81,9 @@ class ProjectTaskTile extends StatelessWidget {
     );
   }
 
-  static String _assigneeLabel(AuthProvider auth, String? userId) {
+  static String _assigneeLabel(UsersProvider users, String? userId) {
     if (userId == null) return 'Unassigned';
-    for (final u in auth.users) {
+    for (final u in users.users) {
       if (u.id == userId) return u.name;
     }
     return 'Unknown user';

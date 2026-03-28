@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/teams_provider.dart';
 import '../theme/app_colors.dart';
 
 class CreateTeamView extends StatefulWidget {
@@ -55,11 +56,11 @@ class _CreateTeamViewState extends State<CreateTeamView> {
             ),
             const Spacer(),
             FilledButton(
-              onPressed: () {
+              onPressed: () async {
                 final name = _name.text.trim();
                 if (name.isEmpty) return;
-                context.read<AuthProvider>().createTeam(name);
-                Navigator.pop(context);
+                await context.read<TeamsProvider>().createTeam(name);
+                if (context.mounted) Navigator.pop(context);
               },
               child: const Text('Create team'),
             ),

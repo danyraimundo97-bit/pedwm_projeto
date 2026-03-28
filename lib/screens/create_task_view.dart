@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/task_model.dart';
 import '../providers/auth_provider.dart';
 import '../providers/project_provider.dart';
+import '../providers/users_provider.dart';
 import '../theme/app_colors.dart';
 
 class CreateTaskView extends StatefulWidget {
@@ -32,6 +33,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final users = context.watch<UsersProvider>();
     if (!auth.canManageProjectsAndTasks) {
       return Scaffold(
         backgroundColor: AppColors.background,
@@ -93,7 +95,7 @@ class _CreateTaskViewState extends State<CreateTaskView> {
                   value: null,
                   child: Text('Unassigned'),
                 ),
-                ...auth.users.map(
+                ...users.users.map(
                   (u) => DropdownMenuItem<String?>(value: u.id, child: Text(u.name)),
                 ),
               ],

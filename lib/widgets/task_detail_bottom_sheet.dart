@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/task_model.dart';
 import '../providers/auth_provider.dart';
 import '../providers/project_provider.dart';
+import '../providers/users_provider.dart';
 import '../theme/app_colors.dart';
 
 /// Opens the task detail sheet (description, assignee, log hours, status).
@@ -66,8 +67,8 @@ class _TaskDetailBottomSheetState extends State<TaskDetailBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<ProjectProvider, AuthProvider>(
-      builder: (context, provider, auth, _) {
+    return Consumer3<ProjectProvider, AuthProvider, UsersProvider>(
+      builder: (context, provider, auth, users, _) {
         final projectIndex = provider.projects.indexWhere((p) => p.id == widget.projectId);
         if (projectIndex == -1) return const SizedBox.shrink();
         final project = provider.projects[projectIndex];
@@ -75,7 +76,7 @@ class _TaskDetailBottomSheetState extends State<TaskDetailBottomSheet> {
         if (taskIndex == -1) return const SizedBox.shrink();
         final task = project.tasks[taskIndex];
         final statuses = TaskStatus.labels;
-        final assigneeLabel = _assigneeDisplayName(auth, task.assigneeUserId);
+        final assigneeLabel = _assigneeDisplayName(users, task.assigneeUserId);
 
         final bottomInset = MediaQuery.paddingOf(context).bottom;
 
@@ -142,7 +143,7 @@ class _TaskDetailBottomSheetState extends State<TaskDetailBottomSheet> {
                         value: null,
                         child: Text('Unassigned', style: TextStyle(color: AppColors.textPrimary)),
                       ),
-                      ...auth.users.map(
+                      ...users.users.map(
                         (u) => DropdownMenuItem<String?>(
                           value: u.id,
                           child: Text(u.name, style: const TextStyle(color: AppColors.textPrimary)),
@@ -249,9 +250,9 @@ class _TaskDetailBottomSheetState extends State<TaskDetailBottomSheet> {
     );
   }
 
-  static String _assigneeDisplayName(AuthProvider auth, String? userId) {
+  static String _assigneeDisplayName(UsersProvider users, String? userId) {
     if (userId == null) return 'Unassigned';
-    for (final u in auth.users) {
+    for (final u in users.users) {
       if (u.id == userId) return u.name;
     }
     return 'Unknown user';

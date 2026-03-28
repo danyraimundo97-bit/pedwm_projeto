@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../models/app_user.dart';
 import '../models/team_model.dart';
 import '../providers/auth_provider.dart';
+import '../providers/teams_provider.dart';
+import '../providers/users_provider.dart';
 import '../theme/app_colors.dart';
 
 /// Manage members per team (PM + Admin).
@@ -12,6 +14,8 @@ class TeamMembersView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final teams = context.watch<TeamsProvider>();
+    final users = context.watch<UsersProvider>();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -22,12 +26,12 @@ class TeamMembersView extends StatelessWidget {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(20),
-        itemCount: auth.teams.length,
+        itemCount: teams.teams.length,
         itemBuilder: (context, index) {
-          final team = auth.teams[index];
+          final team = teams.teams[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _TeamCard(team: team, auth: auth),
+            child: _TeamCard(team: team, users: users, auth: auth),
           );
         },
       ),
@@ -37,15 +41,16 @@ class TeamMembersView extends StatelessWidget {
 
 class _TeamCard extends StatelessWidget {
   final TeamModel team;
+  final UsersProvider users;
   final AuthProvider auth;
 
-  const _TeamCard({required this.team, required this.auth});
+  const _TeamCard({required this.team, required this.users, required this.auth});
 
   @override
   Widget build(BuildContext context) {
     final members = <AppUser>[];
     for (final id in team.memberUserIds) {
-      for (final u in auth.users) {
+      for (final u in users.users) {
         if (u.id == id) {
           members.add(u);
           break;
@@ -84,7 +89,7 @@ class _TeamCard extends StatelessWidget {
   }
 
   Future<void> _pickUser(BuildContext context) async {
-    final candidates = auth.users.where((u) => !team.memberUserIds.contains(u.id)).toList();
+    final candidates = users.users.where((u) => !team.memberUserIds.contains(u.id)).toList();
     if (candidates.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No users to add')));
       return;
@@ -107,7 +112,7 @@ class _TeamCard extends StatelessWidget {
       ),
     );
     if (picked != null && context.mounted) {
-      context.read<AuthProvider>().addUserToTeam(teamId: team.id, userId: picked);
+      context.read<TeamsProvider>().addUserToTeam(teamId: team.id, userId: picked);
     }
   }
 }
