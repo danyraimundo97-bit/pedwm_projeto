@@ -1,4 +1,5 @@
 using DomainLayer.Domain;
+using DomainLayer.Domain.Notifications;
 
 namespace DomainLayer.Domain.Builders
 {

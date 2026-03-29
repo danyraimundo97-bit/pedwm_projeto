@@ -5,12 +5,9 @@ namespace DomainLayer.Domain.Projects
     public class Project : ProjectBase
     {
         public double AllocatedHours { get; set; }
-        public string ClientName { get; set; } = string.Empty;
-        public ProjectStatus Status { get; set; } = ProjectStatus.Active;
+        public ProjectStatus Status { get; private set; } = ProjectStatus.Active;
 
         public string ClientName { get; private set; } = string.Empty;
-
-        public string ProjectStatus { get; private set; } = "Active";
 
         public Guid ManagerId { get; private set; }
 
@@ -29,14 +26,14 @@ namespace DomainLayer.Domain.Projects
             Guid managerId,
             Guid teamId,
             string clientName,
-            string projectStatus)
+            ProjectStatus projectStatus)
             : base(id, title, startDate, endDate)
         {
-            BudgetHours = budgetHours;
+            AllocatedHours = budgetHours;
             ManagerId = managerId;
             TeamId = teamId;
             ClientName = clientName;
-            ProjectStatus = projectStatus;
+            Status = projectStatus;
         }
 
         public override double GetTotalAllocatedHours()

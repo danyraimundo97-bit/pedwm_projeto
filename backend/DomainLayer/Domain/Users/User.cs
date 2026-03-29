@@ -1,6 +1,6 @@
 using DomainLayer.Domain.Builders;
 
-namespace DomainLayer.Domain
+namespace DomainLayer.Domain.Users
 {
     /// <summary>Fluent construction via <see cref="UserBuilder"/>.</summary>
     public class User

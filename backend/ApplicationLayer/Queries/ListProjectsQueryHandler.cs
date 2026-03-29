@@ -1,6 +1,6 @@
 using ApplicationLayer.Mapping;
 using ApplicationLayer.Models;
-using DomainLayer.Ports;
+using DomainLayer.Domain.Repositories;
 
 namespace ApplicationLayer.Queries
 {
@@ -18,6 +18,7 @@ namespace ApplicationLayer.Queries
 
         public async Task<IReadOnlyList<ProjectDto>> HandleAsync()
         {
+            
             var entities = await _repository.GetAllAsync();
             return entities.Select(_mapper.ToProjectDto).ToList();
         }

@@ -1,14 +1,16 @@
 using ApplicationLayer.Handlers;
 using ApplicationLayer.Mapping;
 using ApplicationLayer.Queries;
+using ApplicationLayer.Services;
 using ApplicationLayer.Strategy;
-using DomainLayer.Ports;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Mapping;
+using InfrastructureLayer.Patterns.Singleton;
 using InfrastructureLayer.Patterns.Strategy;
 using InfrastructureLayer.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using DomainLayer.Domain.Repositories;
 
 namespace PresentationLayer.DependencyInjection
 {
@@ -32,10 +34,21 @@ namespace PresentationLayer.DependencyInjection
             services.AddScoped<IDomainEntityDtoMapper, DomainEntityDtoMapper>();
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<ITaskRepository, TaskRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITeamRepository, TeamRepository>();
+
 
             services.AddTransient<ListProjectsQueryHandler>();
             services.AddTransient<CreateProjectHandler>();
             services.AddTransient<CreateTaskHandler>();
+            services.AddTransient<CreateUserHandler>();
+            services.AddTransient<CreateTeamHandler>();
+
+            services.AddScoped<IProjectService, ProjectService>();
+            services.AddScoped<ITaskService, TaskService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ITeamService, TeamService>();
+            services.AddScoped<IAppLogger, AppLogger>();
 
             return services;
         }

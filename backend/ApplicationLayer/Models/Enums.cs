@@ -33,4 +33,11 @@ namespace ApplicationLayer.Models
         GP,
         Standard,
     }
+    public enum BugSeverity
+    {
+        Low,
+        Medium,
+        High,
+        Critical
+    }
 }

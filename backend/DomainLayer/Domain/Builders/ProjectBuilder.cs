@@ -9,7 +9,7 @@ namespace DomainLayer.Domain.Builders
         private Guid _managerId;
         private Guid _teamId;
         private string _clientName = string.Empty;
-        private string _projectStatus = "Active";
+        private ProjectStatus _projectStatus = ProjectStatus.Active;
 
         public ProjectBuilder WithBudget(int hours)
         {
@@ -17,13 +17,14 @@ namespace DomainLayer.Domain.Builders
             return this;
         }
 
-        public ProjectBuilder ManagedBy(Guid managerId)
+        public ProjectBuilder ManagedBy(Guid? managerId)
         {
             _managerId = managerId;
             return this;
         }
 
-        public ProjectBuilder ForTeam(Guid teamId)
+        public ProjectBuilder ForTeam(Guid? teamId)
+
         {
             _teamId = teamId;
             return this;
@@ -35,7 +36,7 @@ namespace DomainLayer.Domain.Builders
             return this;
         }
 
-        public ProjectBuilder WithStatus(string status)
+        public ProjectBuilder WithStatus(ProjectStatus status)
         {
             _projectStatus = status;
             return this;

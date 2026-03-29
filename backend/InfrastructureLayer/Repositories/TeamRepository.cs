@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using ApplicationLayer.Repositories;
 using DomainLayer.Domain.Teams;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Patterns.Singleton;
+using DomainLayer.Domain.Repositories;
 
 namespace InfrastructureLayer.Repositories
 {

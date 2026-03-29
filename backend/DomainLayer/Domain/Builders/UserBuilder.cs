@@ -1,4 +1,4 @@
-using DomainLayer.Domain;
+using DomainLayer.Domain.Users;
 
 namespace DomainLayer.Domain.Builders
 {

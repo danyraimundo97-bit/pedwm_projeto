@@ -17,8 +17,8 @@ namespace ApplicationLayer.Factories
                     .WithTitle(cmd.Title)
                     .WithDates(cmd.StartDate, cmd.EndDate)
                     .WithBudget((int)cmd.AllocatedHours)
-                    .ManagedBy(cmd.ManagerId)
-                    .ForTeam(cmd.TeamId)
+                    .ManagedBy(cmd.ManagerId) //TODO: Rever
+                    .ForTeam(cmd.TeamId) //TODO: REVER
                     .WithClientName(cmd.ClientName ?? string.Empty)
                     .Build(),
 
@@ -33,7 +33,7 @@ namespace ApplicationLayer.Factories
                 AppProjectType.Holiday => Holiday.Builder()
                     .WithTitle(cmd.Title)
                     .WithDates(cmd.StartDate, cmd.EndDate)
-                    .WhichType(Enum.TryParse<DomainHolidayType>(cmd.HolidayType, true, out var ht) ? ht : DomainHolidayType.Optional)
+                    .WhichType((DomainHolidayType)cmd.HolidayType.GetValueOrDefault())
                     .Build(),
 
                 AppProjectType.Training => Training.Builder()

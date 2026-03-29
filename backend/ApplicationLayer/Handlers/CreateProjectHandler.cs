@@ -1,28 +1,23 @@
-using System.Threading.Tasks;
 using ApplicationLayer.Commands;
-using ApplicationLayer.Factories;
 using ApplicationLayer.Mapping;
 using ApplicationLayer.Models;
+using ApplicationLayer.Services;
 using ApplicationLayer.Strategy;
-using DomainLayer.Ports;
 
 namespace ApplicationLayer.Handlers
 {
     public class CreateProjectHandler
     {
         private readonly IProjectService _projectService;
-        private readonly IProjectRepository _repository;
         private readonly IDomainEntityDtoMapper _mapper;
         private readonly NotificationSender _notificationSender;
 
         // Injetar (Serviço e Notificações)
         public CreateProjectHandler(
             IProjectService projectService,
-            IProjectRepository repository,
             IDomainEntityDtoMapper mapper,
             NotificationSender notificationSender)
         {
-            _repository = repository;
             _mapper = mapper;
             _projectService = projectService;
             _notificationSender = notificationSender;
@@ -32,13 +27,13 @@ namespace ApplicationLayer.Handlers
         {
             // Criar o projeto (O Serviço aplica as regras de negócio)
             var project = await _projectService.CreateProjectAsync(command);
-            var project = ProjectFromCommandFactory.Create(command);
-            await _repository.SaveAsync(project);
+            //var project = ProjectFromCommandFactory.Create(command);
+            //await _repository.SaveAsync(project);
             var dto = _mapper.ToProjectDto(project);
 
             var user = new UserDto
             {
-                Id = command.ManagerId,
+                Id = (Guid)command.ManagerId, //TODO:Rever
                 Name = "Gestor do Projeto",
                 Email = string.Empty,
                 Role = UserRole.Standard,

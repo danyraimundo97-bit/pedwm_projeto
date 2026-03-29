@@ -12,8 +12,8 @@ namespace PresentationLayer.GraphQL
             [Service] CreateProjectHandler handler)
         {
             var command = input.ToCommand();
-            var project = await handler.HandleAsync(command);
-            return $"Projeto '{project.Title}' criado com o ID: {project.Id}";
+            var projectDTO = await handler.HandleAsync(command);
+            return $"Projeto '{projectDTO.Title}' criado com o ID: {projectDTO.Id}";
         }
 
         public async Task<string> CreateTask(

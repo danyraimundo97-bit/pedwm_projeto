@@ -1,6 +1,6 @@
 using DomainLayer.Domain.Projects;
 
-namespace DomainLayer.Ports
+namespace DomainLayer.Domain.Repositories
 {
     /// <summary>Outbound port: persistence for <see cref="ProjectBase"/> (implemented in Infrastructure).</summary>
     public interface IProjectRepository
