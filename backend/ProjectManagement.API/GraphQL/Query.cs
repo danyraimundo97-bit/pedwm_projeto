@@ -1,21 +1,16 @@
-﻿using ApplicationLayer.Repositories;
-using DomainLayer.Domain;
-using DomainLayer.Domain.Projects;
+using ApplicationLayer.Models;
+using ApplicationLayer.Queries;
 using HotChocolate;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace PresentationLayer.GraphQL
 {
     public class Query
     {
-        // Query Simples
         public string BemVindo() => "API de Gestão de Projetos Online";
 
-        // O [Service] injeta o nosso Repositório automaticamente
-        public async Task<IEnumerable<ProjectBase>> GetProjects([Service] IProjectRepository repository)
+        public async Task<IReadOnlyList<ProjectDto>> GetProjects([Service] ListProjectsQueryHandler handler)
         {
-            return await repository.GetAllAsync();
+            return await handler.HandleAsync();
         }
     }
 }

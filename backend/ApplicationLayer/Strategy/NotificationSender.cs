@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using DomainLayer.Domain;
+using ApplicationLayer.Models;
 
 namespace ApplicationLayer.Strategy
 {
@@ -7,22 +6,19 @@ namespace ApplicationLayer.Strategy
     {
         private INotificationDeliveryStrategy _strategy;
 
-        // O construtor exige uma estratégia inicial
         public NotificationSender(INotificationDeliveryStrategy strategy)
         {
             _strategy = strategy;
         }
 
-        // Strategy: Permite mudar a forma de envio em tempo de execução
         public void SetStrategy(INotificationDeliveryStrategy strategy)
         {
             _strategy = strategy;
         }
 
-        public async Task DeliverAsync(User user, Notification notif)
+        public async Task DeliverAsync(UserDto user, NotificationDto notification)
         {
-            // Delegamos a responsabilidade de envio para a estratégia atual
-            await _strategy.SendAsync(user, notif);
+            await _strategy.SendAsync(user, notification);
         }
     }
 }

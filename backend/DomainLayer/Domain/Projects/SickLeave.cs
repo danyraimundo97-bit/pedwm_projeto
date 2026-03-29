@@ -1,17 +1,39 @@
-﻿namespace DomainLayer.Domain.Projects
+using DomainLayer.Domain.Builders;
+
+namespace DomainLayer.Domain.Projects
 {
     public class SickLeave : ProjectBase
     {
-        // O ID do atestado médico (pode ser nulo)
-        public string? MedicalCertificateId { get; set; }
-        public bool IsPaid { get; set; }
+        public string? MedicalCertificateId { get; private set; }
 
-        public double MissedHours { get; set; }
+        public bool IsPaid { get; private set; }
 
-        // Método abstrato obrigatório
+        public double MissedHours { get; private set; }
+
+        private SickLeave()
+        {
+        }
+
+        internal SickLeave(
+            Guid id,
+            string title,
+            DateTime startDate,
+            DateTime endDate,
+            double missedHours,
+            string? medicalCertificateId,
+            bool isPaid)
+            : base(id, title, startDate, endDate)
+        {
+            MissedHours = missedHours;
+            MedicalCertificateId = medicalCertificateId;
+            IsPaid = isPaid;
+        }
+
         public override double GetTotalAllocatedHours()
         {
             return MissedHours;
         }
+
+        public static SickLeaveBuilder Builder() => new SickLeaveBuilder();
     }
 }

@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using ApplicationLayer.Repositories;
-using DomainLayer.Domain;
 using DomainLayer.Domain.Projects;
+using DomainLayer.Ports;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Patterns.Singleton;
+using Microsoft.EntityFrameworkCore;
 
 namespace InfrastructureLayer.Repositories
 {
@@ -13,26 +10,22 @@ namespace InfrastructureLayer.Repositories
     {
         private readonly AppDbContext _context;
 
-        // Injeção da dependência do DbContext para aceder à base de dados
         public ProjectRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        // Salva um projeto na base de dados de forma assíncrona
         public async Task SaveAsync(ProjectBase project)
         {
             LoggerService.Instance.Log($"[DATABASE] A guardar o projeto {project.Id} na BD...");
 
-            _context.Projects.Add(project); // Adiciona o projeto ao DbSet
-            await _context.SaveChangesAsync(); // Salva as alterações na base de dados
+            _context.Projects.Add(project);
+            await _context.SaveChangesAsync();
         }
 
-        // Obter todos os projetos da base de dados de forma assíncrona
-        public async Task<IEnumerable<ProjectBase>> GetAllAsync()
+        public async Task<IReadOnlyList<ProjectBase>> GetAllAsync()
         {
             LoggerService.Instance.Log("[DATABASE] A ler todos os projetos...");
-            // O EF Core vai à tabela e devolve a lista completa!
             return await _context.Projects.ToListAsync();
         }
     }

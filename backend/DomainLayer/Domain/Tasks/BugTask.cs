@@ -1,17 +1,37 @@
-﻿namespace DomainLayer.Domain.Tasks
+using DomainLayer.Domain.Builders;
+
+namespace DomainLayer.Domain.Tasks
 {
     public class BugTask : TaskBase
     {
-        public BugSeverity Severity { get; set; }
-        public string Environment { get; set; } = string.Empty; // ex: "Produção", "Testes"
+        public BugSeverity Severity { get; private set; }
+
+        public string Environment { get; private set; } = string.Empty;
+
+        private BugTask()
+        {
+        }
+
+        internal BugTask(
+            Guid id,
+            string title,
+            string description,
+            Guid projectId,
+            BugSeverity severity,
+            string environment,
+            TaskStatus status)
+            : base(id, title, description, status, projectId, null, DateTime.UtcNow, null)
+        {
+            Severity = severity;
+            Environment = environment;
+        }
 
         public override void MarkAsCompleted()
         {
             Status = TaskStatus.Completed;
             CompletedAt = DateTime.UtcNow;
-
-
-            // Se o bug for Crítico, a lógica de conclusão pode ser diferente (ex: exigir preenchimento de um relatório de incidente).
         }
+
+        public static BugTaskBuilder Builder() => new BugTaskBuilder();
     }
 }

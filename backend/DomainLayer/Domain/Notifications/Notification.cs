@@ -1,12 +1,30 @@
-﻿using System;
+using DomainLayer.Domain.Builders;
 
 namespace DomainLayer.Domain
 {
+    /// <summary>Fluent construction via <see cref="NotificationBuilder"/>.</summary>
     public class Notification
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public Guid UserId { get; set; }
-        public NotificationType Type { get; set; }
-        public string Message { get; set; } = string.Empty;
+        public Guid Id { get; private set; }
+
+        public Guid UserId { get; private set; }
+
+        public NotificationType Type { get; private set; }
+
+        public string Message { get; private set; } = string.Empty;
+
+        private Notification()
+        {
+        }
+
+        internal Notification(Guid id, Guid userId, NotificationType type, string message)
+        {
+            Id = id;
+            UserId = userId;
+            Type = type;
+            Message = message;
+        }
+
+        public static NotificationBuilder Builder() => new NotificationBuilder();
     }
 }

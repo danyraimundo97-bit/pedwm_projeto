@@ -1,51 +1,53 @@
-﻿using ApplicationLayer.Commands;
+using ApplicationLayer.Commands;
 using ApplicationLayer.Factories;
-using ApplicationLayer.Repositories;
+using ApplicationLayer.Mapping;
+using ApplicationLayer.Models;
 using ApplicationLayer.Strategy;
-using DomainLayer.Domain;
-using DomainLayer.Domain.Projects;
-using System.Threading.Tasks;
+using DomainLayer.Ports;
 
 namespace ApplicationLayer.Handlers
 {
     public class CreateProjectHandler
     {
-        private readonly ProjectFactory _factory;
         private readonly IProjectRepository _repository;
+        private readonly IDomainEntityDtoMapper _mapper;
         private readonly NotificationSender _notificationSender;
 
-        // Injetar as dependências que o Handler precisa
         public CreateProjectHandler(
-            ProjectFactory factory,
             IProjectRepository repository,
+            IDomainEntityDtoMapper mapper,
             NotificationSender notificationSender)
         {
-            _factory = factory;
             _repository = repository;
+            _mapper = mapper;
             _notificationSender = notificationSender;
         }
 
-        public async Task<ProjectBase> HandleAsync(CreateProjectCommand command)
+        public async Task<ProjectDto> HandleAsync(CreateProjectCommand command)
         {
-            // Criar o projeto (Usa a Factory e o Builder)
-            var project = _factory.CreateFromCommand(command);
-
-            // Guardar na Base de Dados (Repository)
+            var project = ProjectFromCommandFactory.Create(command);
             await _repository.SaveAsync(project);
+            var dto = _mapper.ToProjectDto(project);
 
-            // Preparar a notificação
-            var user = new User { Id = command.ManagerId, Name = "Gestor do Projeto" };
-            var notif = new Notification
+            var user = new UserDto
             {
-                UserId = user.Id,
-                Type = NotificationType.Info,
-                Message = $"O projeto '{project.Title}' foi criado e guardado com sucesso!"
+                Id = command.ManagerId,
+                Name = "Gestor do Projeto",
+                Email = string.Empty,
+                Role = UserRole.Standard,
             };
 
-            // Enviar a notificação (Strategy)
+            var notif = new NotificationDto
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                Type = NotificationType.Info,
+                Message = $"O projeto '{dto.Title}' foi criado e guardado com sucesso!",
+            };
+
             await _notificationSender.DeliverAsync(user, notif);
 
-            return project; // Devolve o projeto criado
+            return dto;
         }
     }
 }

@@ -190,6 +190,25 @@ class ProjectListView extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.cardBgLighter,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: AppColors.textMuted.withValues(alpha: 0.35)),
+                          ),
+                          child: Text(
+                            p.type.label,
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: AppColors.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

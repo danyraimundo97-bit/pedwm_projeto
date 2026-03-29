@@ -1,52 +1,53 @@
-﻿using System;
-using System.Threading.Tasks;
 using ApplicationLayer.Commands;
 using ApplicationLayer.Factories;
-using ApplicationLayer.Repositories;
+using ApplicationLayer.Mapping;
+using ApplicationLayer.Models;
 using ApplicationLayer.Strategy;
-using DomainLayer.Domain;
-using DomainLayer.Domain.Tasks;
+using DomainLayer.Ports;
 
 namespace ApplicationLayer.Handlers
 {
     public class CreateTaskHandler
     {
-        private readonly ProjectTaskFactory _factory;
         private readonly ITaskRepository _repository;
+        private readonly IDomainEntityDtoMapper _mapper;
         private readonly NotificationSender _notificationSender;
 
-        // Injetar as dependências que o Handler precisa
         public CreateTaskHandler(
-            ProjectTaskFactory factory,
             ITaskRepository repository,
+            IDomainEntityDtoMapper mapper,
             NotificationSender notificationSender)
         {
-            _factory = factory;
             _repository = repository;
+            _mapper = mapper;
             _notificationSender = notificationSender;
         }
 
-        public async Task<TaskBase> HandleAsync(CreateTaskCommand command)
+        public async Task<TaskDto> HandleAsync(CreateTaskCommand command)
         {
-            // Criar a tarefa (Usa a Factory e o Builder)
-            var task = _factory.CreateFromCommand(command);
-
-            // Guardar na Base de Dados (Repository)
+            var task = TaskFromCommandFactory.Create(command);
             await _repository.SaveAsync(task);
+            var dto = _mapper.ToTaskDto(task);
 
-            // Preparar a notificação
-            var user = new User { Id = Guid.NewGuid(), Name = "Developer" };
-            var notif = new Notification
+            var user = new UserDto
             {
-                UserId = user.Id,
-                Type = NotificationType.Info,
-                Message = $"Nova tarefa atribuída: '{task.Title}'"
+                Id = Guid.NewGuid(),
+                Name = "Developer",
+                Email = string.Empty,
+                Role = UserRole.Standard,
             };
 
-            // Enviar a notificação (Strategy)
+            var notif = new NotificationDto
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                Type = NotificationType.Info,
+                Message = $"Nova tarefa atribuída: '{dto.Title}'",
+            };
+
             await _notificationSender.DeliverAsync(user, notif);
 
-            return task; // Devolve a tarefa criada
+            return dto;
         }
     }
 }
