@@ -1,19 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using DomainLayer.Domain;
 using DomainLayer.Domain.Projects;
 using DomainLayer.Domain.Tasks;
+using DomainLayer.Domain.Users;
+using DomainLayer.Domain.Teams;
 
 namespace InfrastructureLayer.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-        }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         // Tabelas para os tipos base, que vão armazenar todas as entidades derivadas
         public DbSet<ProjectBase> Projects { get; set; }
         public DbSet<TaskBase> Tasks { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Team> Teams { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

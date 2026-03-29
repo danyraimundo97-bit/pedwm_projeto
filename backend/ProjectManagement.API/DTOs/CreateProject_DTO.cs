@@ -14,17 +14,16 @@ namespace PresentationLayer.DTOs
 
         public double AllocatedHours { get; set; }
 
-        public Guid ManagerId { get; set; }
-
-        public Guid TeamId { get; set; }
-
         public string? ClientName { get; set; }
+        public Guid? ManagerId { get; set; }
+        public Guid? TeamId { get; set; }
 
         public string? MedicalCertificateId { get; set; }
 
         public bool? IsPaid { get; set; }
 
-        public string? HolidayType { get; set; }
+        // Holiday
+        public HolidayType? HolidayType { get; set; } // "Fixed" ou "Optional"
 
         public string? CourseName { get; set; }
 

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using ApplicationLayer.Commands;
 using ApplicationLayer.Factories;
 using ApplicationLayer.Mapping;
@@ -9,22 +10,28 @@ namespace ApplicationLayer.Handlers
 {
     public class CreateProjectHandler
     {
+        private readonly IProjectService _projectService;
         private readonly IProjectRepository _repository;
         private readonly IDomainEntityDtoMapper _mapper;
         private readonly NotificationSender _notificationSender;
 
+        // Injetar (Serviço e Notificações)
         public CreateProjectHandler(
+            IProjectService projectService,
             IProjectRepository repository,
             IDomainEntityDtoMapper mapper,
             NotificationSender notificationSender)
         {
             _repository = repository;
             _mapper = mapper;
+            _projectService = projectService;
             _notificationSender = notificationSender;
         }
 
         public async Task<ProjectDto> HandleAsync(CreateProjectCommand command)
         {
+            // Criar o projeto (O Serviço aplica as regras de negócio)
+            var project = await _projectService.CreateProjectAsync(command);
             var project = ProjectFromCommandFactory.Create(command);
             await _repository.SaveAsync(project);
             var dto = _mapper.ToProjectDto(project);

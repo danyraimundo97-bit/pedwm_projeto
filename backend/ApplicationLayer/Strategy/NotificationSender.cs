@@ -6,11 +6,13 @@ namespace ApplicationLayer.Strategy
     {
         private INotificationDeliveryStrategy _strategy;
 
+        // O construtor exige uma estratégia inicial
         public NotificationSender(INotificationDeliveryStrategy strategy)
         {
             _strategy = strategy;
         }
 
+        // Strategy: Permite mudar a forma de envio em tempo de execução
         public void SetStrategy(INotificationDeliveryStrategy strategy)
         {
             _strategy = strategy;
@@ -18,7 +20,8 @@ namespace ApplicationLayer.Strategy
 
         public async Task DeliverAsync(UserDto user, NotificationDto notification)
         {
-            await _strategy.SendAsync(user, notification);
+            // Delegamos a responsabilidade de envio para a estratégia atual
+            await _strategy.SendAsync(user, notif);
         }
     }
 }

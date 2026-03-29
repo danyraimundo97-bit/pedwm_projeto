@@ -4,7 +4,9 @@ namespace DomainLayer.Domain.Projects
 {
     public class Project : ProjectBase
     {
-        public int BudgetHours { get; private set; }
+        public double AllocatedHours { get; set; }
+        public string ClientName { get; set; } = string.Empty;
+        public ProjectStatus Status { get; set; } = ProjectStatus.Active;
 
         public string ClientName { get; private set; } = string.Empty;
 
@@ -39,7 +41,8 @@ namespace DomainLayer.Domain.Projects
 
         public override double GetTotalAllocatedHours()
         {
-            return BudgetHours;
+            // Implementação simples para calcular os dias
+            return AllocatedHours;
         }
 
         /// <summary>Starts fluent construction; call <see cref="ProjectBuilder.Build"/> when complete.</summary>

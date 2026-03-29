@@ -1,6 +1,6 @@
 using DomainLayer.Domain.Builders;
 
-namespace DomainLayer.Domain
+namespace DomainLayer.Domain.Notifications
 {
     /// <summary>Fluent construction via <see cref="NotificationBuilder"/>.</summary>
     public class Notification

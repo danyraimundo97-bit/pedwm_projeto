@@ -25,6 +25,9 @@ namespace DomainLayer.Domain
             Role = role;
         }
 
+        // A associação opcional a uma equipa (pode ser null)
+        public Guid? TeamId { get; set; }
+
         public void ChangeRole(UserRole newRole)
         {
             Role = newRole;

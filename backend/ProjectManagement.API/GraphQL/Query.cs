@@ -12,5 +12,10 @@ namespace PresentationLayer.GraphQL
         {
             return await handler.HandleAsync();
         }
+
+        public async Task<IEnumerable<TaskBase>> GetTasks([Service] ITaskRepository repository)
+        {
+            return await repository.GetAllAsync();
+        }
     }
 }

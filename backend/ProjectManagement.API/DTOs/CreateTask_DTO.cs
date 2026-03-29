@@ -11,8 +11,10 @@ namespace PresentationLayer.DTOs
         public string Description { get; set; } = string.Empty;
 
         public Guid ProjectId { get; set; }
+        public Guid? AssignedUserId { get; set; }   // A tarefa pode ser criada sem um utilizador atribuído (null)
 
         public string? Environment { get; set; }
+        public BugSeverity? Severity { get; set; } // "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
 
         public int? StoryPoints { get; set; }
     }
