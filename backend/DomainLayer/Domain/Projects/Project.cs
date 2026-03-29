@@ -4,7 +4,7 @@ namespace DomainLayer.Domain.Projects
 {
     public class Project : ProjectBase
     {
-        public double AllocatedHours { get; set; }
+        public double AllocatedHours { get; private set; }
         public ProjectStatus Status { get; private set; } = ProjectStatus.Active;
 
         public string ClientName { get; private set; } = string.Empty;
