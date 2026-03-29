@@ -63,16 +63,35 @@ class ProjectDetailsView extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.schedule_rounded, size: 18, color: AppColors.textMuted),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${project.consumedHours} / ${project.budgetHours} h logged',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                  Row(
+                    children: [
+                      Icon(Icons.category_outlined, size: 18, color: AppColors.textMuted),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Category: ${project.type.label}',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.schedule_rounded, size: 18, color: AppColors.textMuted),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${project.consumedHours} / ${project.budgetHours} h logged',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ],
                   ),
                 ],
               ),

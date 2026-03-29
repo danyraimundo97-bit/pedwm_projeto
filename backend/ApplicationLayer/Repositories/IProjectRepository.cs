@@ -1,14 +1,12 @@
-﻿using System.Threading.Tasks;
 using DomainLayer.Domain.Projects;
 
-namespace ApplicationLayer.Repositories
+namespace DomainLayer.Domain.Repositories
 {
+    /// <summary>Outbound port: persistence for <see cref="ProjectBase"/> (implemented in Infrastructure).</summary>
     public interface IProjectRepository
     {
-        // Salvar um Project
         Task SaveAsync(ProjectBase project);
 
-        // Obter todos os Projects
-        Task<IEnumerable<ProjectBase>> GetAllAsync();
+        Task<IReadOnlyList<ProjectBase>> GetAllAsync();
     }
 }

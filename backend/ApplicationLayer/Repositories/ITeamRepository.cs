@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using DomainLayer.Domain.Teams;
 
-namespace ApplicationLayer.Repositories
+namespace DomainLayer.Domain.Repositories
 {
     public interface ITeamRepository
     {

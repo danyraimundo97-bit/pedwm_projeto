@@ -1,25 +1,23 @@
-﻿using ApplicationLayer.Repositories;
-using DomainLayer.Domain;
-using DomainLayer.Domain.Projects;
-using DomainLayer.Domain.Tasks;
+using ApplicationLayer.Models;
+using ApplicationLayer.Queries;
 using HotChocolate;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace PresentationLayer.GraphQL
 {
     public class Query
     {
-        // Query Simples
         public string BemVindo() => "API de Gestão de Projetos Online";
 
-        public async Task<IEnumerable<ProjectBase>> GetProjects([Service] IProjectRepository repository)
+        public async Task<IReadOnlyList<ProjectDto>> GetProjects([Service] ListProjectsQueryHandler handler) //TODO: Modificar o objecto para ProjectBaseDTO
         {
-            return await repository.GetAllAsync();
+            //TODO: Adicionar Paginação
+            return await handler.HandleAsync();
         }
 
-        public async Task<IEnumerable<TaskBase>> GetTasks([Service] ITaskRepository repository)
+        public async Task<IEnumerable<TaskBase>> GetTasks([Service] ITaskRepository repository) //TODO: Modificar o objecto para TaskBaseDTO
         {
+            //TODO: Adicionar Paginação
             return await repository.GetAllAsync();
         }
     }

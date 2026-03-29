@@ -91,7 +91,7 @@ class ProjectProvider extends ChangeNotifier {
 
   /// Pull-to-refresh on Projects tab.
   Future<void> refreshProjects() async {
-    await fetchProjectsFromBackend();
+    await fetchProjects();
   }
 
   String _formatError(Object e) {
@@ -167,6 +167,7 @@ class ProjectProvider extends ChangeNotifier {
     required String title,
     required String description,
     required int budgetHours,
+    required ProjectType type,
   }) async {
     final id = 'p${DateTime.now().millisecondsSinceEpoch}';
     //TODO: Remove this logic when the API is implemented
@@ -174,6 +175,7 @@ class ProjectProvider extends ChangeNotifier {
       ProjectModel(
         id: id,
         title: title,
+        type: type,
         description: description,
         budgetHours: budgetHours,
         tasks: [],
@@ -182,7 +184,7 @@ class ProjectProvider extends ChangeNotifier {
         completionPercentage: 0,
       ),
     );
-    await createProjectInBackend(title, description, budgetHours);
+    await createProjectInBackend(title, description, budgetHours, type);
     notifyListeners();
   }
 

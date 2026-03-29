@@ -1,16 +1,33 @@
-﻿namespace DomainLayer.Domain.Tasks
+using DomainLayer.Domain.Builders;
+
+namespace DomainLayer.Domain.Tasks
 {
     public class FeatureTask : TaskBase
     {
-        public int StoryPoints { get; set; }
+        public int StoryPoints { get; private set; }
+
+        private FeatureTask()
+        {
+        }
+
+        internal FeatureTask(
+            Guid id,
+            string title,
+            string description,
+            Guid projectId,
+            int storyPoints,
+            TaskStatus status)
+            : base(id, title, description, status, projectId, null, DateTime.UtcNow, null)
+        {
+            StoryPoints = storyPoints;
+        }
 
         public override void MarkAsCompleted()
         {
             Status = TaskStatus.Completed;
             CompletedAt = DateTime.UtcNow;
-
-
-            // Aqui podíamos adicionar lógica extra, como disparar um evento a dizer que a Feature X está pronta!
         }
+
+        public static FeatureTaskBuilder Builder() => new FeatureTaskBuilder();
     }
 }

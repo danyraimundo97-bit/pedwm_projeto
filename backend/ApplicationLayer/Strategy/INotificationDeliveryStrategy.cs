@@ -1,11 +1,9 @@
-﻿using System.Threading.Tasks;
-using DomainLayer.Domain.Users;
-using DomainLayer.Domain.Notifications;
+using ApplicationLayer.Models;
 
 namespace ApplicationLayer.Strategy
 {
     public interface INotificationDeliveryStrategy
     {
-        Task SendAsync(User user, Notification notification);
+        Task SendAsync(UserDto user, NotificationDto notification);
     }
 }

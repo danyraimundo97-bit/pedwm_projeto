@@ -1,5 +1,4 @@
-import 'task_model.dart'; // Add this import
-
+import 'task_model.dart';
 
 enum ProjectStatus {
   Active,
@@ -9,7 +8,7 @@ enum ProjectStatus {
   Unknown;
 
   static ProjectStatus fromString(String? status) {
-    if(status == null) {
+    if (status == null) {
       return ProjectStatus.Unknown;
     }
     return ProjectStatus.values.firstWhere(
@@ -20,20 +19,70 @@ enum ProjectStatus {
 
   String get label {
     switch (this) {
-      case ProjectStatus.Active: return 'Active';
-      case ProjectStatus.ToDo: return 'To Do';
-      case ProjectStatus.Completed: return 'Completed';
-      case ProjectStatus.OnHold: return 'On Hold';
-      case ProjectStatus.Unknown: return 'Unknown';
+      case ProjectStatus.Active:
+        return 'Active';
+      case ProjectStatus.ToDo:
+        return 'To Do';
+      case ProjectStatus.Completed:
+        return 'Completed';
+      case ProjectStatus.OnHold:
+        return 'On Hold';
+      case ProjectStatus.Unknown:
+        return 'Unknown';
+    }
+  }
+}
+
+/// Aligned with backend `DomainLayer.Domain.Projects.ProjectType`.
+enum ProjectType {
+  standard,
+  sickLeave,
+  training,
+  holiday;
+
+  static ProjectType fromString(String? value) {
+    if (value == null || value.isEmpty) return ProjectType.standard;
+    final v = value.trim();
+    for (final e in ProjectType.values) {
+      if (e.name.toLowerCase() == v.toLowerCase()) return e;
+    }
+    switch (v) {
+      case 'Standard':
+      case 'STANDARD':
+        return ProjectType.standard;
+      case 'SickLeave':
+      case 'SICK_LEAVE':
+        return ProjectType.sickLeave;
+      case 'Training':
+      case 'TRAINING':
+        return ProjectType.training;
+      case 'Holiday':
+      case 'HOLIDAY':
+        return ProjectType.holiday;
+      default:
+        return ProjectType.standard;
     }
   }
 
+  /// Short label for chips and dropdowns.
+  String get label {
+    switch (this) {
+      case ProjectType.standard:
+        return 'Standard';
+      case ProjectType.sickLeave:
+        return 'Sick leave';
+      case ProjectType.training:
+        return 'Training';
+      case ProjectType.holiday:
+        return 'Holiday';
+    }
+  }
 }
-
 
 class ProjectModel {
   final String id;
   final String title;
+  final ProjectType type;
   final String description;
   final int budgetHours;
   final List<TaskModel> tasks;
@@ -44,11 +93,12 @@ class ProjectModel {
   ProjectModel({
     required this.id,
     required this.title,
+    required this.type,
     required this.description,
     required this.budgetHours,
     required this.tasks,
     this.status = ProjectStatus.Unknown,
-    this.completionPercentage = 0, // TODO: Mudar depois para final quando tiver a chamada para o backend
-    this.consumedHours = 0, // TODO: Mudar depois para final quando tiver a chamada para o backend
+    this.completionPercentage = 0,
+    this.consumedHours = 0,
   });
 }

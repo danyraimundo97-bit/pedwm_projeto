@@ -1,37 +1,27 @@
-﻿using System.Threading.Tasks;
-using Mapster;
-using ApplicationLayer.Commands;
 using ApplicationLayer.Handlers;
+using HotChocolate;
 using PresentationLayer.DTOs;
+using PresentationLayer.GraphQL.Mapping;
 
 namespace PresentationLayer.GraphQL
 {
     public class Mutation
     {
-        // O [Service] diz ao GraphQL para ir buscar o nosso Handler à Injeção de Dependências!
         public async Task<string> CreateProject(
             CreateProject_DTO input,
             [Service] CreateProjectHandler handler)
         {
-            // MAPSTER transforma o DTO num Command
-            var command = input.Adapt<CreateProjectCommand>();
-
-            // Usar o Handler
-            var project = await handler.HandleAsync(command);
-
-            return $"Projeto '{project.Title}' criado com o ID: {project.Id}";
+            var command = input.ToCommand();
+            var projectDTO = await handler.HandleAsync(command);
+            return $"Projeto '{projectDTO.Title}' criado com o ID: {projectDTO.Id}";
         }
 
         public async Task<string> CreateTask(
             CreateTask_DTO input,
             [Service] CreateTaskHandler handler)
         {
-            // MAPSTER transforma o DTO num Command
-            var command = input.Adapt<CreateTaskCommand>();
-
-            // Usar o Handler
+            var command = input.ToCommand();
             var task = await handler.HandleAsync(command);
-
             return $"Tarefa '{task.Title}' criada com o ID: {task.Id}";
         }
     }

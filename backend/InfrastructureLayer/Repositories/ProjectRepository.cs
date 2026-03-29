@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using ApplicationLayer.Repositories;
-using DomainLayer.Domain;
 using DomainLayer.Domain.Projects;
+using DomainLayer.Domain.Repositories;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Patterns.Singleton;
+using Microsoft.EntityFrameworkCore;
 
 namespace InfrastructureLayer.Repositories
 {
@@ -13,13 +10,11 @@ namespace InfrastructureLayer.Repositories
     {
         private readonly AppDbContext _context;
 
-        // Injeção da dependência do DbContext para aceder à base de dados
         public ProjectRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        // Salva um projeto na base de dados de forma assíncrona
         public async Task SaveAsync(ProjectBase project)
         {
             // TODO: Verificar se o projeto já existe e atualizar em vez de criar um novo, para evitar duplicados
@@ -36,11 +31,9 @@ namespace InfrastructureLayer.Repositories
 
         }
 
-        // Obter todos os projetos da base de dados de forma assíncrona
-        public async Task<IEnumerable<ProjectBase>> GetAllAsync()
+        public async Task<IReadOnlyList<ProjectBase>> GetAllAsync()
         {
             LoggerService.Instance.Log("[DATABASE] A ler todos os projetos...");
-            // O EF Core vai à tabela e devolve a lista completa!
             return await _context.Projects.ToListAsync();
             //TODO: Adicionar tratamento de erros (try-catch) para lidar com possíveis falhas na base de dados
             //TODO: Implementar logging mais detalhado (ex: número de projetos lidos, falha)

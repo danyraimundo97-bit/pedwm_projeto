@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/project_model.dart';
 import '../providers/auth_provider.dart';
 import '../providers/project_provider.dart';
 import '../theme/app_colors.dart';
@@ -15,6 +16,7 @@ class _CreateProjectViewState extends State<CreateProjectView> {
   final _title = TextEditingController();
   final _description = TextEditingController();
   final _budget = TextEditingController();
+  ProjectType _type = ProjectType.standard;
 
   @override
   void dispose() {
@@ -53,6 +55,22 @@ class _CreateProjectViewState extends State<CreateProjectView> {
               decoration: _d('Title'),
             ),
             const SizedBox(height: 12),
+            DropdownButtonFormField<ProjectType>(
+              value: _type,
+              dropdownColor: AppColors.cardBg,
+              style: const TextStyle(color: AppColors.textPrimary),
+              decoration: _d('Category'),
+              items: ProjectType.values
+                  .map(
+                    (t) => DropdownMenuItem(
+                      value: t,
+                      child: Text(t.label, style: const TextStyle(color: AppColors.textPrimary)),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (v) => setState(() => _type = v ?? ProjectType.standard),
+            ),
+            const SizedBox(height: 12),
             TextField(
               controller: _description,
               style: const TextStyle(color: AppColors.textPrimary),
@@ -77,6 +95,7 @@ class _CreateProjectViewState extends State<CreateProjectView> {
                       title: title,
                       description: desc.isEmpty ? '—' : desc,
                       budgetHours: b,
+                      type: _type,
                     );
                 Navigator.pop(context);
               },

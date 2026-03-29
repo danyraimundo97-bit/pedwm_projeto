@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using ApplicationLayer.Repositories;
-using DomainLayer.Domain;
+using DomainLayer.Domain.Repositories;
 using DomainLayer.Domain.Tasks;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Patterns.Singleton;
@@ -13,7 +9,6 @@ namespace InfrastructureLayer.Repositories
     {
         private readonly AppDbContext _context;
 
-        // Injeção da dependência do DbContext para aceder à base de dados
         public TaskRepository(AppDbContext context)
         {
             _context = context;

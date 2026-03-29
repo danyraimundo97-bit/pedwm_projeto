@@ -35,6 +35,7 @@ const _kMockNetworkDelay = Duration(milliseconds: 1000);
         ProjectModel(
           id: '1',
           title: 'Web Platform',
+          type: ProjectType.standard,
           description: 'GraphQL Integration',
           status: ProjectStatus.fromString('Active'),
           budgetHours: 50,
@@ -69,6 +70,7 @@ const _kMockNetworkDelay = Duration(milliseconds: 1000);
         ProjectModel(
           id: '2',
           title: 'Mobile App v2',
+          type: ProjectType.training,
           description: 'Native features',
           status: ProjectStatus.fromString('Active'),
           budgetHours: 40,
@@ -103,6 +105,11 @@ const _kMockNetworkDelay = Duration(milliseconds: 1000);
       return projects;
   }
 
-  Future<void> createProjectInBackend(String title, String description, int budgetHours) async {
+  Future<void> createProjectInBackend(
+    String title,
+    String description,
+    int budgetHours,
+    ProjectType type,
+  ) async {
     await Future<void>.delayed(_kMockNetworkDelay);
   }

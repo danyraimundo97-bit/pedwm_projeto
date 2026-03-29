@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using DomainLayer.Domain.Users;
+﻿using DomainLayer.Domain.Users;
 
-namespace ApplicationLayer.Repositories
+namespace DomainLayer.Domain.Repositories
 {
     public interface IUserRepository
     {

@@ -1,31 +1,32 @@
-﻿using DomainLayer.Domain.Projects;
+using ApplicationLayer.Models;
 
 namespace PresentationLayer.DTOs
 {
     public class CreateProject_DTO
     {
-        public ProjectType Type { get; set; } // "STANDARD" | "SICKLEAVE" | "HOLIDAY" | "TRAINING"
+        public ProjectType Type { get; set; }
+
         public string Title { get; set; } = string.Empty;
+
         public DateTime StartDate { get; set; }
+
         public DateTime EndDate { get; set; }
+
         public double AllocatedHours { get; set; }
 
-        // Propriedades Opcionais (Específicas de cada tipo)
-
-        // Standard
         public string? ClientName { get; set; }
         public Guid? ManagerId { get; set; }
         public Guid? TeamId { get; set; }
 
-        // SickLeave
         public string? MedicalCertificateId { get; set; }
+
         public bool? IsPaid { get; set; }
 
         // Holiday
         public HolidayType? HolidayType { get; set; } // "Fixed" ou "Optional"
 
-        // Training
         public string? CourseName { get; set; }
+
         public string? CertificationLink { get; set; }
     }
 }

@@ -1,14 +1,10 @@
-﻿using System.Threading.Tasks;
 using DomainLayer.Domain.Tasks;
 
-namespace ApplicationLayer.Repositories
+namespace DomainLayer.Domain.Repositories
 {
+    /// <summary>Outbound port: persistence for <see cref="TaskBase"/> (implemented in Infrastructure).</summary>
     public interface ITaskRepository
     {
-        // Salvar uma Task
         Task SaveAsync(TaskBase task);
-
-        // Obter todas as Tasks
-        Task<IEnumerable<TaskBase>> GetAllAsync();
     }
 }
