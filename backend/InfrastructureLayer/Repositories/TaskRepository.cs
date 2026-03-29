@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using ApplicationLayer.Repositories;
 using DomainLayer.Domain;
 using DomainLayer.Domain.Tasks;
@@ -17,6 +19,7 @@ namespace InfrastructureLayer.Repositories
             _context = context;
         }
 
+        // Salva uma tarefa na base de dados de forma assíncrona
         public async Task SaveAsync(TaskBase task)
         {
             // TODO: Verificar se o projeto já existe e atualizar em vez de criar um novo, para evitar duplicados
@@ -29,6 +32,13 @@ namespace InfrastructureLayer.Repositories
             await _context.SaveChangesAsync(); // Salva as alterações na base de dados
              //TODO: Verificar o resultado do SaveChangesAsync para confirmar que a operação foi bem-sucedida
             //TODO: Logar o resultado da operação
+        }
+
+        // Obter todas as tarefas da base de dados de forma assíncrona
+        public async Task<IEnumerable<TaskBase>> GetAllAsync()
+        {
+            LoggerService.Instance.Log("[DATABASE] A ler todas as tarefas...");
+            return await _context.Tasks.ToListAsync();
         }
     }
 }

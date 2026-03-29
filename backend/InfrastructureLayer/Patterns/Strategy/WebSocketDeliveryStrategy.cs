@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using ApplicationLayer.Strategy;
-using DomainLayer.Domain;
+using DomainLayer.Domain.Users;
+using DomainLayer.Domain.Notifications;
 using InfrastructureLayer.Patterns.Singleton;
 
 namespace InfrastructureLayer.Patterns.Strategy

@@ -2,9 +2,9 @@
 {
     public class Project : ProjectBase
     {
-        public int BudgetHours { get; set; }
+        public double AllocatedHours { get; set; }
         public string ClientName { get; set; } = string.Empty;
-        public string ProjectStatus { get; set; } = "Active";
+        public ProjectStatus Status { get; set; } = ProjectStatus.Active;
 
         // Ligações (Chaves Estrangeiras)
         public Guid ManagerId { get; set; }
@@ -13,7 +13,7 @@
         public override double GetTotalAllocatedHours()
         {
             // Implementação simples para calcular os dias
-            return BudgetHours;
+            return AllocatedHours;
         }
     }
 }

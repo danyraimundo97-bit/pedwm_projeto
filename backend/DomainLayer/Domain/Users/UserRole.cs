@@ -1,4 +1,4 @@
-﻿namespace DomainLayer.Domain
+﻿namespace DomainLayer.Domain.Users
 {
     public enum UserRole
     {

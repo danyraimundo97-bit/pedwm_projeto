@@ -1,4 +1,4 @@
-﻿namespace DomainLayer.Domain
+﻿namespace DomainLayer.Domain.Users
 {
     public class User
     {
@@ -7,7 +7,9 @@
         public string Email { get; set; } = string.Empty;
         public UserRole Role { get; set; } = UserRole.Standard;
 
-        // Método do teu diagrama
+        // A associação opcional a uma equipa (pode ser null)
+        public Guid? TeamId { get; set; }
+
         public void ChangeRole(UserRole newRole)
         {
             Role = newRole;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DomainLayer.Domain
+namespace DomainLayer.Domain.Notifications
 {
     public class Notification
     {

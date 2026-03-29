@@ -9,20 +9,20 @@ namespace PresentationLayer.DTOs
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public double AllocatedHours { get; set; }
-        public Guid ManagerId { get; set; }
-        public Guid TeamId { get; set; }
 
         // Propriedades Opcionais (Específicas de cada tipo)
 
         // Standard
         public string? ClientName { get; set; }
+        public Guid? ManagerId { get; set; }
+        public Guid? TeamId { get; set; }
 
         // SickLeave
         public string? MedicalCertificateId { get; set; }
         public bool? IsPaid { get; set; }
 
         // Holiday
-        public string? HolidayType { get; set; } // "Fixed" ou "Optional"
+        public HolidayType? HolidayType { get; set; } // "Fixed" ou "Optional"
 
         // Training
         public string? CourseName { get; set; }

@@ -2,7 +2,6 @@
 {
     public class FeatureTask : TaskBase
     {
-        // Agile (Scrum)
         public int StoryPoints { get; set; }
 
         public override void MarkAsCompleted()

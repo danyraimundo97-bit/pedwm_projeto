@@ -1,52 +1,45 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ApplicationLayer.Commands;
-using ApplicationLayer.Factories;
-using ApplicationLayer.Repositories;
+using ApplicationLayer.Services;
 using ApplicationLayer.Strategy;
-using DomainLayer.Domain;
+using DomainLayer.Domain.Users;
+using DomainLayer.Domain.Notifications;
 using DomainLayer.Domain.Tasks;
 
 namespace ApplicationLayer.Handlers
 {
     public class CreateTaskHandler
     {
-        private readonly ProjectTaskFactory _factory;
-        private readonly ITaskRepository _repository;
+        private readonly ITaskService _taskService;
         private readonly NotificationSender _notificationSender;
 
-        // Injetar as dependências que o Handler precisa
+        // Injetar (Serviço e Notificações)
         public CreateTaskHandler(
-            ProjectTaskFactory factory,
-            ITaskRepository repository,
+            ITaskService taskService,
             NotificationSender notificationSender)
         {
-            _factory = factory;
-            _repository = repository;
+            _taskService = taskService;
             _notificationSender = notificationSender;
         }
 
         public async Task<TaskBase> HandleAsync(CreateTaskCommand command)
         {
-            // Criar a tarefa (Usa a Factory e o Builder)
-            var task = _factory.CreateFromCommand(command);
+            // Criar a tarefa (O Serviço aplica as regras de negócio)
+            var task = await _taskService.CreateTaskAsync(command);
 
-            // Guardar na Base de Dados (Repository)
-            await _repository.SaveAsync(task);
-
-            // Preparar a notificação
-            var user = new User { Id = Guid.NewGuid(), Name = "Developer" };
+            // Simular notificação para o Gestor do projeto
+            var user = new User { Id = command.ProjectId, Name = "Gestor do Projeto" };
             var notif = new Notification
             {
                 UserId = user.Id,
                 Type = NotificationType.Info,
-                Message = $"Nova tarefa atribuída: '{task.Title}'"
+                Message = $"Nova tarefa criada: '{task.Title}'"
             };
 
             // Enviar a notificação (Strategy)
             await _notificationSender.DeliverAsync(user, notif);
 
-            return task; // Devolve a tarefa criada
+            return task;
         }
     }
 }

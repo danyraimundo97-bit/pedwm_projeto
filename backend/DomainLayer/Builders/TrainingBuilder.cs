@@ -5,7 +5,7 @@ namespace DomainLayer.Builders
     public class TrainingBuilder : ProjectBaseBuilder<TrainingBuilder>
     {
         private string _courseName = string.Empty;
-        private int _hours;
+        private double _trainingHours;
 
         public TrainingBuilder WhichCourse(string course)
         {
@@ -13,9 +13,9 @@ namespace DomainLayer.Builders
             return this;
         }
 
-        public TrainingBuilder WithDuration(int hours)
+        public TrainingBuilder WithDuration(double hours)
         {
-            _hours = hours;
+            _trainingHours = hours;
             return this;
         }
 
@@ -27,7 +27,7 @@ namespace DomainLayer.Builders
                 StartDate = _startDate,     // Inherited from ProjectBaseBuilder
                 EndDate = _endDate,         // Inherited from ProjectBaseBuilder
                 CourseName = _courseName,
-                Hours = _hours
+                TrainingHours = _trainingHours
             };
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
-using DomainLayer.Domain;
+using DomainLayer.Domain.Users;
+using DomainLayer.Domain.Notifications;
 
 namespace ApplicationLayer.Strategy
 {

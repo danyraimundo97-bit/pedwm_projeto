@@ -20,7 +20,7 @@ namespace ApplicationLayer.Factories
                     .WithTitle(cmd.Title)
                     .WithDates(cmd.StartDate, cmd.EndDate)
                     .WithBudget((int)cmd.AllocatedHours)
-                    .ManagedBy(cmd.ManagerId)
+                    .ManagedBy(cmd.ManagerId.GetValueOrDefault())
                     .Build() },
 
                 { ProjectType.SickLeave, cmd => new SickLeaveBuilder()
@@ -34,7 +34,7 @@ namespace ApplicationLayer.Factories
                 { ProjectType.Holiday, cmd => new HolidayBuilder()
                     .WithTitle(cmd.Title)
                     .WithDates(cmd.StartDate, cmd.EndDate)
-                    .WhichType(Enum.TryParse<HolidayType>(cmd.HolidayType, true, out var ht) ? ht : HolidayType.Optional)
+                    .WhichType(cmd.HolidayType.GetValueOrDefault())
                     .Build() },
 
                 { ProjectType.Training, cmd => new TrainingBuilder()
