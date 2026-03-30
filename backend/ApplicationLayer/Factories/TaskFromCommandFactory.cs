@@ -1,7 +1,5 @@
 using ApplicationLayer.Commands;
-using ApplicationLayer.Models;
 using DomainLayer.Domain.Tasks;
-using AppTaskType = ApplicationLayer.Models.TaskType;
 
 namespace ApplicationLayer.Factories
 {
@@ -12,14 +10,14 @@ namespace ApplicationLayer.Factories
         {
             return cmd.Type switch
             {
-                AppTaskType.Bug => BugTask.Builder()
+                TaskType.Bug => BugTask.Builder()
                     .WithTitle(cmd.Title)
                     .WithDescription(cmd.Description)
                     .InProject(cmd.ProjectId)
                     .ForEnvironment(cmd.Environment ?? "Production")
                     .Build(),
 
-                AppTaskType.Feature => FeatureTask.Builder()
+                TaskType.Feature => FeatureTask.Builder()
                     .WithTitle(cmd.Title)
                     .WithDescription(cmd.Description)
                     .InProject(cmd.ProjectId)

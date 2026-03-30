@@ -1,6 +1,7 @@
 using ApplicationLayer.Models;
 using ApplicationLayer.Queries;
 using ApplicationLayer.Repositories;
+using DomainLayer.Domain.Tasks;
 using HotChocolate;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 

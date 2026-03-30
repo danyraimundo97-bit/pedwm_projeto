@@ -1,6 +1,6 @@
 using ApplicationLayer.Models;
 
-namespace ApplicationLayer.Strategy
+namespace ApplicationLayer.Repositories
 {
     public interface INotificationDeliveryStrategy
     {

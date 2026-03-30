@@ -1,13 +1,14 @@
 using ApplicationLayer.Models;
+using ApplicationLayer.Repositories;
 
 namespace ApplicationLayer.Strategy
 {
-    public class NotificationSender
+    public class NotificationService : INotificationService
     {
         private INotificationDeliveryStrategy _strategy;
 
         // O construtor exige uma estratégia inicial
-        public NotificationSender(INotificationDeliveryStrategy strategy)
+        public NotificationService(INotificationDeliveryStrategy strategy)
         {
             _strategy = strategy;
         }

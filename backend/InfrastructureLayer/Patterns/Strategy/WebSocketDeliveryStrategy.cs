@@ -1,5 +1,5 @@
 using ApplicationLayer.Models;
-using ApplicationLayer.Strategy;
+using ApplicationLayer.Repositories;
 using InfrastructureLayer.Patterns.Singleton;
 
 namespace InfrastructureLayer.Patterns.Strategy

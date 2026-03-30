@@ -2,7 +2,7 @@ using DomainLayer.Domain.Builders;
 
 namespace DomainLayer.Domain.Projects
 {
-    public class Holiday : ProjectBase
+    public class    Holiday : ProjectBase
     {
         public HolidayType Type { get; private set; } = HolidayType.Optional;
 
