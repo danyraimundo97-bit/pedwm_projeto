@@ -1,6 +1,7 @@
 using ApplicationLayer.Models;
 using ApplicationLayer.Queries;
 using ApplicationLayer.Repositories;
+using DomainLayer.Domain.Tasks;
 using HotChocolate;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -10,7 +11,7 @@ namespace PresentationLayer.GraphQL
     {
         public string BemVindo() => "API de Gestão de Projetos Online";
 
-        public async Task<IReadOnlyList<ProjectDto>> GetProjects([Service] ListProjectsQueryHandler handler) //TODO: Modificar o objecto para ProjectBaseDTO
+        public async Task<IReadOnlyList<ProjectSender>> GetProjects([Service] ListProjectsQueryHandler handler) //TODO: Modificar o objecto para ProjectBaseDTO
         {
             //TODO: Adicionar Paginação
             return await handler.HandleAsync();

@@ -35,5 +35,10 @@ namespace InfrastructureLayer.Repositories
             LoggerService.Instance.Log("[DATABASE] A ler todas as tarefas...");
             return await _context.Tasks.ToListAsync();
         }
+
+        Task<IReadOnlyList<TaskBase>> ITaskRepository.GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

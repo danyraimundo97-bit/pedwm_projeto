@@ -1,10 +1,9 @@
 ﻿using ApplicationLayer.Commands;
+using ApplicationLayer.Models;
 using ApplicationLayer.Services;
 using ApplicationLayer.Strategy;
 using DomainLayer.Domain.Notifications;
 using DomainLayer.Domain.Teams;
-using DomainLayer.Domain.Users;
-using System.Threading.Tasks;
 
 namespace ApplicationLayer.Handlers
 {
@@ -26,8 +25,8 @@ namespace ApplicationLayer.Handlers
             var team = await _teamService.CreateTeamAsync(command);
 
             // Simular notificação para o Admin do sistema
-            var adminUser = new User { Name = "Admin do Sistema" };
-            var notif = new Notification
+            var adminUser = new UserSender { Name = "Admin do Sistema" };
+            var notif = new NotificationSender
             {
                 UserId = adminUser.Id,
                 Type = NotificationType.Info,

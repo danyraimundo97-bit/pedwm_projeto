@@ -1,4 +1,5 @@
 using ApplicationLayer.Models;
+using DomainLayer.Domain.Projects;
 
 namespace PresentationLayer.DTOs
 {

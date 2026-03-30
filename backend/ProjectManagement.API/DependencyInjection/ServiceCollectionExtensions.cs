@@ -1,16 +1,14 @@
 using ApplicationLayer.Handlers;
 using ApplicationLayer.Mapping;
 using ApplicationLayer.Queries;
+using ApplicationLayer.Repositories;
 using ApplicationLayer.Services;
-using ApplicationLayer.Strategy;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Mapping;
 using InfrastructureLayer.Patterns.Singleton;
 using InfrastructureLayer.Patterns.Strategy;
 using InfrastructureLayer.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using DomainLayer.Domain.Repositories;
 
 namespace PresentationLayer.DependencyInjection
 {

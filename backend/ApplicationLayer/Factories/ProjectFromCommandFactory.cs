@@ -1,7 +1,5 @@
 using ApplicationLayer.Commands;
 using DomainLayer.Domain.Projects;
-using DomainHolidayType = DomainLayer.Domain.Projects.HolidayType;
-using AppProjectType = ApplicationLayer.Models.ProjectType;
 
 namespace ApplicationLayer.Factories
 {
@@ -12,7 +10,7 @@ namespace ApplicationLayer.Factories
         {
             return cmd.Type switch
             {   
-                AppProjectType.Standard => Project.Builder()
+                ProjectType.Standard => Project.Builder()
                     .WithTitle(cmd.Title)
                     .WithDates(cmd.StartDate, cmd.EndDate)
                     .WithBudget((int)cmd.AllocatedHours)
@@ -21,7 +19,7 @@ namespace ApplicationLayer.Factories
                     .WithClientName(cmd.ClientName ?? string.Empty)
                     .Build(),
 
-                AppProjectType.SickLeave => SickLeave.Builder()
+                ProjectType.SickLeave => SickLeave.Builder()
                     .WithTitle(cmd.Title)
                     .WithDates(cmd.StartDate, cmd.EndDate)
                     .WithMissedHours(cmd.AllocatedHours)
@@ -29,13 +27,13 @@ namespace ApplicationLayer.Factories
                     .SetPaid(cmd.IsPaid ?? true)
                     .Build(),
 
-                AppProjectType.Holiday => Holiday.Builder()
+                ProjectType.Holiday => Holiday.Builder()
                     .WithTitle(cmd.Title)
                     .WithDates(cmd.StartDate, cmd.EndDate)
-                    .WhichType((DomainHolidayType)cmd.HolidayType.GetValueOrDefault())
+                    .WhichType(cmd.HolidayType.GetValueOrDefault())
                     .Build(),
 
-                AppProjectType.Training => Training.Builder()
+                ProjectType.Training => Training.Builder()
                     .WithTitle(cmd.Title)
                     .WithDates(cmd.StartDate, cmd.EndDate)
                     .WithDuration(cmd.AllocatedHours)
