@@ -12,10 +12,10 @@ namespace InfrastructureLayer.Mapping
     {
         public static void Register()
         {
-            TypeAdapterConfig<ProjectBase, ProjectDto>.NewConfig()
+            TypeAdapterConfig<ProjectBase, ProjectSender>.NewConfig()
                 .Map(dest => dest.Type, src => ResolveProjectKind(src));
 
-            TypeAdapterConfig<TaskBase, TaskDto>.NewConfig()
+            TypeAdapterConfig<TaskBase, TaskSender>.NewConfig()
                 .Map(dest => dest.TaskType, src => ResolveTaskKind(src));
         }
 

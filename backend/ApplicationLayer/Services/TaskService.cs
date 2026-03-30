@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using ApplicationLayer.Commands;
 using ApplicationLayer.Factories;
-using ApplicationLayer.Repositories;
+using DomainLayer.Domain.Repositories;
 using DomainLayer.Domain.Tasks;
 
 namespace ApplicationLayer.Services

@@ -16,7 +16,7 @@ namespace ApplicationLayer.Queries
             _mapper = mapper;
         }
 
-        public async Task<IReadOnlyList<ProjectDto>> HandleAsync()
+        public async Task<IReadOnlyList<ProjectSender>> HandleAsync()
         {
             
             var entities = await _repository.GetAllAsync();

@@ -8,8 +8,8 @@ namespace InfrastructureLayer.Mapping
 {
     public sealed class DomainEntityDtoMapper : IDomainEntityDtoMapper
     {
-        public ProjectDto ToProjectDto(ProjectBase project) => project.Adapt<ProjectDto>();
+        public ProjectSender ToProjectDto(ProjectBase project) => project.Adapt<ProjectSender>();
 
-        public TaskDto ToTaskDto(TaskBase task) => task.Adapt<TaskDto>();
+        public TaskSender ToTaskDto(TaskBase task) => task.Adapt<TaskSender>();
     }
 }

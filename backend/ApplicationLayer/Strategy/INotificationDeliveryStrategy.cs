@@ -4,6 +4,6 @@ namespace ApplicationLayer.Strategy
 {
     public interface INotificationDeliveryStrategy
     {
-        Task SendAsync(UserDto user, NotificationDto notification);
+        Task SendAsync(UserSender user, Models.NotificationSender notification);
     }
 }

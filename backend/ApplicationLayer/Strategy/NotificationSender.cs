@@ -18,10 +18,10 @@ namespace ApplicationLayer.Strategy
             _strategy = strategy;
         }
 
-        public async Task DeliverAsync(UserDto user, NotificationDto notification)
+        public async Task DeliverAsync(UserSender user, Models.NotificationSender notification)
         {
             // Delegamos a responsabilidade de envio para a estratégia atual
-            await _strategy.SendAsync(user, notif);
+            await _strategy.SendAsync(user, notification);
         }
     }
 }

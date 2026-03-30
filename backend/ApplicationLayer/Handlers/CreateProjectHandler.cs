@@ -10,20 +10,20 @@ namespace ApplicationLayer.Handlers
     {
         private readonly IProjectService _projectService;
         private readonly IDomainEntityDtoMapper _mapper;
-        private readonly NotificationSender _notificationSender;
+        private readonly Strategy.NotificationSender _notificationSender;
 
         // Injetar (Serviço e Notificações)
         public CreateProjectHandler(
             IProjectService projectService,
             IDomainEntityDtoMapper mapper,
-            NotificationSender notificationSender)
+            Strategy.NotificationSender notificationSender)
         {
             _mapper = mapper;
             _projectService = projectService;
             _notificationSender = notificationSender;
         }
 
-        public async Task<ProjectDto> HandleAsync(CreateProjectCommand command)
+        public async Task<ProjectSender> HandleAsync(CreateProjectCommand command)
         {
             // Criar o projeto (O Serviço aplica as regras de negócio)
             var project = await _projectService.CreateProjectAsync(command);
@@ -31,7 +31,7 @@ namespace ApplicationLayer.Handlers
             //await _repository.SaveAsync(project);
             var dto = _mapper.ToProjectDto(project);
 
-            var user = new UserDto
+            var user = new UserSender
             {
                 Id = (Guid)command.ManagerId, //TODO:Rever
                 Name = "Gestor do Projeto",
@@ -39,7 +39,7 @@ namespace ApplicationLayer.Handlers
                 Role = UserRole.Standard,
             };
 
-            var notif = new NotificationDto
+            var notif = new Models.NotificationSender
             {
                 Id = Guid.NewGuid(),
                 UserId = user.Id,
