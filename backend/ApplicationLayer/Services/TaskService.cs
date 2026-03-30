@@ -27,14 +27,14 @@ namespace ApplicationLayer.Services
             // Uma tarefa não pode existir sem título
             if (string.IsNullOrWhiteSpace(command.Title))
             {
-                _logger.Log("[SERVICE] Erro de Validação: Título da tarefa em branco.");
+                _logger.LogInfo("[SERVICE] Erro de Validação: Título da tarefa em branco.");
                 throw new ArgumentException("O título da tarefa é obrigatório.");
             }
 
             // Garantir que a tarefa está associada a um projeto válido
             if (command.ProjectId == Guid.Empty)
             {
-                _logger.Log("[SERVICE] Erro de Validação: ID do Projeto inválido.");
+                _logger.LogInfo("[SERVICE] Erro de Validação: ID do Projeto inválido.");
                 throw new ArgumentException("A tarefa tem de estar associada a um Projeto válido.");
             }
 
@@ -45,7 +45,7 @@ namespace ApplicationLayer.Services
             // --- PERSISTÊNCIA ---
             // Guarda a tarefa na Base de Dados através do Repositório
             await _repository.SaveAsync(task);
-            _logger.Log($"[SERVICE] Tarefa '{task.Title}' processada e guardada com sucesso!");
+            _logger.LogInfo($"[SERVICE] Tarefa '{task.Title}' processada e guardada com sucesso!");
 
             // Devolve a tarefa criada para o Handler
             return task;

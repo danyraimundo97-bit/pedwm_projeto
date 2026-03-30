@@ -1,9 +1,10 @@
 using ApplicationLayer.Models;
+using DomainLayer.Domain.Notifications;
 
 namespace ApplicationLayer.Repositories
 {
     public interface INotificationDeliveryStrategy
     {
-        Task SendAsync(UserSender user, Models.NotificationSender notification);
+        Task SendAsync(Notification notification);
     }
 }

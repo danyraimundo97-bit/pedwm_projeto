@@ -4,16 +4,17 @@ using ApplicationLayer.Services;
 using ApplicationLayer.Strategy;
 using DomainLayer.Domain.Notifications;
 using DomainLayer.Domain.Teams;
+using INotificationService = ApplicationLayer.Services.INotificationService;
 
 namespace ApplicationLayer.Handlers
 {
     public class CreateTeamHandler
     {
         private readonly ITeamService _teamService;
-        private readonly NotificationSender _notificationSender;
+        private readonly INotificationService _notificationSender;
 
         // Injetar (Serviço e Notificações)
-        public CreateTeamHandler(ITeamService teamService, NotificationSender notificationSender)
+        public CreateTeamHandler(ITeamService teamService, INotificationService notificationSender)
         {
             _teamService = teamService;
             _notificationSender = notificationSender;
@@ -25,8 +26,8 @@ namespace ApplicationLayer.Handlers
             var team = await _teamService.CreateTeamAsync(command);
 
             // Simular notificação para o Admin do sistema
-            var adminUser = new UserSender { Name = "Admin do Sistema" };
-            var notif = new NotificationSender
+            var adminUser = new UserResponse { Name = "Admin do Sistema" };
+            var notif = new Models.Notification
             {
                 UserId = adminUser.Id,
                 Type = NotificationType.Info,

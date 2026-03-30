@@ -9,9 +9,9 @@ namespace ApplicationLayer.Mapping
     /// <summary>Inbound mapping from domain entities to application DTOs (implemented in Infrastructure via Mapster).</summary>
     public interface IDomainEntityDtoMapper
     {
-        ProjectDto ToProjectDto(ProjectBase project);
+        ProjectDto ToProjectSender(ProjectBase project);
         TaskDto ToTaskDto(TaskBase task);
-        UserDto ToUserDto(User user);
-        TeamDto ToTeamDto(Team team);
+        UserResponse ToUserDto(User user);
+        TeamSender ToTeamDto(Team team);
     }
 }

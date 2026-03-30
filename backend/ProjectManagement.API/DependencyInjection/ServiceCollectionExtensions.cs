@@ -27,7 +27,7 @@ namespace PresentationLayer.DependencyInjection
                 options.UseSqlite(sqliteConnectionString));
 
             services.AddSingleton<INotificationDeliveryStrategy, EmailDeliveryStrategy>();
-            services.AddSingleton<NotificationSender>();
+            services.AddSingleton<INotificationService, NotificationService>();
 
             services.AddScoped<IDomainEntityDtoMapper, DomainEntityDtoMapper>();
             services.AddScoped<IProjectRepository, ProjectRepository>();

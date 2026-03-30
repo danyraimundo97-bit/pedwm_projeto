@@ -2,6 +2,7 @@
 using ApplicationLayer.Commands;
 using ApplicationLayer.Services;
 using ApplicationLayer.Strategy;
+using DomainLayer.Domain.Builders;
 using DomainLayer.Domain.Notifications;
 using DomainLayer.Domain.Users;
 
@@ -21,20 +22,19 @@ namespace ApplicationLayer.Handlers
 
         public async Task<User> HandleAsync(CreateUserCommand command)
         {
-            // Criar o user (O Serviço aplica as regras de negócio)
-            var user = await _userService.CreateUserAsync(command);
+                // Criar o user (O Serviço aplica as regras de negócio)
+                var user = await _userService.CreateUserAsync(command);
 
-            // Notificar o próprio utilizador que a sua conta foi criada
-            var notif = new Notification
-            {
-                UserId = user.Id,
-                Type = NotificationType.Info,
-                Message = $"Olá {user.Name}, a tua conta foi criada com sucesso!"
-            };
+                // Notificar o próprio utilizador que a sua conta foi criada
+                var notif = new NotificationBuilder()
+                    .WithId(user.Id)
+                    .WithMessage($"Olá {user.Name}, a tua conta foi criada com sucesso!")
+                    .WithType(NotificationType.Info)
+                    .Build();
 
-            await _notificationSender.DeliverAsync(user, notif);
+                await _notificationSender.DeliverAsync(user, notif);
 
-            return user;
+                return user;
         }
     }
 }

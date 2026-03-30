@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using ApplicationLayer.Commands;
 using ApplicationLayer.Repositories;
+using DomainLayer.Domain.Builders;
 using DomainLayer.Domain.Users;
 
 namespace ApplicationLayer.Services
@@ -25,24 +26,22 @@ namespace ApplicationLayer.Services
             // O Nome e o Email são obrigatórios
             if (string.IsNullOrWhiteSpace(command.Name) || string.IsNullOrWhiteSpace(command.Email))
             {
-                _logger.Log($"[SERVICE] Erro de Validação: Nome ou Email do utilizador em branco.");
                 throw new ArgumentException("O Nome e o Email são obrigatórios.");
             }
 
             // --- CRIAÇÃO DA ENTIDADE ---
             // Mapeamos os dados do comando para a nossa entidade User
-            var user = new User
-            {
-                Name = command.Name,
-                Email = command.Email,
-                Role = command.Role,
-                TeamId = command.TeamId // Chave estrangeira opcional
-            };
+            var user = new UserBuilder()
+                .WithId(Guid.NewGuid())
+                .WithName(command.Name)
+                .WithRole(command.Role)
+                .WithEmail(command.Email)
+                .Build();
 
             // --- PERSISTÊNCIA ---
             // Guarda o user na Base de Dados através do Repositório
             await _repository.SaveAsync(user);
-            _logger.Log($"[SERVICE] Utilizador '{user.Name}' guardado com sucesso!");
+            _logger.LogInfo($"[SERVICE] Utilizador '{user.Name}' guardado com sucesso!");
 
             // Devolve o user criado para o Handler
             return user;

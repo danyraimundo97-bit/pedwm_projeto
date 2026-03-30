@@ -20,7 +20,7 @@ namespace ApplicationLayer.Queries
         {
             
             var entities = await _repository.GetAllAsync();
-            return entities.Select(_mapper.ToProjectDto).ToList();
+            return entities.Select(_mapper.ToProjectSender).ToList();
         }
     }
 }

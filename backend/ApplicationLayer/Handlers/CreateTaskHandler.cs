@@ -32,7 +32,7 @@ namespace ApplicationLayer.Handlers
             //var task = TaskFromCommandFactory.Create(command);
             var dto = _mapper.ToTaskDto(task);
 
-            var user = new UserSender
+            var user = new UserResponse
             {
                 Id = Guid.NewGuid(),
                 Name = "Developer",
@@ -41,7 +41,7 @@ namespace ApplicationLayer.Handlers
             };
 
 
-            var notif = new Models.NotificationSender
+            var notif = new Models.Notification
             {
                 Id = Guid.NewGuid(),
                 UserId = user.Id,

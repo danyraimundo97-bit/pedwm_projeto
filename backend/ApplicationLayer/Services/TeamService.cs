@@ -25,7 +25,7 @@ namespace ApplicationLayer.Services
             // O nome da equipa é obrigatório
             if (string.IsNullOrWhiteSpace(command.Name))
             {
-                _logger.Log($"[SERVICE] Erro de Validação: Nome da equipa em branco.");
+                _logger.LogInfo($"[SERVICE] Erro de Validação: Nome da equipa em branco.");
                 throw new ArgumentException("O nome da equipa é obrigatório.");
             }
 
@@ -36,7 +36,7 @@ namespace ApplicationLayer.Services
             // --- PERSISTÊNCIA ---
             // Guarda a equipa na Base de Dados através do Repositório
             await _repository.SaveAsync(team);
-            _logger.Log($"[SERVICE] Equipa '{team.Name}' guardada com sucesso!");
+            _logger.LogInfo($"[SERVICE] Equipa '{team.Name}' guardada com sucesso!");
 
             // Devolve a equipa criada para o Handler
             return team;
