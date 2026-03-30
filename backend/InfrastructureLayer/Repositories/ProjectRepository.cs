@@ -1,5 +1,5 @@
 using DomainLayer.Domain.Projects;
-using DomainLayer.Domain.Repositories;
+using ApplicationLayer.Repositories;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Patterns.Singleton;
 using Microsoft.EntityFrameworkCore;

@@ -1,3 +1,6 @@
+using System;
+using DomainLayer.Domain.Projects;
+
 namespace ApplicationLayer.Models
 {
     public sealed class ProjectDto

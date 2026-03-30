@@ -1,6 +1,6 @@
 ﻿using DomainLayer.Domain.Users;
 
-namespace DomainLayer.Domain.Repositories
+namespace ApplicationLayer.Repositories
 {
     public interface IUserRepository
     {

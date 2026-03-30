@@ -1,5 +1,4 @@
 using ApplicationLayer.Handlers;
-using HotChocolate;
 using PresentationLayer.DTOs;
 using PresentationLayer.GraphQL.Mapping;
 

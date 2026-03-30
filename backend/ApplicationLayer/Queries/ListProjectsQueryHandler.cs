@@ -1,6 +1,6 @@
 using ApplicationLayer.Mapping;
 using ApplicationLayer.Models;
-using DomainLayer.Domain.Repositories;
+using ApplicationLayer.Repositories;
 
 namespace ApplicationLayer.Queries
 {

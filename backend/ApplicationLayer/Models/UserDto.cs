@@ -1,3 +1,6 @@
+using System;
+using DomainLayer.Domain.Users;
+
 namespace ApplicationLayer.Models
 {
     public sealed class UserDto
@@ -8,6 +11,8 @@ namespace ApplicationLayer.Models
 
         public string Email { get; init; } = string.Empty;
 
-        public UserRole Role { get; init; } = UserRole.Standard;
+        public UserRole Role { get; init; }
+
+        public Guid? TeamId { get; init; }
     }
 }

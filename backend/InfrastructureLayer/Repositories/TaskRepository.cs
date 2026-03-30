@@ -1,4 +1,4 @@
-using DomainLayer.Domain.Repositories;
+using ApplicationLayer.Repositories;
 using DomainLayer.Domain.Tasks;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Patterns.Singleton;

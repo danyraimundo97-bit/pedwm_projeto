@@ -1,4 +1,4 @@
-using ApplicationLayer.Models;
+using DomainLayer.Domain.Tasks;
 
 namespace ApplicationLayer.Commands
 {

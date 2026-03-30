@@ -1,5 +1,4 @@
 using ApplicationLayer.Commands;
-using ApplicationLayer.Models;
 using DomainLayer.Domain.Projects;
 using DomainHolidayType = DomainLayer.Domain.Projects.HolidayType;
 using AppProjectType = ApplicationLayer.Models.ProjectType;

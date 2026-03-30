@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using DomainLayer.Domain.Users;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Patterns.Singleton;
-using DomainLayer.Domain.Repositories;
+using ApplicationLayer.Repositories;
 
 namespace InfrastructureLayer.Repositories
 {

@@ -1,3 +1,6 @@
+using System;
+using DomainLayer.Domain.Notifications;
+
 namespace ApplicationLayer.Models
 {
     public sealed class NotificationDto

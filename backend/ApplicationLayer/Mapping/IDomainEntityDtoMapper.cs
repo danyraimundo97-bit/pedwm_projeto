@@ -1,6 +1,8 @@
 using ApplicationLayer.Models;
 using DomainLayer.Domain.Projects;
 using DomainLayer.Domain.Tasks;
+using DomainLayer.Domain.Users;
+using DomainLayer.Domain.Teams;
 
 namespace ApplicationLayer.Mapping
 {
@@ -8,7 +10,8 @@ namespace ApplicationLayer.Mapping
     public interface IDomainEntityDtoMapper
     {
         ProjectDto ToProjectDto(ProjectBase project);
-
         TaskDto ToTaskDto(TaskBase task);
+        UserDto ToUserDto(User user);
+        TeamDto ToTeamDto(Team team);
     }
 }

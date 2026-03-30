@@ -1,3 +1,6 @@
+using System;
+using DomainLayer.Domain.Tasks;
+
 namespace ApplicationLayer.Models
 {
     public sealed class TaskDto

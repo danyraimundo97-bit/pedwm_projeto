@@ -19,14 +19,14 @@ namespace DomainLayer.Domain.Builders
 
         public ProjectBuilder ManagedBy(Guid? managerId)
         {
-            _managerId = managerId;
+            _managerId = managerId.GetValueOrDefault();
             return this;
         }
 
         public ProjectBuilder ForTeam(Guid? teamId)
 
         {
-            _teamId = teamId;
+            _teamId = teamId.GetValueOrDefault();
             return this;
         }
 
