@@ -8,9 +8,9 @@ namespace ApplicationLayer.Queries
     public class ListProjectsQueryHandler
     {
         private readonly IProjectRepository _repository;
-        private readonly IDomainEntityDtoMapper _mapper;
+        private readonly Mapper _mapper;
 
-        public ListProjectsQueryHandler(IProjectRepository repository, IDomainEntityDtoMapper mapper)
+        public ListProjectsQueryHandler(IProjectRepository repository, Mapper mapper)
         {
             _repository = repository;
             _mapper = mapper;

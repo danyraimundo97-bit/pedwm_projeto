@@ -1,7 +1,6 @@
-﻿using ApplicationLayer.Commands;
-using ApplicationLayer.Models;
+using ApplicationLayer.Commands;
 using ApplicationLayer.Services;
-using ApplicationLayer.Strategy;
+using DomainLayer.Domain.Builders;
 using DomainLayer.Domain.Notifications;
 using DomainLayer.Domain.Teams;
 using INotificationService = ApplicationLayer.Services.INotificationService;
@@ -26,15 +25,15 @@ namespace ApplicationLayer.Handlers
             var team = await _teamService.CreateTeamAsync(command);
 
             // Simular notificação para o Admin do sistema
-            var adminUser = new UserResponse { Name = "Admin do Sistema" };
-            var notif = new Models.Notification
-            {
-                UserId = adminUser.Id,
-                Type = NotificationType.Info,
-                Message = $"Nova Equipa criada com sucesso: '{team.Name}'"
-            };
+            var adminUserId = Guid.NewGuid();
+            var notif = new NotificationBuilder()
+                .WithId(Guid.NewGuid())
+                .ForUser(adminUserId)
+                .WithType(NotificationType.Info)
+                .WithMessage($"Nova Equipa criada com sucesso: '{team.Name}'")
+                .Build();
 
-            await _notificationSender.DeliverAsync(adminUser, notif);
+            await _notificationSender.DeliverAsync(notif);
 
             return team;
         }

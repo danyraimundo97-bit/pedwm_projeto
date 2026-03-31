@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using DomainLayer.Domain.Builders;
 using DomainLayer.Domain.Tasks;
-using DomainLayer.Builders;
 using ApplicationLayer.Commands;
 
 namespace ApplicationLayer.Factories

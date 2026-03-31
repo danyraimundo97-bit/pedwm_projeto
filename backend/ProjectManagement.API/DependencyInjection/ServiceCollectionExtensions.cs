@@ -29,7 +29,7 @@ namespace PresentationLayer.DependencyInjection
             services.AddSingleton<INotificationDeliveryStrategy, EmailDeliveryStrategy>();
             services.AddSingleton<INotificationService, NotificationService>();
 
-            services.AddScoped<IDomainEntityDtoMapper, DomainEntityDtoMapper>();
+            services.AddScoped<Mapper, DomainEntityDtoMapper>();
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<IUserRepository, UserRepository>();

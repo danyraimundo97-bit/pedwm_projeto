@@ -12,14 +12,14 @@ namespace ApplicationLayer.Handlers
     public class CreateProjectHandler
     {
         private readonly IProjectService _projectService;
-        private readonly IDomainEntityDtoMapper _mapper;
+        private readonly Mapper _mapper;
         private readonly INotificationService _notificationService;
         private readonly ISessionService _sessionService;
 
         // Injetar (Serviço e Notificações)
         public CreateProjectHandler(
             IProjectService projectService,
-            IDomainEntityDtoMapper mapper,
+            Mapper mapper,
             INotificationService notificationService,
             ISessionService sessionService)
         {

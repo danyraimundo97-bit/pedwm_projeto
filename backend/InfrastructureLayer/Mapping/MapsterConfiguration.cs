@@ -3,8 +3,6 @@ using DomainLayer.Domain.Projects;
 using DomainLayer.Domain.Tasks;
 using Mapster;
 using ProjectEntity = DomainLayer.Domain.Projects.Project;
-using AppProjectType = ApplicationLayer.Models.ProjectType;
-using AppTaskType = ApplicationLayer.Models.TaskType;
 
 namespace InfrastructureLayer.Mapping
 {
@@ -19,24 +17,24 @@ namespace InfrastructureLayer.Mapping
                 .Map(dest => dest.TaskType, src => ResolveTaskKind(src));
         }
 
-        private static AppProjectType ResolveProjectKind(ProjectBase src)
+        private static ProjectType ResolveProjectKind(ProjectBase src)
         {
             return src switch
             {
-                ProjectEntity => AppProjectType.Standard,
-                Holiday => AppProjectType.Holiday,
-                SickLeave => AppProjectType.SickLeave,
-                Training => AppProjectType.Training,
+                ProjectEntity => ProjectType.Standard,
+                Holiday => ProjectType.Holiday,
+                SickLeave => ProjectType.SickLeave,
+                Training => ProjectType.Training,
                 _ => throw new InvalidOperationException($"Unknown project subtype: {src.GetType().Name}"),
             };
         }
 
-        private static AppTaskType ResolveTaskKind(TaskBase src)
+        private static TaskType ResolveTaskKind(TaskBase src)
         {
             return src switch
             {
-                BugTask => AppTaskType.Bug,
-                FeatureTask => AppTaskType.Feature,
+                BugTask => TaskType.Bug,
+                FeatureTask => TaskType.Feature,
                 _ => throw new InvalidOperationException($"Unknown task subtype: {src.GetType().Name}"),
             };
         }
