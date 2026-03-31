@@ -23,7 +23,7 @@ namespace InfrastructureLayer.Repositories
 
         public async Task SaveAsync(Team team)
         {
-            LoggerService.Instance.Log($"[DATABASE] A guardar equipa {team.Name} na BD...");
+            LoggerService.Instance.LogInfo($"[DATABASE] A guardar equipa {team.Name} na BD...");
             
             _context.Teams.Add(team);   // Adiciona a team ao DbSet
             await _context.SaveChangesAsync();  // Salva as alterações na base de dados
@@ -32,7 +32,7 @@ namespace InfrastructureLayer.Repositories
         // Obter todas as equipas da base de dados de forma assíncrona
         public async Task<IEnumerable<Team>> GetAllAsync()
         {
-            LoggerService.Instance.Log("[DATABASE] A ler todas as equipas...");
+            LoggerService.Instance.LogInfo("[DATABASE] A ler todas as equipas...");
 
             // O .Include(t => t.Members) diz ao EF Core: 
             // "Quando fores buscar a equipa, vai também à tabela dos Users e junta as pessoas à lista!"

@@ -21,7 +21,7 @@ namespace InfrastructureLayer.Repositories
             //TODO: Adicionar tratamento de erros (try-catch) para lidar com possíveis falhas na base de dados
             //TODO: Implementar logging mais detalhado (ex: sucesso, falha)
             //TODO: Verificar se o projeto é válido antes de tentar salvar (ex: campos obrigatórios)
-            LoggerService.Instance.Log($"[DATABASE] A guardar a tarefa {task.Id} na BD...");
+            LoggerService.Instance.LogInfo($"[DATABASE] A guardar a tarefa {task.Id} na BD...");
 
             _context.Tasks.Add(task); // Adiciona a tarefa ao DbSet
             await _context.SaveChangesAsync(); // Salva as alterações na base de dados
@@ -32,7 +32,7 @@ namespace InfrastructureLayer.Repositories
         // Obter todas as tarefas da base de dados de forma assíncrona
         public async Task<IEnumerable<TaskBase>> GetAllAsync()
         {
-            LoggerService.Instance.Log("[DATABASE] A ler todas as tarefas...");
+            LoggerService.Instance.LogInfo("[DATABASE] A ler todas as tarefas...");
             return await _context.Tasks.ToListAsync();
         }
 

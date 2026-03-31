@@ -74,7 +74,7 @@ var app = builder.Build();
 app.UseCors("FlutterWebDev");
 app.UseHttpsRedirection();
 
-LoggerService.Instance.Log("--- ARRANQUE DA API COM GRAPHQL ---");
+LoggerService.Instance.LogInfo("--- ARRANQUE DA API COM GRAPHQL ---");
 
 app.MapGraphQL();
 

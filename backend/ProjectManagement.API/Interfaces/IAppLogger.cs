@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ApplicationLayer.Services
+namespace PresentationLayer.Interfaces
 {
     public interface IAppLogger
     {

@@ -21,7 +21,7 @@ namespace InfrastructureLayer.Repositories
         // Salva um user na base de dados de forma assíncrona
         public async Task SaveAsync(User user)
         {
-            LoggerService.Instance.Log($"[DATABASE] A guardar utilizador {user.Name} na BD...");
+            LoggerService.Instance.LogInfo($"[DATABASE] A guardar utilizador {user.Name} na BD...");
             
             _context.Users.Add(user);   // Adiciona o user ao DbSet
             await _context.SaveChangesAsync();  // Salva as alterações na base de dados
@@ -30,7 +30,7 @@ namespace InfrastructureLayer.Repositories
         // Obter todos os users da base de dados de forma assíncrona
         public async Task<IEnumerable<User>> GetAllAsync()
         {
-            LoggerService.Instance.Log("[DATABASE] A ler todos os utilizadores...");
+            LoggerService.Instance.LogInfo("[DATABASE] A ler todos os utilizadores...");
             return await _context.Users.ToListAsync();
         }
     }

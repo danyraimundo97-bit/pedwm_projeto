@@ -25,7 +25,7 @@ namespace ApplicationLayer.Services
             // O Nome e o Email são obrigatórios
             if (string.IsNullOrWhiteSpace(command.Name) || string.IsNullOrWhiteSpace(command.Email))
             {
-                _logger.Log($"[SERVICE] Erro de Validação: Nome ou Email do utilizador em branco.");
+                _logger.LogWarning($"[SERVICE] Erro de Validação: Nome ou Email do utilizador em branco.");
                 throw new ArgumentException("O Nome e o Email são obrigatórios.");
             }
 
@@ -42,7 +42,7 @@ namespace ApplicationLayer.Services
             // --- PERSISTÊNCIA ---
             // Guarda o user na Base de Dados através do Repositório
             await _repository.SaveAsync(user);
-            _logger.Log($"[SERVICE] Utilizador '{user.Name}' guardado com sucesso!");
+            _logger.LogInfo($"[SERVICE] Utilizador '{user.Name}' guardado com sucesso!");
 
             // Devolve o user criado para o Handler
             return user;
