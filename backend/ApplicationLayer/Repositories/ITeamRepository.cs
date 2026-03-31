@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using DomainLayer.Domain.Teams;
+﻿using DomainLayer.Domain.Teams;
 
 namespace ApplicationLayer.Repositories
 {
@@ -10,6 +8,6 @@ namespace ApplicationLayer.Repositories
         Task SaveAsync(Team team);
 
         // Obter todas as Teams
-        Task<IEnumerable<Team>> GetAllAsync();
+        Task<IReadOnlyList<Team>> GetAllAsync();
     }
 }

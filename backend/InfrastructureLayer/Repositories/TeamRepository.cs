@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using DomainLayer.Domain.Teams;
+using ApplicationLayer.Repositories;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Patterns.Singleton;
-using ApplicationLayer.Repositories;
 
 namespace InfrastructureLayer.Repositories
 {
@@ -13,32 +11,46 @@ namespace InfrastructureLayer.Repositories
         private readonly AppDbContext _context;
 
         // Injeção da dependência do DbContext para aceder à base de dados
-
         public TeamRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        // Salva uma equipa na base de dados de forma assíncrona
-
+        // SAVE
         public async Task SaveAsync(Team team)
         {
-            LoggerService.Instance.LogInfo($"[DATABASE] A guardar equipa {team.Name} na BD...");
-            
-            _context.Teams.Add(team);   // Adiciona a team ao DbSet
-            await _context.SaveChangesAsync();  // Salva as alterações na base de dados
+            LoggerService.Instance.LogInfo($"[DATABASE] A processar a equipa '{team.Name}' (ID: {team.Id})...");
+
+            // Verificar se a tarefa já existe ('AsNoTracking' para performance)
+            bool exists = await _context.Teams.AsNoTracking().AnyAsync(t => t.Id == team.Id);
+
+            if (exists)
+            {
+                _context.Teams.Update(team);
+                LoggerService.Instance.LogInfo($"[DATABASE] A atualizar a Equipa {team.Id}.");
+            }
+            else
+            {
+                await _context.Teams.AddAsync(team);
+                LoggerService.Instance.LogInfo($"[DATABASE] A inserir a Equipa {team.Id}.");
+            }
+
+            // Verificar o resultado
+            int rowsAffected = await _context.SaveChangesAsync();
+            LoggerService.Instance.LogInfo($"[DATABASE] Operação concluída com {rowsAffected} linhas afetadas");
         }
 
-        // Obter todas as equipas da base de dados de forma assíncrona
-        public async Task<IEnumerable<Team>> GetAllAsync()
+        // GET ALL
+        public async Task<IReadOnlyList<Team>> GetAllAsync()
         {
-            LoggerService.Instance.LogInfo("[DATABASE] A ler todas as equipas...");
+            LoggerService.Instance.LogInfo("[DATABASE] A iniciar a leitura de todas as equipas...");
 
-            // O .Include(t => t.Members) diz ao EF Core: 
-            // "Quando fores buscar a equipa, vai também à tabela dos Users e junta as pessoas à lista!"
-            return await _context.Teams
-                .Include(t => t.Members)
-                .ToListAsync();
+            // Include para carregar as relações dos team menbers
+            var teams = await _context.Teams.Include(t => t.Members).ToListAsync();
+
+            LoggerService.Instance.LogInfo($"[DATABASE] Leitura de {teams.Count} equipas concluída.");
+            
+            return teams;
         }
     }
 }

@@ -1,8 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using DomainLayer.Domain.Projects;
 using ApplicationLayer.Repositories;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Patterns.Singleton;
-using Microsoft.EntityFrameworkCore;
 
 namespace InfrastructureLayer.Repositories
 {
@@ -10,34 +10,46 @@ namespace InfrastructureLayer.Repositories
     {
         private readonly AppDbContext _context;
 
+        // Injeção da dependência do DbContext para aceder à base de dados
         public ProjectRepository(AppDbContext context)
         {
             _context = context;
         }
 
+        // SAVE
         public async Task SaveAsync(ProjectBase project)
         {
-            // TODO: Verificar se o projeto já existe e atualizar em vez de criar um novo, para evitar duplicados
-            //TODO: Adicionar tratamento de erros (try-catch) para lidar com possíveis falhas na base de dados
-            //TODO: Implementar logging mais detalhado (ex: sucesso, falha)
-            //TODO: Verificar se o projeto é válido antes de tentar salvar (ex: campos obrigatórios)
-            LoggerService.Instance.LogInfo($"[DATABASE] A guardar o projeto {project.Id} na BD...");
+            LoggerService.Instance.LogInfo($"[DATABASE] A processar o Projeto '{project.Title}' (ID: {project.Id})...");
 
-            _context.Projects.Add(project); // Adiciona o projeto ao DbSet
-            await _context.SaveChangesAsync(); // Salva as alterações na base de dados d Salva as alterações na base de dados
+            // Verificar se o projeto já existe ('AsNoTracking' para performance)
+            bool exists = await _context.Projects.AsNoTracking().AnyAsync(p => p.Id == project.Id);
 
-            //TODO: Verificar o resultado do SaveChangesAsync para confirmar que a operação foi bem-sucedida
-            //TODO: Logar o resultado da operação
+            if (exists)
+            {
+                _context.Projects.Update(project);
+                LoggerService.Instance.LogInfo($"[DATABASE] A atualizar o Projeto {project.Id}.");
+            }
+            else
+            {
+                await _context.Projects.AddAsync(project);
+                LoggerService.Instance.LogInfo($"[DATABASE] A inserir o Projeto {project.Id}.");
+            }
 
+            // Verificar o resultado
+            int rowsAffected = await _context.SaveChangesAsync();
+            LoggerService.Instance.LogInfo($"[DATABASE] Operação concluída com {rowsAffected} linhas afetadas");
         }
 
+        // GET ALL
         public async Task<IReadOnlyList<ProjectBase>> GetAllAsync()
         {
-            LoggerService.Instance.LogInfo("[DATABASE] A ler todos os projetos...");
-            return await _context.Projects.ToListAsync();
-            //TODO: Adicionar tratamento de erros (try-catch) para lidar com possíveis falhas na base de dados
-            //TODO: Implementar logging mais detalhado (ex: número de projetos lidos, falha)
-            //TODO: Implementar paginação para evitar ler uma quantidade excessiva de dados de uma só vez
+            LoggerService.Instance.LogInfo("[DATABASE] A iniciar a leitura de todos os projetos...");
+
+            var projects = await _context.Projects.ToListAsync();
+
+            LoggerService.Instance.LogInfo($"[DATABASE] Leitura de {projects.Count} projetos concluída.");
+
+            return projects;
         }
     }
 }
