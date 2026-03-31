@@ -1,4 +1,3 @@
-using DomainLayer.Domain.Projects;
 using DomainLayer.Domain.Tasks;
 
 namespace ApplicationLayer.Repositories

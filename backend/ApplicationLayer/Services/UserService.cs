@@ -26,6 +26,7 @@ namespace ApplicationLayer.Services
             // O Nome e o Email são obrigatórios
             if (string.IsNullOrWhiteSpace(command.Name) || string.IsNullOrWhiteSpace(command.Email))
             {
+                _logger.LogWarning($"[SERVICE] Erro de Validação: Nome ou Email do utilizador em branco.");
                 throw new ArgumentException("O Nome e o Email são obrigatórios.");
             }
 

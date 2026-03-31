@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using ApplicationLayer.Repositories;
 using DomainLayer.Domain.Users;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Patterns.Singleton;
-using ApplicationLayer.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace InfrastructureLayer.Repositories
 {
@@ -18,20 +16,40 @@ namespace InfrastructureLayer.Repositories
             _context = context;
         }
 
-        // Salva um user na base de dados de forma assíncrona
+        // Save
         public async Task SaveAsync(User user)
         {
-            LoggerService.Instance.Log($"[DATABASE] A guardar utilizador {user.Name} na BD...");
-            
-            _context.Users.Add(user);   // Adiciona o user ao DbSet
-            await _context.SaveChangesAsync();  // Salva as alterações na base de dados
+            LoggerService.Instance.LogInfo($"[DATABASE] A processar o Utilizador '{user.Name}' (ID: {user.Id})...");
+
+            // Verificar se a tarefa já existe ('AsNoTracking' para performance)
+            bool exists = await _context.Users.AsNoTracking().AnyAsync(u => u.Id == user.Id);
+
+            if (exists)
+            {
+                _context.Users.Update(user);
+                LoggerService.Instance.LogInfo($"[DATABASE] A atualizar o Utilizador {user.Id}.");
+            }
+            else
+            {
+                await _context.Users.AddAsync(user);
+                LoggerService.Instance.LogInfo($"[DATABASE] A inserir o Utilizador {user.Id}.");
+            }
+
+            // Verificar o resultado
+            int rowsAffected = await _context.SaveChangesAsync();
+            LoggerService.Instance.LogInfo($"[DATABASE] Operação concluída com {rowsAffected} linhas afetadas");
         }
 
-        // Obter todos os users da base de dados de forma assíncrona
-        public async Task<IEnumerable<User>> GetAllAsync()
+        // GET ALL
+        public async Task<IReadOnlyList<User>> GetAllAsync()
         {
-            LoggerService.Instance.Log("[DATABASE] A ler todos os utilizadores...");
-            return await _context.Users.ToListAsync();
+            LoggerService.Instance.LogInfo("[DATABASE] A iniciar leitura de todos os utilizadores...");
+
+            var users = await _context.Users.ToListAsync();
+
+            LoggerService.Instance.LogInfo($"[DATABASE] Leitura de {users.Count} utilizadores concluída.");
+
+            return users;
         }
     }
 }

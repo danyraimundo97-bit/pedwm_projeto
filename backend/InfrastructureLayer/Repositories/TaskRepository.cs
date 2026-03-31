@@ -1,5 +1,6 @@
-using ApplicationLayer.Repositories;
+using Microsoft.EntityFrameworkCore;
 using DomainLayer.Domain.Tasks;
+using ApplicationLayer.Repositories;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Patterns.Singleton;
 
@@ -9,36 +10,46 @@ namespace InfrastructureLayer.Repositories
     {
         private readonly AppDbContext _context;
 
+        // Injeção da dependência do DbContext para aceder à base de dados
         public TaskRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        // Salva uma tarefa na base de dados de forma assíncrona
+        // SAVE
         public async Task SaveAsync(TaskBase task)
         {
-            // TODO: Verificar se o projeto já existe e atualizar em vez de criar um novo, para evitar duplicados
-            //TODO: Adicionar tratamento de erros (try-catch) para lidar com possíveis falhas na base de dados
-            //TODO: Implementar logging mais detalhado (ex: sucesso, falha)
-            //TODO: Verificar se o projeto é válido antes de tentar salvar (ex: campos obrigatórios)
-            LoggerService.Instance.Log($"[DATABASE] A guardar a tarefa {task.Id} na BD...");
+            LoggerService.Instance.LogInfo($"[DATABASE] A processar a Tarefa '{task.Title}' (ID: {task.Id})...");
 
-            _context.Tasks.Add(task); // Adiciona a tarefa ao DbSet
-            await _context.SaveChangesAsync(); // Salva as alterações na base de dados
-             //TODO: Verificar o resultado do SaveChangesAsync para confirmar que a operação foi bem-sucedida
-            //TODO: Logar o resultado da operação
+            // Verificar se a tarefa já existe ('AsNoTracking' para performance)
+            bool exists = await _context.Tasks.AsNoTracking().AnyAsync(t => t.Id == task.Id);
+
+            if (exists)
+            {
+                _context.Tasks.Update(task);
+                LoggerService.Instance.LogInfo($"[DATABASE] A atualizar a Tarefa {task.Id}.");
+            }
+            else
+            {
+                await _context.Tasks.AddAsync(task);
+                LoggerService.Instance.LogInfo($"[DATABASE] A inserir a Tarefa {task.Id}.");
+            }
+
+            // Verificar o resultado
+            int rowsAffected = await _context.SaveChangesAsync();
+            LoggerService.Instance.LogInfo($"[DATABASE] Operação concluída com {rowsAffected} linhas afetadas");
         }
 
-        // Obter todas as tarefas da base de dados de forma assíncrona
-        public async Task<IEnumerable<TaskBase>> GetAllAsync()
+        // GET ALL
+        public async Task<IReadOnlyList<TaskBase>> GetAllAsync()
         {
-            LoggerService.Instance.Log("[DATABASE] A ler todas as tarefas...");
-            return await _context.Tasks.ToListAsync();
-        }
+            LoggerService.Instance.LogInfo("[DATABASE] A iniciar a leitura de todas as tarefas...");
 
-        Task<IReadOnlyList<TaskBase>> ITaskRepository.GetAllAsync()
-        {
-            throw new NotImplementedException();
+            var tasks = await _context.Tasks.ToListAsync();
+
+            LoggerService.Instance.LogInfo($"[DATABASE] Leitura de {tasks.Count} tarefas concluída.");
+
+            return tasks;
         }
     }
 }

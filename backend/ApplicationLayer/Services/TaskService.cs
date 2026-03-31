@@ -27,14 +27,14 @@ namespace ApplicationLayer.Services
             // Uma tarefa não pode existir sem título
             if (string.IsNullOrWhiteSpace(command.Title))
             {
-                _logger.LogInfo("[SERVICE] Erro de Validação: Título da tarefa em branco.");
+                _logger.LogWarning("[SERVICE] Erro de Validação: Título da tarefa em branco.");
                 throw new ArgumentException("O título da tarefa é obrigatório.");
             }
 
             // Garantir que a tarefa está associada a um projeto válido
             if (command.ProjectId == Guid.Empty)
             {
-                _logger.LogInfo("[SERVICE] Erro de Validação: ID do Projeto inválido.");
+                _logger.LogWarning("[SERVICE] Erro de Validação: ID do Projeto inválido.");
                 throw new ArgumentException("A tarefa tem de estar associada a um Projeto válido.");
             }
 

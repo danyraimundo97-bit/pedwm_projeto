@@ -10,7 +10,7 @@ namespace InfrastructureLayer.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        // Tabelas para os tipos base, que vão armazenar todas as entidades derivadas
+        // Tabelas para os tipos base, que vão armazenar as entidades
         public DbSet<ProjectBase> Projects { get; set; }
         public DbSet<TaskBase> Tasks { get; set; }
         public DbSet<User> Users { get; set; }

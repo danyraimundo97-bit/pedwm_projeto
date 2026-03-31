@@ -28,14 +28,14 @@ namespace ApplicationLayer.Services
             // Verifica se as datas fazem sentido cronológico
             if (command.EndDate < command.StartDate)
             {
-                _logger.LogInfo("[SERVICE] Erro de Validação: Data de fim do projeto anterior à data de início do projeto.");
+                _logger.LogError("[SERVICE] Erro de Validação: Data de fim do projeto anterior à data de início do projeto.");
                 throw new ArgumentException("A data de término não pode ser anterior à data de início.");
             }
 
             // Verifica se o projeto tem tempo alocado válido
             if (command.AllocatedHours <= 0)
             {
-                _logger.LogInfo("[SERVICE] Erro de Validação: Horas alocadas ao projeto inválidas.");
+                _logger.LogError("[SERVICE] Erro de Validação: Horas alocadas ao projeto inválidas.");
                 throw new ArgumentException("As horas alocadas devem ser maiores que zero.");
             }
 

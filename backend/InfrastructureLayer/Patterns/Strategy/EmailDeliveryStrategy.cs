@@ -8,8 +8,8 @@ namespace InfrastructureLayer.Patterns.Strategy
     {
         public Task SendAsync(UserResponse user, ApplicationLayer.Models.Notification notification)
         {
-            LoggerService.Instance.Log($"[EMAIL] A enviar email para {user.Name}: {notification.Message}");
-            LoggerService.Instance.Log($"[EMAIL] Email enviado com sucesso!!");
+            LoggerService.Instance.LogInfo($"[EMAIL] A enviar email para {user.Name}: {notification.Message}");
+            LoggerService.Instance.LogInfo($"[EMAIL] Email enviado com sucesso!!");
 
             return Task.CompletedTask;
         }

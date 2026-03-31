@@ -1,45 +1,93 @@
-﻿namespace InfrastructureLayer.Patterns.Singleton
+﻿using System;
+using System.IO;
+using System.Text;
+
+namespace InfrastructureLayer.Patterns.Singleton
 {
     public sealed class LoggerService
     {
         // O Lazy assegura a complexidade da criação segura
         private static readonly Lazy<LoggerService> _lazyInstance = new Lazy<LoggerService>(() => new LoggerService());
 
-        private readonly string _logFilePath;
+        // Caminho da diretoria de logs
+        private readonly string _logsDirectory;
 
         // Lock exclusivo para a escrita no ficheiro
         private readonly object _fileLock = new object();
 
-        // Construtor Privado
+        // Enum para o tipo de log
+        private enum LogLevel { INFO, WARNING, ERROR }
+
         private LoggerService()
         {
-            // Define que o ficheiro se vai chamar "system_logs.log" e ficará na pasta onde a API corre
+            // Criação da pasta "Logs"
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            _logFilePath = Path.Combine(baseDir, "system_logs.log");
+            _logsDirectory = Path.Combine(baseDir, "Logs");
 
-            Log($"--- LoggerService inicializado ---");
+            // Se a pasta "Logs" não existir, cria-a automaticamente
+            if (!Directory.Exists(_logsDirectory))
+            {
+                Directory.CreateDirectory(_logsDirectory);
+            }
+
+            LogInfo("--- LoggerService inicializado ---");
         }
 
         // Propriedade para aceder à instância
         public static LoggerService Instance => _lazyInstance.Value;
 
-        // Método de log
-        public void Log(string message)
+        // Log file diário com base na data
+        private string GetCurrentLogFilePath()
         {
-            // Mensagem com a data e quebra de linha
-            string logEntry = $"[LOG - {DateTime.Now:dd/MM/yyyy HH:mm:ss}] {message}{Environment.NewLine}";
+            string dateSuffix = DateTime.Now.ToString("yyyy-MM-dd");
+            return Path.Combine(_logsDirectory, $"system_logs_{dateSuffix}.log");
+        }
+
+        // Método para escrever o log
+        private void WriteLog(LogLevel level, string message, Exception? ex = null)
+        {
+            var sb = new StringBuilder();
+            sb.Append($"[{DateTime.Now:dd/MM/yyyy HH:mm:ss}] [{level}] {message}");
+
+            // Adicionar o Stack Trace se for um erro e trouxer a exceção
+            if (ex != null)
+            {
+                sb.AppendLine();
+                sb.Append($"   EXCEPTION: {ex.Message}");
+                sb.AppendLine();
+                sb.Append($"   STACK TRACE: {ex.StackTrace}");
+            }
+
+            string logEntry = sb.ToString() + Environment.NewLine;
+
+            // Mudar a cor da consola dependendo do nível do log
+            ConsoleColor originalColor = Console.ForegroundColor;
+
+            Console.ForegroundColor = level switch
+            {
+                LogLevel.INFO => ConsoleColor.Cyan,      // Ciano para Info
+                LogLevel.WARNING => ConsoleColor.Yellow, // Amarelo para Avisos
+                LogLevel.ERROR => ConsoleColor.Red,      // Vermelho para Erros
+                _ => originalColor
+            };
 
             // Imprime na consola
             Console.Write(logEntry);
 
-            // Escreve no ficheiro em segurança (com lock)
+            // Restaura a cor original
+            Console.ForegroundColor = originalColor;
+
+            // Escreve no ficheiro do dia em segurança
             lock (_fileLock)
             {
-                File.AppendAllText(_logFilePath, logEntry);
+                File.AppendAllText(GetCurrentLogFilePath(), logEntry);
             }
         }
 
-        //TODO: Poderíamos adicionar métodos adicionais para diferentes níveis de log (ex: LogInfo, LogWarning, LogError) e incluir mais detalhes (ex: stack trace para erros)
-        //TODO: Poderíamos implementar uma rotação de ficheiros para evitar que o ficheiro de log cresça indefinidamente (ex: criar um novo ficheiro a cada dia ou quando atingir um certo tamanho)
+        public void LogInfo(string message) => WriteLog(LogLevel.INFO, message);
+
+        public void LogWarning(string message) => WriteLog(LogLevel.WARNING, message);
+
+        public void LogError(string message, Exception? ex = null) => WriteLog(LogLevel.ERROR, message, ex);
     }
 }

@@ -8,7 +8,7 @@ namespace InfrastructureLayer.Patterns.Strategy
     {
         public Task SendAsync(UserResponse user, ApplicationLayer.Models.Notification notification)
         {
-            LoggerService.Instance.Log($"[WEBSOCKET] Push real-time para ecrã de {user.Name}: {notification.Message}");
+            LoggerService.Instance.LogInfo($"[WEBSOCKET] Push real-time para ecrã de {user.Name}: {notification.Message}");
             //TODO: Implementar o código real do SignalR para enviar a notificação em tempo real para o Flutter
 
             return Task.CompletedTask;

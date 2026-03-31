@@ -25,7 +25,7 @@ namespace ApplicationLayer.Services
             // O nome da equipa é obrigatório
             if (string.IsNullOrWhiteSpace(command.Name))
             {
-                _logger.LogInfo($"[SERVICE] Erro de Validação: Nome da equipa em branco.");
+                _logger.LogWarning($"[SERVICE] Erro de Validação: Nome da equipa em branco.");
                 throw new ArgumentException("O nome da equipa é obrigatório.");
             }
 

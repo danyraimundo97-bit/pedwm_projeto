@@ -8,6 +8,6 @@ namespace ApplicationLayer.Repositories
         Task SaveAsync(User user);
 
         // Obter todos os Users
-        Task<IEnumerable<User>> GetAllAsync();
+        Task<IReadOnlyList<User>> GetAllAsync();
     }
 }
