@@ -1,11 +1,26 @@
 using ApplicationLayer.Commands;
+using DomainLayer.Domain.Builders;
 using DomainLayer.Domain.Tasks;
 
 namespace ApplicationLayer.Factories
 {
     /// <summary>Maps application commands to domain aggregates (use-case construction).</summary>
-    public static class TaskFromCommandFactory
+    public static class TaskFactory
     {
+        /// <summary>Reassigns a user by rebuilding the task with <see cref="BugTaskBuilder.From"/> / <see cref="FeatureTaskBuilder.From"/>.</summary>
+        public static TaskBase ChangeAssignee(TaskBase task, string assigneeUserId)
+        {
+            if (!Guid.TryParse(assigneeUserId, out var userId))
+                throw new ArgumentException("Invalid assignee user id.", nameof(assigneeUserId));
+
+            return task switch
+            {
+                BugTask b => BugTaskBuilder.From(b).WithAssignedUser(userId).Build(),
+                FeatureTask f => FeatureTaskBuilder.From(f).WithAssignedUser(userId).Build(),
+                _ => throw new ArgumentException("Unsupported task type.", nameof(task)),
+            };
+        }
+
         public static TaskBase Create(CreateTaskCommand cmd)
         {
             return cmd.Type switch

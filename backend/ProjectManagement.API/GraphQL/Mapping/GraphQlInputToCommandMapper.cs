@@ -20,5 +20,8 @@ namespace PresentationLayer.GraphQL.Mapping
 
         public static CreateTeamCommand ToCommand(this CreateTeam_DTO input) =>
             input.Adapt<CreateTeamCommand>();
+        public static AssignTaskToUserCommand ToCommand(this AssignUserToTask_DTO input) =>
+            input.Adapt<AssignTaskToUserCommand>();
+
     }
 }

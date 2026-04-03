@@ -92,5 +92,66 @@ namespace PresentationLayer.GraphQL
                 throw new GraphQLException("Ocorreu um erro interno inesperado ao tentar criar a equipa.");
             }
         }
+
+        public async Task<string> AssignTaskToUser(AssignUserToTask_DTO input, [Service] AssignUserToTaskHandler handler)
+        {
+            try
+            {
+                var command = input.ToCommand();
+                handler.HandleAsync(command);
+                return $"Tarefa atribuida ao utilizador com sucesso!";
+            }
+            catch (ArgumentException ex)
+            {
+                throw new GraphQLException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"[GraphQL Mutation] Falha ao tentar criar a Equipa com o nome '{input.Name}'.", ex);
+                throw new GraphQLException("Ocorreu um erro interno inesperado ao tentar criar a equipa.");
+            }
+        }
+        public async Task<string> AssignUserToTask(CreateTeam_DTO input, [Service] CreateTeamHandler handler)
+        {
+            try
+            {
+                var command = input.ToCommand();
+                var team = await handler.HandleAsync(command);
+                return $"Equipa '{team.Name}' criada com sucesso";
+            }
+            catch (ArgumentException ex)
+            {
+                throw new GraphQLException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"[GraphQL Mutation] Falha ao tentar criar a Equipa com o nome '{input.Name}'.", ex);
+                throw new GraphQLException("Ocorreu um erro interno inesperado ao tentar criar a equipa.");
+            }
+        }
+
+        public async Task<string> AssignUserToTask(AssignUserToTask_DTO input, [Service] CreateTeamHandler handler)
+        {
+            try
+            {
+                var command = input.ToCommand();
+                var team = await handler.HandleAsync(command);
+                return $"Equipa '{team.Name}' criada com sucesso";
+            }
+            catch (ArgumentException ex)
+            {
+                throw new GraphQLException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"[GraphQL Mutation] Falha ao tentar criar a Equipa com o nome '{input.Name}'.", ex);
+                throw new GraphQLException("Ocorreu um erro interno inesperado ao tentar criar a equipa.");
+            }
+        }
+
+        //TODO: AssignUserToTeam
+        //TODO: AddHoursToProject
+        //TODO: ChangeStatusProject
+        //TODO: Permissões?
     }
 }
