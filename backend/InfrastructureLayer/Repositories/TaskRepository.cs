@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DomainLayer.Domain.Tasks;
 using ApplicationLayer.Repositories;
@@ -40,16 +44,22 @@ namespace InfrastructureLayer.Repositories
             LoggerService.Instance.LogInfo($"[DATABASE] Operação concluída com {rowsAffected} linhas afetadas");
         }
 
-        // GET ALL
-        public async Task<IReadOnlyList<TaskBase>> GetAllAsync()
+        // GET PAGED
+        public async Task<IReadOnlyList<TaskBase>> GetPagedAsync(int page, int size)
         {
-            LoggerService.Instance.LogInfo("[DATABASE] A iniciar a leitura de todas as tarefas...");
+            LoggerService.Instance.LogInfo($"[DATABASE] A ler tarefas (Página {page}, Tamanho {size})...");
+            return await _context.Tasks
+                .AsNoTracking()
+                .OrderBy(t => t.Id) // Ordena por ID
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+        }
 
-            var tasks = await _context.Tasks.ToListAsync();
-
-            LoggerService.Instance.LogInfo($"[DATABASE] Leitura de {tasks.Count} tarefas concluída.");
-
-            return tasks;
+        // GET TASK BY ID
+        public async Task<TaskBase?> GetByIdAsync(Guid id)
+        {
+            return await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id);
         }
 
         public async Task<TaskBase?> GetTaskAsync(string taskId, string projectId)
@@ -58,6 +68,26 @@ namespace InfrastructureLayer.Repositories
                 return null;
 
             return await _context.Tasks.FirstOrDefaultAsync(t => t.Id == tid && t.ProjectId == pid);
+        }
+
+        // GET TASKS BY PROJECT
+        public async Task<IReadOnlyList<TaskBase>> GetByProjectAsync(Guid projectId)
+        {
+            LoggerService.Instance.LogInfo($"[DATABASE] A ler tarefas do projeto {projectId}...");
+            return await _context.Tasks
+                .AsNoTracking()
+                .Where(t => t.ProjectId == projectId)
+                .ToListAsync();
+        }
+
+        // GET TASKS BY USER
+        public async Task<IReadOnlyList<TaskBase>> GetByUserAsync(Guid userId)
+        {
+            LoggerService.Instance.LogInfo($"[DATABASE] A ler tarefas atribuídas ao utilizador {userId}...");
+            return await _context.Tasks
+                .AsNoTracking()
+                .Where(t => t.AssignedUserId == userId)
+                .ToListAsync();
         }
     }
 }

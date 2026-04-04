@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using DomainLayer.Domain.Teams;
 using ApplicationLayer.Repositories;
 using InfrastructureLayer.Data;
@@ -45,17 +49,16 @@ namespace InfrastructureLayer.Repositories
             return await _context.Teams.FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        // GET ALL
-        public async Task<IReadOnlyList<Team>> GetAllAsync()
+        // GET PAGED
+        public async Task<IReadOnlyList<Team>> GetPagedAsync(int page, int size)
         {
-            LoggerService.Instance.LogInfo("[DATABASE] A iniciar a leitura de todas as equipas...");
-
-            // Include para carregar as relações dos team menbers
-            var teams = await _context.Teams.Include(t => t.Members).ToListAsync();
-
-            LoggerService.Instance.LogInfo($"[DATABASE] Leitura de {teams.Count} equipas concluída.");
-            
-            return teams;
+            LoggerService.Instance.LogInfo($"[DATABASE] A ler equipas (Página {page}, Tamanho {size})...");
+            return await _context.Teams
+                .Include(t => t.Members) // Carrega as relações!
+                .OrderBy(t => t.Name) // Ordenado alfabeticamente
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
         }
     }
 }

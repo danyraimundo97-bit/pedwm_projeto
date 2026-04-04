@@ -45,16 +45,16 @@ namespace InfrastructureLayer.Repositories
             return await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        // GET ALL
-        public async Task<IReadOnlyList<User>> GetAllAsync()
+        // GET PAGED
+        public async Task<IReadOnlyList<User>> GetPagedAsync(int page, int size)
         {
-            LoggerService.Instance.LogInfo("[DATABASE] A iniciar leitura de todos os utilizadores...");
-
-            var users = await _context.Users.ToListAsync();
-
-            LoggerService.Instance.LogInfo($"[DATABASE] Leitura de {users.Count} utilizadores concluída.");
-
-            return users;
+            LoggerService.Instance.LogInfo($"[DATABASE] A ler utilizadores (Página {page}, Tamanho {size})...");
+            return await _context.Users
+                .AsNoTracking()
+                .OrderBy(u => u.Name) // Ordenado alfabeticamente
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
         }
     }
 }

@@ -110,17 +110,17 @@ namespace PresentationLayer.GraphQL
             }
             catch (Exception ex)
             {
-                _logger.LogError("[GraphQL Mutation] Falha ao atribuir tarefa ao utilizador.", ex);
+                _logger.LogError($"[GraphQL Mutation] Falha ao atribuir a Tarefa (ID: {input.TaskId}) ao Utilizador (ID: {input.AssigneeUserId}).", ex);
                 throw new GraphQLException("Ocorreu um erro interno inesperado ao atribuir a tarefa.");
             }
         }
 
-        public async Task<string> AssignUserToTeam(AssignUserToTeam_DTO input, [Service] IUserService userService)
+        public async Task<string> AssignUserToTeam(AssignUserToTeam_DTO input, [Service] AssignUserToTeamHandler handler)
         {
             try
             {
                 var command = input.ToCommand();
-                var user = await userService.AssignUserToTeamAsync(command);
+                var user = await handler.HandleAsync(command);
                 return $"Utilizador '{user.Name}' associado à equipa com sucesso.";
             }
             catch (ArgumentException ex)
@@ -133,17 +133,17 @@ namespace PresentationLayer.GraphQL
             }
             catch (Exception ex)
             {
-                _logger.LogError("[GraphQL Mutation] Falha ao associar utilizador à equipa.", ex);
+                _logger.LogError($"[GraphQL Mutation] Falha ao associar Utilizador (ID: {input.UserId}) à Equipa (ID: {input.TeamId}).", ex);
                 throw new GraphQLException("Ocorreu um erro interno inesperado ao associar o utilizador à equipa.");
             }
         }
 
-        public async Task<string> AddHoursToProject(AddHoursToProject_DTO input, [Service] IProjectService projectService)
+        public async Task<string> AddHoursToProject(AddHoursToProject_DTO input, [Service] AddHoursToProjectHandler handler)
         {
             try
             {
                 var command = input.ToCommand();
-                var project = await projectService.AddConsumedHoursToProjectAsync(command);
+                var project = await handler.HandleAsync(command);
                 return $"Registadas {command.Hours} horas no projeto '{project.Title}'.";
             }
             catch (ArgumentException ex)
@@ -156,17 +156,17 @@ namespace PresentationLayer.GraphQL
             }
             catch (Exception ex)
             {
-                _logger.LogError("[GraphQL Mutation] Falha ao registar horas no projeto.", ex);
+                _logger.LogError($"[GraphQL Mutation] Falha ao registar {input.Hours} horas no Projeto (ID: {input.ProjectId}).", ex);
                 throw new GraphQLException("Ocorreu um erro interno inesperado ao registar horas.");
             }
         }
 
-        public async Task<string> ChangeProjectStatus(ChangeProjectStatus_DTO input, [Service] IProjectService projectService)
+        public async Task<string> ChangeProjectStatus(ChangeProjectStatus_DTO input, [Service] ChangeProjectStatusHandler handler)
         {
             try
             {
                 var command = input.ToCommand();
-                var project = await projectService.ChangeProjectStatusAsync(command);
+                var project = await handler.HandleAsync(command);
                 return $"Estado do projeto '{project.Title}' atualizado para {command.Status}.";
             }
             catch (ArgumentException ex)
@@ -179,7 +179,7 @@ namespace PresentationLayer.GraphQL
             }
             catch (Exception ex)
             {
-                _logger.LogError("[GraphQL Mutation] Falha ao alterar estado do projeto.", ex);
+                _logger.LogError($"[GraphQL Mutation] Falha ao alterar estado do Projeto (ID: {input.ProjectId}) para '{input.Status}'.", ex);
                 throw new GraphQLException("Ocorreu um erro interno inesperado ao alterar o estado.");
             }
         }

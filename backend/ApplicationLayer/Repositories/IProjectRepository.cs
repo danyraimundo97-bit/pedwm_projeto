@@ -6,9 +6,8 @@ namespace ApplicationLayer.Repositories
     public interface IProjectRepository
     {
         Task SaveAsync(ProjectBase project);
-
         Task<ProjectBase?> GetByIdAsync(Guid id);
-
-        Task<IReadOnlyList<ProjectBase>> GetAllAsync();
+        Task<IReadOnlyList<ProjectBase>> GetPagedAsync(int page, int size);
+        Task<IReadOnlyList<ProjectBase>> GetByUserAsync(Guid userId);
     }
 }
