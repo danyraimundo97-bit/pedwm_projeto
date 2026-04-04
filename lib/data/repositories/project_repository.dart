@@ -51,7 +51,6 @@ Map<String, dynamic> _createProjectInput({
 }) {
   final now = DateTime.now().toUtc();
   final end = now.add(const Duration(days: 365));
-  final mgr = coerceGuid(managerId);
   final base = <String, dynamic>{
     'title': title,
     'startDate': now.toIso8601String(),
@@ -64,7 +63,7 @@ Map<String, dynamic> _createProjectInput({
       return {
         ...base,
         'clientName': description,
-        'managerId': mgr,
+        'managerId': managerId,
         'teamId': null,
       };
     case ProjectType.sickLeave:

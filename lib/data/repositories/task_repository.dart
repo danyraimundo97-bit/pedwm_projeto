@@ -28,7 +28,7 @@ Future<void> updateTaskAssigneeInBackend(
         'input': {
           'projectId': projectId,
           'taskId': taskId,
-          'assigneeUserId': coerceGuid(assigneeUserId),
+          'assigneeUserId': assigneeUserId,
         },
       },
     ),
@@ -46,13 +46,13 @@ Future<void> createTaskInBackend(
   String? severity,
   String? assigneeUserId,
 }) async {
-  final pid = coerceGuid(projectId);
+  final pid = projectId;
   final input = <String, dynamic>{
     'type': BackendMaps.taskType(type),
     'title': title,
     'description': description,
     'projectId': pid,
-    'assignedUserId': assigneeUserId != null && assigneeUserId.isNotEmpty ? coerceGuid(assigneeUserId) : null,
+    'assignedUserId': assigneeUserId != null && assigneeUserId.isNotEmpty ? assigneeUserId : null,
   };
 
   if (type == TaskType.Bug) {
