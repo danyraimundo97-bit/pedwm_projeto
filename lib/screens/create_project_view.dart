@@ -96,6 +96,7 @@ class _CreateProjectViewState extends State<CreateProjectView> {
                       description: desc.isEmpty ? '—' : desc,
                       budgetHours: b,
                       type: _type,
+                      managerUserId: auth.user.id,
                     );
                 Navigator.pop(context);
               },

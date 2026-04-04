@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:graphql/client.dart';
 import '../models/hours_log_entry.dart';
 import '../models/project_model.dart';
 import '../models/task_model.dart';
@@ -7,6 +7,8 @@ import '../data/repositories/task_repository.dart';
 import '../data/repositories/project_repository.dart';
 
 class ProjectProvider extends ChangeNotifier {
+  final GraphQLClient _client;
+
   List<ProjectModel> _projects = [];
   final List<HoursLogEntry> _hoursLog = [];
   List<MonthlyHoursStats> _monthlyStats = [];
@@ -21,22 +23,18 @@ class ProjectProvider extends ChangeNotifier {
 
   List<ProjectModel> get projects => _projects;
 
-  /// Initial / projects tab loading.
   bool get isLoadingProjects => _isLoadingProjects;
 
-  /// Hours-by-month tab loading.
   bool get isLoadingMonthlyStats => _isLoadingMonthlyStats;
 
-  /// Last error from [fetchProjectsFromBackend] / [refreshProjects].
   String? get projectsError => _projectsError;
 
-  /// Last error from [loadMonthlyHoursStats].
   String? get monthlyStatsError => _monthlyStatsError;
 
   List<MonthlyHoursStats> get monthlyHoursStats => _monthlyStats;
   List<TaskHoursInMonth> get taskHoursBreakdownForMonth => _taskHoursBreakdownForMonth;
 
-  ProjectProvider() {
+  ProjectProvider(this._client) {
     fetchProjects();
   }
 
@@ -55,7 +53,6 @@ class ProjectProvider extends ChangeNotifier {
     }
   }
 
-  /// Loads month task rows for dialogs; ignores stale responses when [month] changes quickly.
   Future<List<TaskHoursInMonth>> loadMonthDetailForDialog(DateTime month) async {
     final gen = ++_monthDetailGen;
     try {
@@ -78,7 +75,7 @@ class ProjectProvider extends ChangeNotifier {
     _projectsError = null;
     notifyListeners();
     try {
-      _projects = await fetchProjectsFromBackend();
+      _projects = await fetchProjectsFromBackend(_client);
       dummyUpdateProjects();
     } catch (e, st) {
       _projectsError = _formatError(e);
@@ -89,7 +86,6 @@ class ProjectProvider extends ChangeNotifier {
     }
   }
 
-  /// Pull-to-refresh on Projects tab.
   Future<void> refreshProjects() async {
     await fetchProjects();
   }
@@ -99,7 +95,7 @@ class ProjectProvider extends ChangeNotifier {
     return e.toString();
   }
 
-  void updateTaskStatus(String projectId, String taskId, TaskStatus newStatus) async {
+  Future<void> updateTaskStatus(String projectId, String taskId, TaskStatus newStatus) async {
     final projectIndex = _projects.indexWhere((p) => p.id == projectId);
     if (projectIndex == -1) return;
 
@@ -113,7 +109,7 @@ class ProjectProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTaskAssignee(String projectId, String taskId, String? assigneeUserId) async {
+  Future<void> updateTaskAssignee(String projectId, String taskId, String? assigneeUserId) async {
     final projectIndex = _projects.indexWhere((p) => p.id == projectId);
     if (projectIndex == -1) return;
     final project = _projects[projectIndex];
@@ -123,12 +119,19 @@ class ProjectProvider extends ChangeNotifier {
       updateAssignee: true,
       assigneeUserId: assigneeUserId,
     );
-    await updateTaskAssigneeInBackend(projectId, taskId, assigneeUserId);
+    await updateTaskAssigneeInBackend(
+      _client,
+      projectId: projectId,
+      taskId: taskId,
+      assigneeUserId: assigneeUserId,
+    );
     notifyListeners();
   }
 
-  void addLoggedHoursToTask(String projectId, String taskId, int hours) {
+  Future<void> addLoggedHoursToTask(String projectId, String taskId, int hours) async {
     if (hours <= 0) return;
+
+    await addHoursToProjectInBackend(_client, projectId: projectId, hours: hours.toDouble());
 
     final projectIndex = _projects.indexWhere((p) => p.id == projectId);
     if (projectIndex == -1) return;
@@ -154,7 +157,6 @@ class ProjectProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-//remove this function when the API is implemented
   void dummyUpdateProjects() {
     for (final project in _projects) {
       project.consumedHours = project.tasks.fold<double>(0, (sum, task) => sum + task.loggedHours);
@@ -163,14 +165,14 @@ class ProjectProvider extends ChangeNotifier {
     }
   }
 
-  void addProject ({
+  Future<void> addProject({
     required String title,
     required String description,
     required int budgetHours,
     required ProjectType type,
+    required String managerUserId,
   }) async {
     final id = 'p${DateTime.now().millisecondsSinceEpoch}';
-    //TODO: Remove this logic when the API is implemented
     _projects.add(
       ProjectModel(
         id: id,
@@ -184,11 +186,25 @@ class ProjectProvider extends ChangeNotifier {
         completionPercentage: 0,
       ),
     );
-    await createProjectInBackend(title, description, budgetHours, type);
     notifyListeners();
+    try {
+      await createProjectInBackend(
+        _client,
+        title: title,
+        description: description,
+        budgetHours: budgetHours,
+        type: type,
+        managerId: managerUserId,
+      );
+      await fetchProjects();
+    } catch (e, st) {
+      _projectsError = _formatError(e);
+      debugPrint('createProjectInBackend: $e\n$st');
+      notifyListeners();
+    }
   }
 
-  void addTask({
+  Future<void> addTask({
     required String projectId,
     required String title,
     required String description,
@@ -197,7 +213,6 @@ class ProjectProvider extends ChangeNotifier {
     String? severity,
     String? assigneeUserId,
   }) async {
-    //TODO: Remove this logic when the API is implemented
     final projectIndex = _projects.indexWhere((p) => p.id == projectId);
     if (projectIndex == -1) return;
     final taskId = 't${DateTime.now().millisecondsSinceEpoch}';
@@ -213,7 +228,29 @@ class ProjectProvider extends ChangeNotifier {
       assigneeUserId: assigneeUserId,
     );
     _projects[projectIndex].tasks.add(task);
-    await createTaskInBackend(projectId, title, description, estimate, type, severity, assigneeUserId);
     notifyListeners();
+    try {
+      await createTaskInBackend(
+        _client,
+        projectId: projectId,
+        title: title,
+        description: description,
+        estimate: estimate,
+        type: type,
+        severity: severity,
+        assigneeUserId: assigneeUserId,
+      );
+      await fetchProjects();
+    } catch (e, st) {
+      _projectsError = _formatError(e);
+      debugPrint('createTaskInBackend: $e\n$st');
+      notifyListeners();
+    }
+  }
+
+  /// Persists status change for standard projects via GraphQL (optional UI use).
+  Future<void> saveProjectStatusToBackend(String projectId, ProjectStatus status) async {
+    await changeProjectStatusInBackend(_client, projectId: projectId, status: status);
+    await fetchProjects();
   }
 }

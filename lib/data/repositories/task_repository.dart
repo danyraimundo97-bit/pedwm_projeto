@@ -1,25 +1,72 @@
-import '../../models/hours_log_entry.dart';
+import 'package:graphql/client.dart';
+
 import '../../models/task_model.dart';
+import '../graphql/backend_maps.dart';
+import '../graphql/graphql_operations.dart';
+import '../graphql/graphql_result.dart';
 
-const _kMockNetworkDelay = Duration(milliseconds: 1000);
- 
- Future<List<TaskHoursInMonth>> fetchTaskHoursBreakdownForMonthFromBackend(DateTime month) async {
-    await Future<void>.delayed(_kMockNetworkDelay);
-    return [
-      TaskHoursInMonth(projectTitle: 'Project 1', taskTitle: 'Task 1', hours: 10),
-      TaskHoursInMonth(projectTitle: 'Project 2', taskTitle: 'Task 2', hours: 20),
-      TaskHoursInMonth(projectTitle: 'Project 3', taskTitle: 'Task 3', hours: 30),
-    ];
+const _kMockNetworkDelay = Duration(milliseconds: 300);
+
+/// Backend has no task-status mutation yet; keeps optimistic UI working offline-style.
+Future<void> updateTaskStatusInBackend(String projectId, String taskId, TaskStatus newStatus) async {
+  await Future<void>.delayed(_kMockNetworkDelay);
+}
+
+Future<void> updateTaskAssigneeInBackend(
+  GraphQLClient client, {
+  required String projectId,
+  required String taskId,
+  required String? assigneeUserId,
+}) async {
+  if (assigneeUserId == null || assigneeUserId.isEmpty) {
+    return;
+  }
+  final result = await client.mutate(
+    MutationOptions(
+      document: GraphqlOperations.assignTaskToUserMutation,
+      variables: {
+        'input': {
+          'projectId': projectId,
+          'taskId': taskId,
+          'assigneeUserId': coerceGuid(assigneeUserId),
+        },
+      },
+    ),
+  );
+  assertNoGraphQlException(result);
+}
+
+Future<void> createTaskInBackend(
+  GraphQLClient client, {
+  required String projectId,
+  required String title,
+  required String description,
+  required int estimate,
+  required TaskType type,
+  String? severity,
+  String? assigneeUserId,
+}) async {
+  final pid = coerceGuid(projectId);
+  final input = <String, dynamic>{
+    'type': BackendMaps.taskType(type),
+    'title': title,
+    'description': description,
+    'projectId': pid,
+    'assignedUserId': assigneeUserId != null && assigneeUserId.isNotEmpty ? coerceGuid(assigneeUserId) : null,
+  };
+
+  if (type == TaskType.Bug) {
+    input['environment'] = 'Production';
+    input['severity'] = BackendMaps.bugSeverity(severity);
+  } else {
+    input['storyPoints'] = estimate;
   }
 
-   Future<void> updateTaskStatusInBackend(String projectId, String taskId, TaskStatus newStatus) async {
-    await Future<void>.delayed(_kMockNetworkDelay);
-  }
-
-  Future<void> updateTaskAssigneeInBackend(String projectId, String taskId, String? assigneeUserId) async {
-    await Future<void>.delayed(_kMockNetworkDelay);
-  }
-
-  Future<void> createTaskInBackend(String projectId, String title, String description, int estimate, TaskType type, String? severity, String? assigneeUserId) async {
-    await Future<void>.delayed(_kMockNetworkDelay);
-  }
+  final result = await client.mutate(
+    MutationOptions(
+      document: GraphqlOperations.createTaskMutation,
+      variables: {'input': input},
+    ),
+  );
+  assertNoGraphQlException(result);
+}
