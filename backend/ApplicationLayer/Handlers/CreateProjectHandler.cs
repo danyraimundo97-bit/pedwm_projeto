@@ -2,25 +2,31 @@ using ApplicationLayer.Commands;
 using ApplicationLayer.Mapping;
 using ApplicationLayer.Models;
 using ApplicationLayer.Services;
-using ApplicationLayer.Strategy;
+using DomainLayer.Domain.Builders;
+using DomainLayer.Domain.Notifications;
+using DomainLayer.Domain.Users;
+using System.Diagnostics.Tracing;
 
 namespace ApplicationLayer.Handlers
 {
     public class CreateProjectHandler
     {
         private readonly IProjectService _projectService;
-        private readonly IDomainEntityDtoMapper _mapper;
-        private readonly Strategy.NotificationSender _notificationSender;
+        private readonly Mapper _mapper;
+        private readonly INotificationService _notificationService;
+        private readonly ISessionService _sessionService;
 
         // Injetar (Serviço e Notificações)
         public CreateProjectHandler(
             IProjectService projectService,
-            IDomainEntityDtoMapper mapper,
-            Strategy.NotificationSender notificationSender)
+            Mapper mapper,
+            INotificationService notificationService,
+            ISessionService sessionService)
         {
             _mapper = mapper;
             _projectService = projectService;
-            _notificationSender = notificationSender;
+            _notificationService = notificationService;
+            _sessionService = sessionService;
         }
 
         public async Task<ProjectSender> HandleAsync(CreateProjectCommand command)
@@ -29,27 +35,20 @@ namespace ApplicationLayer.Handlers
             var project = await _projectService.CreateProjectAsync(command);
             //var project = ProjectFromCommandFactory.Create(command);
             //await _repository.SaveAsync(project);
-            var dto = _mapper.ToProjectDto(project);
+            var projectResponse = _mapper.ToProjectSender(project);
+            Guid userId = _sessionService.GetCurrentUserID();
 
-            var user = new UserSender
-            {
-                Id = (Guid)command.ManagerId, //TODO:Rever
-                Name = "Gestor do Projeto",
-                Email = string.Empty,
-                Role = UserRole.Standard,
-            };
 
-            var notif = new Models.NotificationSender
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                Type = NotificationType.Info,
-                Message = $"O projeto '{dto.Title}' foi criado e guardado com sucesso!",
-            };
+            var notif = new NotificationBuilder()
+                .WithId(Guid.NewGuid())
+                .WithType(NotificationType.Info)
+                .ForUser(userId)
+                .WithMessage($"O projeto '{projectResponse.Title}' foi criado e guardado com sucesso!")
+                .Build();
 
-            await _notificationSender.DeliverAsync(user, notif);
+            await _notificationService.DeliverAsync(notif);
 
-            return dto;
+            return projectResponse;
         }
     }
 }

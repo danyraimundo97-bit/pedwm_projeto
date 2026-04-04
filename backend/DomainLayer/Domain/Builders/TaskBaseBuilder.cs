@@ -10,6 +10,8 @@ namespace DomainLayer.Domain.Builders
         protected string _title = string.Empty;
         protected string _description = string.Empty;
         protected Guid _projectId;
+        protected Guid _assignedUserId;
+
 
         public TBuilder WithTitle(string title)
         {

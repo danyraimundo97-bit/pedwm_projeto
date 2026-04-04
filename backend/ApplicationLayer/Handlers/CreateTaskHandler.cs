@@ -1,28 +1,29 @@
 using System.Threading.Tasks;
 using ApplicationLayer.Commands;
-using ApplicationLayer.Factories;
 using ApplicationLayer.Mapping;
 using ApplicationLayer.Models;
 using ApplicationLayer.Services;
-using ApplicationLayer.Strategy;
+using DomainLayer.Domain.Builders;
+using DomainLayer.Domain.Notifications;
+using DomainLayer.Domain.Users;
 
 namespace ApplicationLayer.Handlers
 {
     public class CreateTaskHandler
     {
-        private readonly IDomainEntityDtoMapper _mapper;
+        private readonly Mapper _mapper;
         private readonly ITaskService _taskService;
-        private readonly Strategy.NotificationSender _notificationSender;
+        private readonly INotificationService _notificationService;
 
         // Injetar (Serviço e Notificações)
         public CreateTaskHandler(
             ITaskService taskService,
-            IDomainEntityDtoMapper mapper,
-            Strategy.NotificationSender notificationSender)
+            Mapper mapper,
+            INotificationService notificationService)
         {
             _mapper = mapper;
             _taskService = taskService;
-            _notificationSender = notificationSender;
+            _notificationService = notificationService;
         }
 
         public async Task<TaskSender> HandleAsync(CreateTaskCommand command)
@@ -30,9 +31,9 @@ namespace ApplicationLayer.Handlers
             // Criar a tarefa (O Serviço aplica as regras de negócio)
             var task = await _taskService.CreateTaskAsync(command);
             //var task = TaskFromCommandFactory.Create(command);
-            var dto = _mapper.ToTaskDto(task);
+            var dto = _mapper.ToTaskSender(task);
 
-            var user = new UserSender
+            var user = new UserResponse
             {
                 Id = Guid.NewGuid(),
                 Name = "Developer",
@@ -41,15 +42,14 @@ namespace ApplicationLayer.Handlers
             };
 
 
-            var notif = new Models.NotificationSender
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                Type = NotificationType.Info,
-                Message = $"Nova tarefa atribuída: '{dto.Title}'",
-            };
+            var notif = new NotificationBuilder()
+                .WithId(Guid.NewGuid())
+                .ForUser(user.Id)
+                .WithType(NotificationType.Info)
+                .WithMessage($"Nova tarefa atribuída: '{dto.Title}'")
+                .Build();
 
-            await _notificationSender.DeliverAsync(user, notif);
+            await _notificationService.DeliverAsync(notif);
 
             return dto;
         }

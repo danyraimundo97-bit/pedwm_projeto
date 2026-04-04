@@ -2,7 +2,7 @@ using DomainLayer.Domain.Users;
 
 namespace ApplicationLayer.Models
 {
-    public sealed class UserSender
+    public sealed class UserResponse
     {
         public Guid Id { get; init; }
 

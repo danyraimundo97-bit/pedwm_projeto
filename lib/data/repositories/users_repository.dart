@@ -1,7 +1,12 @@
+import 'package:graphql/client.dart';
+
 import '../../models/app_user.dart';
 import '../../models/user_role.dart';
+import '../graphql/backend_maps.dart';
+import '../graphql/graphql_operations.dart';
+import '../graphql/graphql_result.dart';
 
-const _kMockNetworkDelay = Duration(milliseconds: 1000);
+const _kMockNetworkDelay = Duration(milliseconds: 400);
 
 Future<List<AppUser>> fetchUsersFromBackend() async {
   await Future<void>.delayed(_kMockNetworkDelay);
@@ -17,6 +22,24 @@ Future<AppUser> fetchCurrentUserFromBackend() async {
   return AppUser(id: 'u1', name: 'Jay Majors', email: 'jay@example.com', role: UserRole.projectManager);
 }
 
-Future<void> createUserInBackend(String name, String email, UserRole role) async {
-  await Future<void>.delayed(_kMockNetworkDelay);
+Future<void> createUserInBackend(
+  GraphQLClient client, {
+  required String name,
+  required String email,
+  required UserRole role,
+}) async {
+  final result = await client.mutate(
+    MutationOptions(
+      document: GraphqlOperations.createUserMutation,
+      variables: {
+        'input': {
+          'name': name,
+          'email': email,
+          'role': BackendMaps.userRole(role),
+          'teamId': null,
+        },
+      },
+    ),
+  );
+  assertNoGraphQlException(result);
 }

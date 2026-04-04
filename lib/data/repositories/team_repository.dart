@@ -1,6 +1,11 @@
-import '../../models/team_model.dart';
+import 'package:graphql/client.dart';
 
-const _kMockNetworkDelay = Duration(milliseconds: 1000);
+import '../../models/team_model.dart';
+import '../graphql/backend_maps.dart';
+import '../graphql/graphql_operations.dart';
+import '../graphql/graphql_result.dart';
+
+const _kMockNetworkDelay = Duration(milliseconds: 400);
 
 Future<List<TeamModel>> fetchTeamsFromBackend() async {
   await Future<void>.delayed(_kMockNetworkDelay);
@@ -9,10 +14,33 @@ Future<List<TeamModel>> fetchTeamsFromBackend() async {
   ];
 }
 
-Future<void> createTeamInBackend(String name) async {
-  await Future<void>.delayed(_kMockNetworkDelay);
+Future<void> createTeamInBackend(GraphQLClient client, {required String name}) async {
+  final result = await client.mutate(
+    MutationOptions(
+      document: GraphqlOperations.createTeamMutation,
+      variables: {
+        'input': {'name': name},
+      },
+    ),
+  );
+  assertNoGraphQlException(result);
 }
 
-Future<void> addUserToTeamInBackend(String teamId, String userId) async {
-  await Future<void>.delayed(_kMockNetworkDelay);
+Future<void> addUserToTeamInBackend(
+  GraphQLClient client, {
+  required String teamId,
+  required String userId,
+}) async {
+  final result = await client.mutate(
+    MutationOptions(
+      document: GraphqlOperations.assignUserToTeamMutation,
+      variables: {
+        'input': {
+          'teamId': coerceGuid(teamId),
+          'userId': coerceGuid(userId),
+        },
+      },
+    ),
+  );
+  assertNoGraphQlException(result);
 }

@@ -8,5 +8,9 @@ namespace ApplicationLayer.Services
     public interface IProjectService
     {
         Task<ProjectBase> CreateProjectAsync(CreateProjectCommand command);
+
+        Task<ProjectBase> AddConsumedHoursToProjectAsync(AddHoursToProjectCommand command);
+
+        Task<ProjectBase> ChangeProjectStatusAsync(ChangeProjectStatusCommand command);
     }
 }

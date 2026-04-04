@@ -4,10 +4,10 @@ namespace ApplicationLayer.Repositories
 {
     public interface IUserRepository
     {
-        // Salvar um User
         Task SaveAsync(User user);
 
-        // Obter todos os Users
+        Task<User?> GetByIdAsync(Guid id);
+
         Task<IReadOnlyList<User>> GetAllAsync();
     }
 }

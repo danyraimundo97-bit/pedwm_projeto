@@ -51,5 +51,13 @@ namespace InfrastructureLayer.Repositories
 
             return tasks;
         }
+
+        public async Task<TaskBase?> GetTaskAsync(string taskId, string projectId)
+        {
+            if (!Guid.TryParse(taskId, out var tid) || !Guid.TryParse(projectId, out var pid))
+                return null;
+
+            return await _context.Tasks.FirstOrDefaultAsync(t => t.Id == tid && t.ProjectId == pid);
+        }
     }
 }

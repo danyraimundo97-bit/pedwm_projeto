@@ -1,7 +1,8 @@
 using ApplicationLayer.Models;
 using ApplicationLayer.Repositories;
+using DomainLayer.Domain.Notifications;
 
-namespace ApplicationLayer.Strategy
+namespace ApplicationLayer.Services
 {
     public class NotificationService : INotificationService
     {
@@ -19,10 +20,10 @@ namespace ApplicationLayer.Strategy
             _strategy = strategy;
         }
 
-        public async Task DeliverAsync(UserSender user, Models.NotificationSender notification)
+        public async Task DeliverAsync(Notification notification)
         {
             // Delegamos a responsabilidade de envio para a estratégia atual
-            await _strategy.SendAsync(user, notification);
+            await _strategy.SendAsync(notification);
         }
     }
 }

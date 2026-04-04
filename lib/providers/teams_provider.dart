@@ -1,16 +1,19 @@
 import 'package:flutter/foundation.dart';
+import 'package:graphql/client.dart';
 import '../models/team_model.dart';
 import '../data/repositories/team_repository.dart' as team_repo;
 
 /// Teams and membership (CRUD + backend sync).
 class TeamsProvider extends ChangeNotifier {
+  TeamsProvider(this._client) {
+    fetchTeams();
+  }
+
+  final GraphQLClient _client;
+
   List<TeamModel> _teams = [];
 
   List<TeamModel> get teams => List.unmodifiable(_teams);
-
-  TeamsProvider() {
-    fetchTeams();
-  }
 
   Future<void> fetchTeams() async {
     _teams = await team_repo.fetchTeamsFromBackend();
@@ -20,8 +23,14 @@ class TeamsProvider extends ChangeNotifier {
   Future<void> createTeam(String name) async {
     final id = 'team${DateTime.now().millisecondsSinceEpoch}';
     _teams.add(TeamModel(id: id, name: name));
-    await team_repo.createTeamInBackend(name);
     notifyListeners();
+    try {
+      await team_repo.createTeamInBackend(_client, name: name);
+      await fetchTeams();
+    } catch (e, st) {
+      debugPrint('createTeamInBackend: $e\n$st');
+      rethrow;
+    }
   }
 
   Future<void> addUserToTeam({required String teamId, required String userId}) async {
@@ -34,7 +43,13 @@ class TeamsProvider extends ChangeNotifier {
       name: t.name,
       memberUserIds: [...t.memberUserIds, userId],
     );
-    await team_repo.addUserToTeamInBackend(teamId, userId);
     notifyListeners();
+    try {
+      await team_repo.addUserToTeamInBackend(_client, teamId: teamId, userId: userId);
+      await fetchTeams();
+    } catch (e, st) {
+      debugPrint('addUserToTeamInBackend: $e\n$st');
+      rethrow;
+    }
   }
 }

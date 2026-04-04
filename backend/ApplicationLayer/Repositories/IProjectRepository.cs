@@ -7,6 +7,8 @@ namespace ApplicationLayer.Repositories
     {
         Task SaveAsync(ProjectBase project);
 
+        Task<ProjectBase?> GetByIdAsync(Guid id);
+
         Task<IReadOnlyList<ProjectBase>> GetAllAsync();
     }
 }

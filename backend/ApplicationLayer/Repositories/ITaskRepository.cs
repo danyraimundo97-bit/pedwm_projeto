@@ -8,5 +8,7 @@ namespace ApplicationLayer.Repositories
         Task SaveAsync(TaskBase task);
 
         Task<IReadOnlyList<TaskBase>> GetAllAsync();
+
+        Task<TaskBase?> GetTaskAsync(string taskId, string projectId);
     }
 }

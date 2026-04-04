@@ -1,14 +1,14 @@
-using ApplicationLayer.Models;
 using ApplicationLayer.Repositories;
+using DomainLayer.Domain.Notifications;
 using InfrastructureLayer.Patterns.Singleton;
 
 namespace InfrastructureLayer.Patterns.Strategy
 {
     public class EmailDeliveryStrategy : INotificationDeliveryStrategy
     {
-        public Task SendAsync(UserSender user, ApplicationLayer.Models.NotificationSender notification)
+        public Task SendAsync(Notification notification)
         {
-            LoggerService.Instance.LogInfo($"[EMAIL] A enviar email para {user.Name}: {notification.Message}");
+            LoggerService.Instance.LogInfo($"[EMAIL] A enviar email para utilizador {notification.UserId}: {notification.Message}");
             LoggerService.Instance.LogInfo($"[EMAIL] Email enviado com sucesso!!");
 
             return Task.CompletedTask;

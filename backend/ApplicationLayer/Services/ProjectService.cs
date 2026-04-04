@@ -4,6 +4,7 @@ using ApplicationLayer.Commands;
 using ApplicationLayer.Factories;
 using ApplicationLayer.Repositories;
 using DomainLayer.Domain.Projects;
+using ProjectEntity = DomainLayer.Domain.Projects.Project;
 
 namespace ApplicationLayer.Services
 {
@@ -11,14 +12,12 @@ namespace ApplicationLayer.Services
     // Retira esta responsabilidade do Handler para manter o código organizado e fácil de testar.
     public class ProjectService : IProjectService
     {
-        private readonly ProjectFactory _factory;
         private readonly IProjectRepository _repository;
         private readonly IAppLogger _logger;
 
         // Construtor: Injeta a Factory e o Repositório de Projetos
-        public ProjectService(ProjectFactory factory, IProjectRepository repository, IAppLogger logger)
+        public ProjectService(IProjectRepository repository, IAppLogger logger)
         {
-            _factory = factory;
             _repository = repository;
             _logger = logger;
         }
@@ -43,7 +42,7 @@ namespace ApplicationLayer.Services
 
             // --- CRIAÇÃO DA ENTIDADE ---
             // Se passou nas validações, pede à Factory para construir o objeto de Domínio
-            var project = _factory.CreateFromCommand(command);
+            var project = ProjectFactory.Create(command);
 
             // --- PERSISTÊNCIA ---
             // Guarda o projeto na Base de Dados através do Repositório
@@ -52,6 +51,61 @@ namespace ApplicationLayer.Services
 
             // Devolve o projeto criado para o Handler
             return project;
+        }
+
+        public async Task<ProjectBase> AddConsumedHoursToProjectAsync(AddHoursToProjectCommand command)
+        {
+            if (string.IsNullOrWhiteSpace(command.ProjectId))
+            {
+                throw new ArgumentException("O identificador do projeto é obrigatório.");
+            }
+
+            if (command.Hours <= 0)
+            {
+                throw new ArgumentException("As horas devem ser um valor positivo.");
+            }
+
+            if (!Guid.TryParse(command.ProjectId, out var projectId))
+            {
+                throw new ArgumentException("ID do projeto inválido.");
+            }
+
+            var project = await _repository.GetByIdAsync(projectId);
+            if (project is not ProjectEntity standard)
+            {
+                throw new InvalidOperationException("Apenas projetos standard suportam registo de horas consumidas.");
+            }
+
+            standard.AddConsumedHours(command.Hours);
+            await _repository.SaveAsync(standard);
+            _logger.LogInfo($"[SERVICE] Registadas {command.Hours} horas no projeto '{standard.Title}'.");
+
+            return standard;
+        }
+
+        public async Task<ProjectBase> ChangeProjectStatusAsync(ChangeProjectStatusCommand command)
+        {
+            if (string.IsNullOrWhiteSpace(command.ProjectId))
+            {
+                throw new ArgumentException("O identificador do projeto é obrigatório.");
+            }
+
+            if (!Guid.TryParse(command.ProjectId, out var projectId))
+            {
+                throw new ArgumentException("ID do projeto inválido.");
+            }
+
+            var project = await _repository.GetByIdAsync(projectId);
+            if (project is not ProjectEntity standard)
+            {
+                throw new InvalidOperationException("Apenas projetos standard suportam alteração de estado.");
+            }
+
+            standard.ChangeStatus(command.Status);
+            await _repository.SaveAsync(standard);
+            _logger.LogInfo($"[SERVICE] Estado do projeto '{standard.Title}' alterado para {command.Status}.");
+
+            return standard;
         }
     }
 }

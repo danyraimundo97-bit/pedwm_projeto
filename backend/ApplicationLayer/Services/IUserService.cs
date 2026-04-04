@@ -8,5 +8,7 @@ namespace ApplicationLayer.Services
     public interface IUserService
     {
         Task<User> CreateUserAsync(CreateUserCommand command);
+
+        Task<User> AssignUserToTeamAsync(AssignUserToTeamCommand command);
     }
 }

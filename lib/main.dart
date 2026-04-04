@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
-import 'package:graphql/client.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'widgets/auth_session_shell.dart';
 import 'theme/app_colors.dart';
@@ -25,9 +24,9 @@ Future<void> main() async {
         providers: [
           Provider<GraphQLClient>.value(value: graphQLClient),
           ChangeNotifierProvider(create: (_) => AuthProvider()),
-          ChangeNotifierProvider(create: (_) => UsersProvider()),
-          ChangeNotifierProvider(create: (_) => TeamsProvider()),
-          ChangeNotifierProvider(create: (_) => ProjectProvider()),
+          ChangeNotifierProvider(create: (_) => UsersProvider(graphQLClient)),
+          ChangeNotifierProvider(create: (_) => TeamsProvider(graphQLClient)),
+          ChangeNotifierProvider(create: (_) => ProjectProvider(graphQLClient)),
         ],
         child: const TimePlannerApp(),
       ),

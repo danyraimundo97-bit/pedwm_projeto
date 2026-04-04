@@ -7,11 +7,11 @@ using DomainLayer.Domain.Teams;
 namespace ApplicationLayer.Mapping
 {
     /// <summary>Inbound mapping from domain entities to application DTOs (implemented in Infrastructure via Mapster).</summary>
-    public interface IDomainEntityDtoMapper
+    public interface Mapper
     {
-        ProjectDto ToProjectDto(ProjectBase project);
-        TaskDto ToTaskDto(TaskBase task);
-        UserDto ToUserDto(User user);
-        TeamDto ToTeamDto(Team team);
+        ProjectSender ToProjectSender(ProjectBase project);
+        TaskSender ToTaskSender(TaskBase task);
+        UserResponse ToUserSender(User user);
+        TeamSender ToTeamSender(Team team);
     }
 }
