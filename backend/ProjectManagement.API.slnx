@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="ApplicationLayer.Tests/ApplicationLayer.Tests.csproj" Id="fd3b7016-894d-45b0-a08e-9faf1b9b28bd" />
   <Project Path="ApplicationLayer/ApplicationLayer.csproj" Id="6a48388b-8cab-4b04-9d2b-e95495da41ac" />
   <Project Path="DomainLayer/DomainLayer.csproj" Id="ca975313-b537-4974-9404-cb7cd4236ffa" />
   <Project Path="InfrastructureLayer/InfrastructureLayer.csproj" Id="116a0942-393e-4014-b256-a3e09c131afc" />

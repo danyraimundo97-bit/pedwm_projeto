@@ -7,11 +7,17 @@ namespace DomainLayer.Domain.Builders
         where TBuilder : TaskBaseBuilder<TBuilder, TTask>
         where TTask : TaskBase
     {
+        protected Guid _id = Guid.NewGuid();
         protected string _title = string.Empty;
         protected string _description = string.Empty;
         protected Guid _projectId;
         protected Guid _assignedUserId;
 
+        public TBuilder WithId(Guid id)
+        {
+            _id = id;
+            return (TBuilder)this;
+        }
 
         public TBuilder WithTitle(string title)
         {

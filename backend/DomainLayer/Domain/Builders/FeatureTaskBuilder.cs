@@ -17,7 +17,7 @@ namespace DomainLayer.Domain.Builders
             EnsureTitle();
             EnsureProjectContext();
             return new FeatureTask(
-                Guid.NewGuid(),
+                _id,
                 _title.Trim(),
                 _description,
                 _projectId,

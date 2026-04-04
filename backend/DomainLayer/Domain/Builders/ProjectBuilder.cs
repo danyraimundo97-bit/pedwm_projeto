@@ -51,7 +51,7 @@ namespace DomainLayer.Domain.Builders
             }
 
             return new Project(
-                Guid.NewGuid(),
+                _id,
                 _title.Trim(),
                 _startDate,
                 _endDate,
