@@ -1,11 +1,11 @@
-﻿using System.Globalization;
-
-namespace PresentationLayer.DTOs
+﻿namespace PresentationLayer.DTOs
 {
     public class AssignUserToTask_DTO
     {
-        string projectId {  get; set; }
-        string taskId { get; set; }
-        string assigneeUserId { get; set; }
+        public string ProjectId { get; set; } = string.Empty;
+
+        public string TaskId { get; set; } = string.Empty;
+
+        public string AssigneeUserId { get; set; } = string.Empty;
     }
 }

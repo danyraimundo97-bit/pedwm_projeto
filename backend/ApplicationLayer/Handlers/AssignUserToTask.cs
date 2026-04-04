@@ -1,13 +1,9 @@
-﻿using ApplicationLayer.Commands;
+﻿using System;
+using System.Threading.Tasks;
+using ApplicationLayer.Commands;
 using ApplicationLayer.Services;
 using DomainLayer.Domain.Builders;
 using DomainLayer.Domain.Notifications;
-using DomainLayer.Domain.Teams;
-using DomainLayer.Domain.Users;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace ApplicationLayer.Handlers
 {
     public class AssignUserToTaskHandler
@@ -24,18 +20,16 @@ namespace ApplicationLayer.Handlers
             _notificationSender = notificationSender;
         }
 
-        public async void HandleAsync(AssignTaskToUserCommand command)
+        public async Task HandleAsync(AssignTaskToUserCommand command)
         {
-            // Criar a equipa (O Serviço aplica as regras de negócio)
-            var user = await _taskService.AssignUser(command.AssigneeUserId, command.TaskId, command.ProjectId);
+            var user = await _taskService.AssignUserToTaskAsync(command.AssigneeUserId, command.TaskId, command.ProjectId);
 
-            // Simular notificação para o Admin do sistema
             var adminUserId = _sessionService.GetCurrentUserID();
             var notif = new NotificationBuilder()
                 .WithId(Guid.NewGuid())
                 .ForUser(adminUserId)
                 .WithType(NotificationType.Info)
-                .WithMessage($"Tarefa foi associada ao utilizador com sucesso !")
+                .WithMessage($"Tarefa atribuída a {user.Name}.")
                 .Build();
 
             await _notificationSender.DeliverAsync(notif);

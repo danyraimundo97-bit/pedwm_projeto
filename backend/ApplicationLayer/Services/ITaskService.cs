@@ -8,7 +8,8 @@ namespace ApplicationLayer.Services
     // Interface: Contrato que define o que faz o TaskService
     public interface ITaskService
     {
-        Task<User> AssignUser(string assigneeUserId, string taskId, string projectId);
+        Task<User> AssignUserToTaskAsync(string assigneeUserId, string taskId, string projectId);
+
         Task<TaskBase> CreateTaskAsync(CreateTaskCommand command);
     }
 }

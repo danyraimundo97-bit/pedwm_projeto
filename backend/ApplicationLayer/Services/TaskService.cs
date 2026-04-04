@@ -1,11 +1,8 @@
 using ApplicationLayer.Commands;
 using ApplicationLayer.Factories;
-using ApplicationLayer.Mapping;
 using ApplicationLayer.Repositories;
 using DomainLayer.Domain.Tasks;
-using DomainLayer.Domain.Teams;
 using DomainLayer.Domain.Users;
-using System.Runtime.CompilerServices;
 using TaskFactory = ApplicationLayer.Factories.TaskFactory;
 
 namespace ApplicationLayer.Services
@@ -14,18 +11,14 @@ namespace ApplicationLayer.Services
     public class TaskService : ITaskService
     {
         private readonly ITaskRepository _repository;
+        private readonly IUserRepository _userRepository;
         private readonly IAppLogger _logger;
 
-        // Construtor: Injeta a Factory e o Repositório de Tarefas
-        public TaskService(ITaskRepository repository, IAppLogger logger)
+        public TaskService(ITaskRepository repository, IUserRepository userRepository, IAppLogger logger)
         {
             _repository = repository;
+            _userRepository = userRepository;
             _logger = logger;
-        }
-
-        public Task<Team> AssignUser(string assigneeUserId)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<TaskBase> CreateTaskAsync(CreateTaskCommand command)
@@ -59,7 +52,7 @@ namespace ApplicationLayer.Services
             return task;
         }
 
-        public async Task<User> AssignUser(string assigneeUserId, string taskId, string projectId)
+        public async Task<User> AssignUserToTaskAsync(string assigneeUserId, string taskId, string projectId)
         {
             if (string.IsNullOrWhiteSpace(assigneeUserId))
             {
@@ -79,6 +72,11 @@ namespace ApplicationLayer.Services
                 throw new ArgumentException("O Projeto é obrigatório.");
             }
 
+            if (!Guid.TryParse(assigneeUserId, out var assigneeGuid))
+            {
+                throw new ArgumentException("ID do utilizador inválido.");
+            }
+
             var task = await _repository.GetTaskAsync(taskId, projectId);
             if (task is null)
             {
@@ -89,7 +87,14 @@ namespace ApplicationLayer.Services
             var updated = TaskFactory.ChangeAssignee(task, assigneeUserId);
             await _repository.SaveAsync(updated);
 
-            throw new NotImplementedException("Resolução do utilizador para retorno ainda não implementada.");
+            var user = await _userRepository.GetByIdAsync(assigneeGuid);
+            if (user is null)
+            {
+                _logger.LogWarning("[SERVICE] Utilizador atribuído não encontrado na base de dados.");
+                throw new InvalidOperationException("Utilizador não encontrado.");
+            }
+
+            return user;
         }
     }
 }

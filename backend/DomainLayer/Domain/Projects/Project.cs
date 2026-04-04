@@ -5,6 +5,10 @@ namespace DomainLayer.Domain.Projects
     public class Project : ProjectBase
     {
         public double AllocatedHours { get; private set; }
+
+        /// <summary>Hours logged / consumed against this project (budget is <see cref="AllocatedHours"/>).</summary>
+        public double ConsumedHours { get; private set; }
+
         public ProjectStatus Status { get; private set; } = ProjectStatus.Active;
 
         public string ClientName { get; private set; } = string.Empty;
@@ -26,14 +30,31 @@ namespace DomainLayer.Domain.Projects
             Guid managerId,
             Guid teamId,
             string clientName,
-            ProjectStatus projectStatus)
+            ProjectStatus projectStatus,
+            double consumedHours = 0)
             : base(id, title, startDate, endDate)
         {
             AllocatedHours = budgetHours;
+            ConsumedHours = consumedHours;
             ManagerId = managerId;
             TeamId = teamId;
             ClientName = clientName;
             Status = projectStatus;
+        }
+
+        public void AddConsumedHours(double hours)
+        {
+            if (hours <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(hours), "Hours must be positive.");
+            }
+
+            ConsumedHours += hours;
+        }
+
+        public void ChangeStatus(ProjectStatus newStatus)
+        {
+            Status = newStatus;
         }
 
         public override double GetTotalAllocatedHours()

@@ -43,6 +43,16 @@ namespace DomainLayer.Domain.Tasks
             CompletedAt = completedAt;
         }
 
-        public abstract void MarkAsCompleted();
+        public TaskBase ChangeAssignee(Guid userID)
+        {
+            this.AssignedUserId = userID;
+            return this;
+        }
+
+        public virtual void MarkAsCompleted()
+        {
+            Status = TaskStatus.Completed;
+            CompletedAt = DateTime.UtcNow;
+        }
     }
 }

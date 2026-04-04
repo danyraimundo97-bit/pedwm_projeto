@@ -22,12 +22,6 @@ namespace DomainLayer.Domain.Tasks
             StoryPoints = storyPoints;
         }
 
-        public override void MarkAsCompleted()
-        {
-            Status = TaskStatus.Completed;
-            CompletedAt = DateTime.UtcNow;
-        }
-
         public static FeatureTaskBuilder Builder() => new FeatureTaskBuilder();
     }
 }

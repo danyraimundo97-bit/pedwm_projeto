@@ -13,12 +13,9 @@ namespace ApplicationLayer.Factories
             if (!Guid.TryParse(assigneeUserId, out var userId))
                 throw new ArgumentException("Invalid assignee user id.", nameof(assigneeUserId));
 
-            return task switch
-            {
-                BugTask b => BugTaskBuilder.From(b).WithAssignedUser(userId).Build(),
-                FeatureTask f => FeatureTaskBuilder.From(f).WithAssignedUser(userId).Build(),
-                _ => throw new ArgumentException("Unsupported task type.", nameof(task)),
-            };
+            task.ChangeAssignee(userId);
+
+            return task;
         }
 
         public static TaskBase Create(CreateTaskCommand cmd)

@@ -152,6 +152,9 @@ namespace InfrastructureLayer.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<double>("ConsumedHours")
+                        .HasColumnType("REAL");
+
                     b.Property<Guid>("ManagerId")
                         .HasColumnType("TEXT");
 

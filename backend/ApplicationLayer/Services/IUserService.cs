@@ -9,5 +9,6 @@ namespace ApplicationLayer.Services
     {
         Task<User> CreateUserAsync(CreateUserCommand command);
 
+        Task<User> AssignUserToTeamAsync(AssignUserToTeamCommand command);
     }
 }

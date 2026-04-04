@@ -1,9 +1,8 @@
 using ApplicationLayer.Handlers;
-using ApplicationLayer.Repositories;
+using ApplicationLayer.Services;
 using HotChocolate;
 using PresentationLayer.DTOs;
 using PresentationLayer.GraphQL.Mapping;
-using PresentationLayer.Interfaces;
 
 namespace PresentationLayer.GraphQL
 {
@@ -98,60 +97,91 @@ namespace PresentationLayer.GraphQL
             try
             {
                 var command = input.ToCommand();
-                handler.HandleAsync(command);
-                return $"Tarefa atribuida ao utilizador com sucesso!";
+                await handler.HandleAsync(command);
+                return "Tarefa atribuída ao utilizador com sucesso.";
             }
             catch (ArgumentException ex)
             {
                 throw new GraphQLException(ex.Message);
             }
+            catch (InvalidOperationException ex)
+            {
+                throw new GraphQLException(ex.Message);
+            }
             catch (Exception ex)
             {
-                _logger.LogError($"[GraphQL Mutation] Falha ao tentar criar a Equipa com o nome '{input.Name}'.", ex);
-                throw new GraphQLException("Ocorreu um erro interno inesperado ao tentar criar a equipa.");
+                _logger.LogError("[GraphQL Mutation] Falha ao atribuir tarefa ao utilizador.", ex);
+                throw new GraphQLException("Ocorreu um erro interno inesperado ao atribuir a tarefa.");
             }
         }
-        public async Task<string> AssignUserToTask(CreateTeam_DTO input, [Service] CreateTeamHandler handler)
+
+        public async Task<string> AssignUserToTeam(AssignUserToTeam_DTO input, [Service] IUserService userService)
         {
             try
             {
                 var command = input.ToCommand();
-                var team = await handler.HandleAsync(command);
-                return $"Equipa '{team.Name}' criada com sucesso";
+                var user = await userService.AssignUserToTeamAsync(command);
+                return $"Utilizador '{user.Name}' associado à equipa com sucesso.";
             }
             catch (ArgumentException ex)
             {
                 throw new GraphQLException(ex.Message);
             }
+            catch (InvalidOperationException ex)
+            {
+                throw new GraphQLException(ex.Message);
+            }
             catch (Exception ex)
             {
-                _logger.LogError($"[GraphQL Mutation] Falha ao tentar criar a Equipa com o nome '{input.Name}'.", ex);
-                throw new GraphQLException("Ocorreu um erro interno inesperado ao tentar criar a equipa.");
+                _logger.LogError("[GraphQL Mutation] Falha ao associar utilizador à equipa.", ex);
+                throw new GraphQLException("Ocorreu um erro interno inesperado ao associar o utilizador à equipa.");
             }
         }
 
-        public async Task<string> AssignUserToTask(AssignUserToTask_DTO input, [Service] CreateTeamHandler handler)
+        public async Task<string> AddHoursToProject(AddHoursToProject_DTO input, [Service] IProjectService projectService)
         {
             try
             {
                 var command = input.ToCommand();
-                var team = await handler.HandleAsync(command);
-                return $"Equipa '{team.Name}' criada com sucesso";
+                var project = await projectService.AddConsumedHoursToProjectAsync(command);
+                return $"Registadas {command.Hours} horas no projeto '{project.Title}'.";
             }
             catch (ArgumentException ex)
             {
                 throw new GraphQLException(ex.Message);
             }
+            catch (InvalidOperationException ex)
+            {
+                throw new GraphQLException(ex.Message);
+            }
             catch (Exception ex)
             {
-                _logger.LogError($"[GraphQL Mutation] Falha ao tentar criar a Equipa com o nome '{input.Name}'.", ex);
-                throw new GraphQLException("Ocorreu um erro interno inesperado ao tentar criar a equipa.");
+                _logger.LogError("[GraphQL Mutation] Falha ao registar horas no projeto.", ex);
+                throw new GraphQLException("Ocorreu um erro interno inesperado ao registar horas.");
             }
         }
 
-        //TODO: AssignUserToTeam
-        //TODO: AddHoursToProject
-        //TODO: ChangeStatusProject
-        //TODO: Permissões?
+        public async Task<string> ChangeProjectStatus(ChangeProjectStatus_DTO input, [Service] IProjectService projectService)
+        {
+            try
+            {
+                var command = input.ToCommand();
+                var project = await projectService.ChangeProjectStatusAsync(command);
+                return $"Estado do projeto '{project.Title}' atualizado para {command.Status}.";
+            }
+            catch (ArgumentException ex)
+            {
+                throw new GraphQLException(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new GraphQLException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("[GraphQL Mutation] Falha ao alterar estado do projeto.", ex);
+                throw new GraphQLException("Ocorreu um erro interno inesperado ao alterar o estado.");
+            }
+        }
     }
 }

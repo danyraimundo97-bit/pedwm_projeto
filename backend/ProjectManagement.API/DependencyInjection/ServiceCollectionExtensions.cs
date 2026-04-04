@@ -41,6 +41,9 @@ namespace PresentationLayer.DependencyInjection
             services.AddTransient<CreateTaskHandler>();
             services.AddTransient<CreateUserHandler>();
             services.AddTransient<CreateTeamHandler>();
+            services.AddTransient<AssignUserToTaskHandler>();
+
+            services.AddScoped<ISessionService, SessionService>();
 
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<ITaskService, TaskService>();

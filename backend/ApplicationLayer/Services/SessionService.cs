@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ApplicationLayer.Services
 {
-    internal class SessionService :ISessionService
+    public class SessionService : ISessionService
     {
         private User _user;
         private readonly IAppLogger _appLogger;

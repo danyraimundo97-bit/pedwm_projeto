@@ -11,11 +11,13 @@ namespace ApplicationLayer.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _repository;
+        private readonly ITeamRepository _teamRepository;
         private readonly IAppLogger _logger;
 
-        public UserService(IUserRepository repository, IAppLogger logger)
+        public UserService(IUserRepository repository, ITeamRepository teamRepository, IAppLogger logger)
         {
             _repository = repository;
+            _teamRepository = teamRepository;
             _logger = logger;
         }
 
@@ -45,6 +47,38 @@ namespace ApplicationLayer.Services
             _logger.LogInfo($"[SERVICE] Utilizador '{user.Name}' guardado com sucesso!");
 
             // Devolve o user criado para o Handler
+            return user;
+        }
+
+        public async Task<User> AssignUserToTeamAsync(AssignUserToTeamCommand command)
+        {
+            if (string.IsNullOrWhiteSpace(command.UserId) || string.IsNullOrWhiteSpace(command.TeamId))
+            {
+                _logger.LogWarning("[SERVICE] Utilizador ou equipa em falta.");
+                throw new ArgumentException("O identificador do utilizador e da equipa são obrigatórios.");
+            }
+
+            if (!Guid.TryParse(command.UserId, out var userId) || !Guid.TryParse(command.TeamId, out var teamId))
+            {
+                throw new ArgumentException("IDs inválidos.");
+            }
+
+            var user = await _repository.GetByIdAsync(userId);
+            if (user is null)
+            {
+                throw new InvalidOperationException("Utilizador não encontrado.");
+            }
+
+            var team = await _teamRepository.GetByIdAsync(teamId);
+            if (team is null)
+            {
+                throw new InvalidOperationException("Equipa não encontrada.");
+            }
+
+            user.TeamId = teamId;
+            await _repository.SaveAsync(user);
+            _logger.LogInfo($"[SERVICE] Utilizador '{user.Name}' associado à equipa '{team.Name}'.");
+
             return user;
         }
     }

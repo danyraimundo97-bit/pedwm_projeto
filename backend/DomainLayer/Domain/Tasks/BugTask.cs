@@ -26,6 +26,7 @@ namespace DomainLayer.Domain.Tasks
             Environment = environment;
         }
 
+
         public override void MarkAsCompleted()
         {
             Status = TaskStatus.Completed;

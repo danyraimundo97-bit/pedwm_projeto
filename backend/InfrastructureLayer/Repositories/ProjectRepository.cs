@@ -40,6 +40,11 @@ namespace InfrastructureLayer.Repositories
             LoggerService.Instance.LogInfo($"[DATABASE] Operação concluída com {rowsAffected} linhas afetadas");
         }
 
+        public async Task<ProjectBase?> GetByIdAsync(Guid id)
+        {
+            return await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+        }
+
         // GET ALL
         public async Task<IReadOnlyList<ProjectBase>> GetAllAsync()
         {
