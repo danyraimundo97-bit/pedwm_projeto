@@ -7,16 +7,6 @@ namespace ApplicationLayer.Factories
     /// <summary>Maps application commands to domain aggregates (use-case construction).</summary>
     public static class TaskFactory
     {
-        /// <summary>Reassigns a user by rebuilding the task with <see cref="BugTaskBuilder.From"/> / <see cref="FeatureTaskBuilder.From"/>.</summary>
-        public static TaskBase ChangeAssignee(TaskBase task, string assigneeUserId)
-        {
-            if (!Guid.TryParse(assigneeUserId, out var userId))
-                throw new ArgumentException("Invalid assignee user id.", nameof(assigneeUserId));
-
-            task.ChangeAssignee(userId);
-
-            return task;
-        }
 
         public static TaskBase Create(CreateTaskCommand cmd)
         {

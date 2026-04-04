@@ -36,8 +36,8 @@ Future<void> addUserToTeamInBackend(
       document: GraphqlOperations.assignUserToTeamMutation,
       variables: {
         'input': {
-          'teamId': coerceGuid(teamId),
-          'userId': coerceGuid(userId),
+          'teamId': teamId,
+          'userId': userId,
         },
       },
     ),

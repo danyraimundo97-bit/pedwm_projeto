@@ -8,7 +8,7 @@ class BackendMaps {
 
   static String projectType(ProjectType t) {
     switch (t) {
-      case ProjectType.standar d:
+      case ProjectType.standard:
         return 'Standard';
       case ProjectType.sickLeave:
         return 'SickLeave';
@@ -85,15 +85,4 @@ class BackendMaps {
     if (raw == null || raw.isEmpty) return ProjectType.standard;
     return ProjectType.fromString(raw);
   }
-}
-
-/// Ensures a string is a valid UUID for GraphQL `UUID` scalars; uses [fallback] if not.
-String coerceGuid(String? value, {String? fallback}) {
-  const defaultGuid = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
-  if (value == null || value.isEmpty) return fallback ?? defaultGuid;
-  final re = RegExp(
-    r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
-  );
-  if (re.hasMatch(value)) return value;
-  return fallback ?? defaultGuid;
 }

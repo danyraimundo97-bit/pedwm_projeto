@@ -83,8 +83,7 @@ namespace ApplicationLayer.Services
                 _logger.LogWarning("[SERVICE] Tarefa não encontrada.");
                 throw new InvalidOperationException("Tarefa não encontrada.");
             }
-
-            var updated = TaskFactory.ChangeAssignee(task, assigneeUserId);
+            var updated = task.ChangeAssignee(Guid.Parse(assigneeUserId));
             await _repository.SaveAsync(updated);
 
             var user = await _userRepository.GetByIdAsync(assigneeGuid);
