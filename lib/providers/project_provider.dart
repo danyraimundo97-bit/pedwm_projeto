@@ -76,7 +76,8 @@ class ProjectProvider extends ChangeNotifier {
     notifyListeners();
     try {
       _projects = await fetchProjectsFromBackend(_client);
-      dummyUpdateProjects();
+      debugPrint('fetchProjectsFromBackend: $_projects');
+      //dummyUpdateProjects();
     } catch (e, st) {
       _projectsError = _formatError(e);
       debugPrint('fetchProjectsFromBackend: $e\n$st');

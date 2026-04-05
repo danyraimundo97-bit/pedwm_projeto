@@ -6,28 +6,24 @@ class GraphqlOperations {
 
   static final projectsAndTasksQuery = gql(r'''
     query ProjectsAndTasks {
-      getProjects {
+      projects {
         id
         title
         startDate
         endDate
         type
       }
-      getTasks {
-        __typename
+      tasks {
         id
         title
         description
         status
         projectId
         assignedUserId
-        ... on BugTask {
-          environment
-          severity
-        }
-        ... on FeatureTask {
-          storyPoints
-        }
+        taskType
+        environment
+        severity
+        storyPoints
       }
     }
   ''');

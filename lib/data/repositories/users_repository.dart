@@ -19,7 +19,8 @@ Future<List<AppUser>> fetchUsersFromBackend() async {
 
 Future<AppUser> fetchCurrentUserFromBackend() async {
   await Future<void>.delayed(_kMockNetworkDelay);
-  return AppUser(id: 'u1', name: 'Jay Majors', email: 'jay@example.com', role: UserRole.projectManager);
+  //TODO: Fazer chamada Backend
+  return AppUser(id: '139591f2-0e7e-4ccb-a089-63bb96c1617b', name: 'Jay Majors', email: 'jay@example.com', role: UserRole.admin);
 }
 
 Future<void> createUserInBackend(

@@ -37,6 +37,7 @@ namespace PresentationLayer.DependencyInjection
 
 
             services.AddTransient<ListProjectsQueryHandler>();
+            services.AddTransient<ListTasksQueryHandler>();
             services.AddTransient<CreateProjectHandler>();
             services.AddTransient<CreateTaskHandler>();
             services.AddTransient<CreateUserHandler>();

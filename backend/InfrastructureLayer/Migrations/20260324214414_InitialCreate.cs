@@ -22,7 +22,7 @@ namespace InfrastructureLayer.Migrations
                     ProjectType = table.Column<int>(type: "INTEGER", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: true),
                     HolidayHours = table.Column<double>(type: "REAL", nullable: true),
-                    BudgetHours = table.Column<int>(type: "INTEGER", nullable: true),
+                    AllocatedHours = table.Column<int>(type: "INTEGER", nullable: true),
                     ClientName = table.Column<string>(type: "TEXT", nullable: true),
                     ProjectStatus = table.Column<string>(type: "TEXT", nullable: true),
                     ManagerId = table.Column<Guid>(type: "TEXT", nullable: true),
