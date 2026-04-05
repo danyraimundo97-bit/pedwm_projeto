@@ -3,9 +3,16 @@ namespace DomainLayer.Domain.Builders
     /// <summary>Shared fluent steps for <see cref="DomainLayer.Domain.Projects.ProjectBase"/> hierarchy.</summary>
     public abstract class ProjectBaseBuilder<TBuilder> where TBuilder : ProjectBaseBuilder<TBuilder>
     {
+        protected Guid _id = Guid.NewGuid();
         protected string _title = string.Empty;
         protected DateTime _startDate;
         protected DateTime _endDate;
+
+        public TBuilder WithId(Guid id)
+        {
+            _id = id;
+            return (TBuilder)this;
+        }
 
         public TBuilder WithTitle(string title)
         {
