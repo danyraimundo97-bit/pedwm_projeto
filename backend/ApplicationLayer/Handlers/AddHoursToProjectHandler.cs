@@ -24,6 +24,8 @@ namespace ApplicationLayer.Handlers
 
         public async Task<ProjectBase> HandleAsync(AddHoursToProjectCommand command)
         {
+            command.UserId = _sessionService.GetCurrentUserID();
+
             // O serviço trata da lógica e validações de negócio
             var project = await _projectService.AddConsumedHoursToProjectAsync(command);
 

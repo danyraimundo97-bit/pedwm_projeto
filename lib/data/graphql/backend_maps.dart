@@ -22,9 +22,9 @@ class BackendMaps {
   static String taskType(TaskType t) {
     switch (t) {
       case TaskType.Feature:
-        return 'Feature';
+        return 'FEATURE';
       case TaskType.Bug:
-        return 'Bug';
+        return 'BUG';
     }
   }
 
@@ -42,39 +42,55 @@ class BackendMaps {
   static String userRole(UserRole role) {
     switch (role) {
       case UserRole.admin:
-        return 'Admin';
+        return 'ADMIN';
       case UserRole.projectManager:
         return 'GP';
       case UserRole.member:
-        return 'Standard';
+        return 'STANDARD';
+    }
+  }
+
+  /// GraphQL [UserRole] / backend enum → Flutter [UserRole].
+  static UserRole parseUserRole(String? raw) {
+    if (raw == null || raw.isEmpty) return UserRole.member;
+    final token = raw.split(RegExp(r'[.\s]')).last.toUpperCase();
+    switch (token) {
+      case 'ADMIN':
+        return UserRole.admin;
+      case 'GP':
+        return UserRole.projectManager;
+      case 'STANDARD':
+        return UserRole.member;
+      default:
+        return UserRole.member;
     }
   }
 
   static String projectStatusForMutation(ProjectStatus status) {
     switch (status) {
       case ProjectStatus.Active:
-        return 'Active';
+        return 'ACTIVE';
       case ProjectStatus.Completed:
-        return 'Completed';
+        return 'COMPLETED';
       case ProjectStatus.OnHold:
-        return 'OnHold';
+        return 'ON_HOLD';
       case ProjectStatus.ToDo:
-        return 'Active';
+        return 'ACTIVE';
       case ProjectStatus.Unknown:
-        return 'Active';
+        return 'ACTIVE';
     }
   }
 
   /// Backend [TaskStatus] → Flutter [TaskStatus].
   static TaskStatus parseTaskStatus(String? raw) {
     switch (raw) {
-      case 'Todo':
+      case 'TODO':
         return TaskStatus.ToDo;
-      case 'InProgress':
+      case 'IN_PROGRESS':
         return TaskStatus.Active;
-      case 'InReview':
+      case 'IN_REVIEW':
         return TaskStatus.Active;
-      case 'Completed':
+      case 'COMPLETED':
         return TaskStatus.Completed;
       default:
         return TaskStatus.Unknown;
@@ -95,3 +111,4 @@ class BackendMaps {
     return TaskType.fromString(raw);
   }
 }
+

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ApplicationLayer.Commands;
 using ApplicationLayer.Factories;
 using ApplicationLayer.Repositories;
+using DomainLayer.Domain.Hours;
 using DomainLayer.Domain.Projects;
 using ProjectEntity = DomainLayer.Domain.Projects.Project;
 
@@ -13,12 +14,19 @@ namespace ApplicationLayer.Services
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _repository;
+        private readonly ITaskRepository _taskRepository;
+        private readonly IHourLogRepository _hourLogRepository;
         private readonly IAppLogger _logger;
 
-        // Construtor: Injeta a Factory e o Repositório de Projetos
-        public ProjectService(IProjectRepository repository, IAppLogger logger)
+        public ProjectService(
+            IProjectRepository repository,
+            ITaskRepository taskRepository,
+            IHourLogRepository hourLogRepository,
+            IAppLogger logger)
         {
             _repository = repository;
+            _taskRepository = taskRepository;
+            _hourLogRepository = hourLogRepository;
             _logger = logger;
         }
 
@@ -78,6 +86,28 @@ namespace ApplicationLayer.Services
 
             standard.AddConsumedHours(command.Hours);
             await _repository.SaveAsync(standard);
+
+            var hourLog = new HourLog
+            {
+                Id = Guid.NewGuid(),
+                ProjectId = projectId,
+                Hours = command.Hours,
+                LoggedAtUtc = DateTime.UtcNow,
+                UserId = command.UserId,
+            };
+
+            if (!string.IsNullOrWhiteSpace(command.TaskId) && Guid.TryParse(command.TaskId, out var taskGuid))
+            {
+                var task = await _taskRepository.GetByIdAsync(taskGuid);
+                if (task is null || task.ProjectId != projectId)
+                {
+                    throw new ArgumentException("Tarefa inválida para este projeto.");
+                }
+
+                hourLog.TaskId = taskGuid;
+            }
+
+            await _hourLogRepository.AddAsync(hourLog);
             _logger.LogInfo($"[SERVICE] Registadas {command.Hours} horas no projeto '{standard.Title}'.");
 
             return standard;

@@ -37,6 +37,13 @@ namespace DomainLayer.Domain.Builders
             return (TBuilder)this;
         }
 
+        public TBuilder AssignedTo(Guid? userId)
+        {
+            if (userId != Guid.Empty && userId != null)
+                _assignedUserId = (Guid)userId;
+            return (TBuilder)this;
+        }
+
         public abstract TTask Build();
 
         protected void EnsureProjectContext()

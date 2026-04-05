@@ -9,6 +9,8 @@ using InfrastructureLayer.Patterns.Singleton;
 using InfrastructureLayer.Patterns.Strategy;
 using InfrastructureLayer.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using PresentationLayer.Notifications;
 
 namespace PresentationLayer.DependencyInjection
 {
@@ -26,7 +28,15 @@ namespace PresentationLayer.DependencyInjection
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite(sqliteConnectionString));
 
-            services.AddSingleton<INotificationDeliveryStrategy, EmailDeliveryStrategy>();
+            services.AddSingleton<EmailDeliveryStrategy>();
+            services.AddSingleton<SignalRNotificationDeliveryStrategy>();
+            services.AddSingleton<INotificationDeliveryStrategy>(sp =>
+                new CompositeNotificationDeliveryStrategy(
+                    new INotificationDeliveryStrategy[]
+                    {
+                        sp.GetRequiredService<EmailDeliveryStrategy>(),
+                        sp.GetRequiredService<SignalRNotificationDeliveryStrategy>(),
+                    }));
             services.AddSingleton<INotificationService, NotificationService>();
 
             services.AddScoped<Mapper, DomainEntityDtoMapper>();
@@ -34,15 +44,20 @@ namespace PresentationLayer.DependencyInjection
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITeamRepository, TeamRepository>();
-
+            services.AddScoped<IHourLogRepository, HourLogRepository>();
 
             services.AddTransient<ListProjectsQueryHandler>();
             services.AddTransient<ListTasksQueryHandler>();
+            services.AddTransient<ListUsersQueryHandler>();
+            services.AddTransient<ListHourLogsQueryHandler>();
             services.AddTransient<CreateProjectHandler>();
             services.AddTransient<CreateTaskHandler>();
             services.AddTransient<CreateUserHandler>();
             services.AddTransient<CreateTeamHandler>();
             services.AddTransient<AssignUserToTaskHandler>();
+            services.AddTransient<AssignUserToTeamHandler>();
+            services.AddTransient<AddHoursToProjectHandler>();
+            services.AddTransient<ChangeProjectStatusHandler>();
 
             services.AddScoped<ISessionService, SessionService>();
 

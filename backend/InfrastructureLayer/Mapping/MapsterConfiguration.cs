@@ -10,10 +10,10 @@ namespace InfrastructureLayer.Mapping
     {
         public static void Register()
         {
-            TypeAdapterConfig<ProjectBase, ProjectSender>.NewConfig()
+            TypeAdapterConfig<ProjectBase, ProjectResponse>.NewConfig()
                 .Map(dest => dest.Type, src => ResolveProjectKind(src));
 
-            TypeAdapterConfig<TaskBase, TaskSender>.NewConfig()
+            TypeAdapterConfig<TaskBase, TaskResponse>.NewConfig()
                 .Map(dest => dest.TaskType, src => ResolveTaskKind(src))
                 .Map(dest => dest.Status, src => src.Status)
                 .Map(dest => dest.AssignedUserId, src => src.AssignedUserId)

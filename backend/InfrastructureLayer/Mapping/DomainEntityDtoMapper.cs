@@ -10,12 +10,12 @@ namespace InfrastructureLayer.Mapping
 {
     public sealed class DomainEntityDtoMapper : Mapper
     {
-        public ProjectSender ToProjectSender(ProjectBase project) => project.Adapt<ProjectSender>();
+        public ProjectResponse ToProjectResponse(ProjectBase project) => project.Adapt<ProjectResponse>();
 
-        public TaskSender ToTaskSender(TaskBase task) => task.Adapt<TaskSender>();
+        public TaskResponse ToTaskResponse(TaskBase task) => task.Adapt<TaskResponse>();
 
-        public UserResponse ToUserSender(User user) => user.Adapt<UserResponse>();
+        public UserResponse ToUserResponse(User user) => user.Adapt<UserResponse>();
 
-        public TeamSender ToTeamSender(Team team) => team.Adapt<TeamSender>();
+        public TeamResponse ToTeamResponse(Team team) => team.Adapt<TeamResponse>();
     }
 }

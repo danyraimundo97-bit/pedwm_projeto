@@ -8,5 +8,13 @@ class GraphqlConfig {
     defaultValue: defaultGraphqlUrl,
   );
 
-
+  /// SignalR hub URL derived from [graphqlUrl] (same host/port as the API).
+  static String get notificationsHubUrl {
+    const suffix = '/graphql';
+    final u = graphqlUrl.trim();
+    if (u.toLowerCase().endsWith(suffix)) {
+      return '${u.substring(0, u.length - suffix.length)}/hubs/notifications';
+    }
+    return '$u/hubs/notifications';
+  }
 }

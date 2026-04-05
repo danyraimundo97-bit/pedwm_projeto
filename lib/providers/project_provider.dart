@@ -43,7 +43,7 @@ class ProjectProvider extends ChangeNotifier {
     _monthlyStatsError = null;
     notifyListeners();
     try {
-      _monthlyStats = await fetchMonthlyHoursStatsFromBackend();
+      _monthlyStats = await fetchMonthlyHoursStatsFromBackend(_client);
     } catch (e, st) {
       _monthlyStatsError = _formatError(e);
       debugPrint('loadMonthlyHoursStats: $e\n$st');
@@ -56,7 +56,7 @@ class ProjectProvider extends ChangeNotifier {
   Future<List<TaskHoursInMonth>> loadMonthDetailForDialog(DateTime month) async {
     final gen = ++_monthDetailGen;
     try {
-      final list = await fetchTaskHoursBreakdownForMonthFromBackend(month);
+      final list = await fetchTaskHoursBreakdownForMonthFromBackend(_client, month);
       if (gen != _monthDetailGen) {
         return const [];
       }
@@ -132,7 +132,12 @@ class ProjectProvider extends ChangeNotifier {
   Future<void> addLoggedHoursToTask(String projectId, String taskId, int hours) async {
     if (hours <= 0) return;
 
-    await addHoursToProjectInBackend(_client, projectId: projectId, hours: hours.toDouble());
+    await addHoursToProjectInBackend(
+      _client,
+      projectId: projectId,
+      hours: hours.toDouble(),
+      taskId: taskId,
+    );
 
     final projectIndex = _projects.indexWhere((p) => p.id == projectId);
     if (projectIndex == -1) return;
@@ -173,7 +178,8 @@ class ProjectProvider extends ChangeNotifier {
     required ProjectType type,
     required String managerUserId,
   }) async {
-    final id = 'p${DateTime.now().millisecondsSinceEpoch}';
+    //Removido para ir buscar pela BD
+   /* final id = 'p${DateTime.now().millisecondsSinceEpoch}';
     _projects.add(
       ProjectModel(
         id: id,
@@ -186,8 +192,8 @@ class ProjectProvider extends ChangeNotifier {
         consumedHours: 0,
         completionPercentage: 0,
       ),
-    );
-    notifyListeners();
+    ); 
+    notifyListeners();*/
     try {
       await createProjectInBackend(
         _client,
@@ -198,9 +204,11 @@ class ProjectProvider extends ChangeNotifier {
         managerId: managerUserId,
       );
       await fetchProjects();
+      
     } catch (e, st) {
       _projectsError = _formatError(e);
       debugPrint('createProjectInBackend: $e\n$st');
+    } finally{
       notifyListeners();
     }
   }
@@ -216,7 +224,7 @@ class ProjectProvider extends ChangeNotifier {
   }) async {
     final projectIndex = _projects.indexWhere((p) => p.id == projectId);
     if (projectIndex == -1) return;
-    final taskId = 't${DateTime.now().millisecondsSinceEpoch}';
+    /*final taskId = 't${DateTime.now().millisecondsSinceEpoch}';
     final task = TaskModel(
       id: taskId,
       title: title,
@@ -229,7 +237,7 @@ class ProjectProvider extends ChangeNotifier {
       assigneeUserId: assigneeUserId,
     );
     _projects[projectIndex].tasks.add(task);
-    notifyListeners();
+    notifyListeners();*/
     try {
       await createTaskInBackend(
         _client,

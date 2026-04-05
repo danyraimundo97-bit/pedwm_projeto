@@ -49,13 +49,13 @@ namespace ApplicationLayer.Tests.Handlers
                 .ManagedBy(adminId)
                 .Build();
 
-            var fakeSender = new ProjectSender { Title = "Novo ERP" };
+            var fakeSender = new ProjectResponse { Title = "Novo ERP" };
 
             _sessionServiceMock.Setup(s => s.GetCurrentUserID()).Returns(adminId);
             _projectServiceMock.Setup(s => s.CreateProjectAsync(command)).ReturnsAsync(fakeProject);
 
             // Mapper devolve o fakeSender!
-            _mapperMock.Setup(m => m.ToProjectSender(fakeProject)).Returns(fakeSender);
+            _mapperMock.Setup(m => m.ToProjectResponse(fakeProject)).Returns(fakeSender);
 
             var result = await _sut.HandleAsync(command);
 

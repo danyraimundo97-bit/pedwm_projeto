@@ -4,7 +4,7 @@ using TaskEntityStatus = DomainLayer.Domain.Tasks.TaskStatus;
 namespace ApplicationLayer.Models
 {
     /// <summary>GraphQL-facing task row (maps from <see cref="TaskBase"/> including Bug/Feature-specific fields).</summary>
-    public sealed class TaskSender
+    public sealed class TaskResponse
     {
         public Guid Id { get; init; }
 

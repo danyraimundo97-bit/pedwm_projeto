@@ -16,8 +16,9 @@ namespace DomainLayer.Domain.Tasks
             string description,
             Guid projectId,
             int storyPoints,
-            TaskStatus status)
-            : base(id, title, description, status, projectId, null, DateTime.UtcNow, null)
+            TaskStatus status,
+            Guid? assignedUserId)
+            : base(id, title, description, status, projectId, assignedUserId, DateTime.UtcNow, null)
         {
             StoryPoints = storyPoints;
         }

@@ -19,8 +19,9 @@ namespace DomainLayer.Domain.Tasks
             Guid projectId,
             BugSeverity severity,
             string environment,
-            TaskStatus status)
-            : base(id, title, description, status, projectId, null, DateTime.UtcNow, null)
+            TaskStatus status,
+            Guid? assignedUserId)
+            : base(id, title, description, status, projectId, assignedUserId, DateTime.UtcNow, null)
         {
             Severity = severity;
             Environment = environment;

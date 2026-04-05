@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ApplicationLayer.Commands;
 using ApplicationLayer.Repositories;
 using ApplicationLayer.Services;
+using DomainLayer.Domain.Hours;
 using DomainLayer.Domain.Projects;
 using DomainLayer.Domain.Builders;
 using Moq;
@@ -14,16 +15,27 @@ namespace ApplicationLayer.Tests.Services
     public class ProjectServiceTests
     {
         private readonly Mock<IProjectRepository> _projectRepositoryMock;
+        private readonly Mock<ITaskRepository> _taskRepositoryMock;
+        private readonly Mock<IHourLogRepository> _hourLogRepositoryMock;
         private readonly Mock<IAppLogger> _loggerMock;
         private readonly ProjectService _sut;
 
         public ProjectServiceTests()
         {
             _projectRepositoryMock = new Mock<IProjectRepository>();
+            _taskRepositoryMock = new Mock<ITaskRepository>();
+            _hourLogRepositoryMock = new Mock<IHourLogRepository>();
             _loggerMock = new Mock<IAppLogger>();
 
-            // Injetamos as falsificações no serviço
-            _sut = new ProjectService(_projectRepositoryMock.Object, _loggerMock.Object);
+            _hourLogRepositoryMock
+                .Setup(r => r.AddAsync(It.IsAny<HourLog>()))
+                .Returns(Task.CompletedTask);
+
+            _sut = new ProjectService(
+                _projectRepositoryMock.Object,
+                _taskRepositoryMock.Object,
+                _hourLogRepositoryMock.Object,
+                _loggerMock.Object);
         }
 
         // ==========================================
@@ -72,7 +84,8 @@ namespace ApplicationLayer.Tests.Services
             var command = new AddHoursToProjectCommand
             {
                 ProjectId = projectId.ToString(),
-                Hours = 8
+                Hours = 8,
+                UserId = Guid.NewGuid(),
             };
 
             var fakeProject = new ProjectBuilder()
@@ -90,6 +103,8 @@ namespace ApplicationLayer.Tests.Services
 
             // Garantir que o repositório mandou gravar as alterações
             _projectRepositoryMock.Verify(repo => repo.SaveAsync(It.IsAny<Project>()), Times.Once);
+
+            _hourLogRepositoryMock.Verify(r => r.AddAsync(It.IsAny<HourLog>()), Times.Once);
 
             // Garantir que o logger registou o sucesso
             _loggerMock.Verify(l => l.LogInfo(It.Is<string>(msg => msg.Contains("Registadas 8 horas"))), Times.Once);

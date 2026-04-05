@@ -30,7 +30,8 @@ namespace DomainLayer.Domain.Builders
                 _projectId,
                 _severity,
                 _environment,
-                DomainLayer.Domain.Tasks.TaskStatus.Todo);
+                DomainLayer.Domain.Tasks.TaskStatus.Todo,
+                _assignedUserId);
         }
     }
 }

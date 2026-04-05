@@ -38,6 +38,7 @@ dependencies:
   intl: ^0.20.2
   graphql: ^5.2.4
   graphql_flutter: ^5.3.0
+  signalr_netcore: ^1.4.4
 
 
 dev_dependencies:

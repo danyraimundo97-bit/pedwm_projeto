@@ -17,6 +17,7 @@ namespace ApplicationLayer.Factories
                     .WithDescription(cmd.Description)
                     .InProject(cmd.ProjectId)
                     .ForEnvironment(cmd.Environment ?? "Production")
+                    .AssignedTo(cmd.AssignedUserId)
                     .Build(),
 
                 TaskType.Feature => FeatureTask.Builder()
@@ -24,6 +25,7 @@ namespace ApplicationLayer.Factories
                     .WithDescription(cmd.Description)
                     .InProject(cmd.ProjectId)
                     .WithStoryPoints(cmd.StoryPoints ?? 0)
+                    .AssignedTo(cmd.AssignedUserId)
                     .Build(),
 
                 _ => throw new ArgumentException($"Tipo de tarefa '{cmd.Type}' desconhecido."),

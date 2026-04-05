@@ -22,7 +22,8 @@ namespace DomainLayer.Domain.Builders
                 _description,
                 _projectId,
                 _storyPoints,
-                DomainLayer.Domain.Tasks.TaskStatus.Todo);
+                DomainLayer.Domain.Tasks.TaskStatus.Todo,
+                _assignedUserId);
         }
     }
 }
