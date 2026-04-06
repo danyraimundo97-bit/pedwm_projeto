@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ApplicationLayer.Repositories;
-using HotChocolate;
-using PresentationLayer.DTOs;
+using ApplicationLayer.Queries;
+using ApplicationLayer.Models;
 using Mapster;
+using HotChocolate;
 
 namespace PresentationLayer.GraphQL
 {
@@ -16,114 +16,105 @@ namespace PresentationLayer.GraphQL
         // PROJETOS
         // ==========================================
 
-        public async Task<List<ProjectResponse_DTO>> GetProjects(
-            [Service] IProjectRepository repository,
-            int page = 1, int size = 10)
+
+        // Listar Projetos (paged)
+        public async Task<IReadOnlyList<ProjectSender>> GetProjects([Service] ListProjectsQueryHandler handler)
         {
-            var projects = await repository.GetPagedAsync(page, size);
-            // O Mapster converte a IReadOnlyList<ProjectBase> para List<ProjectResponse_DTO> automaticamente!
-            return projects.Adapt<List<ProjectResponse_DTO>>();
+            return await handler.HandleAsync();
         }
 
-        public async Task<ProjectResponse_DTO> GetProjectById(Guid id, [Service] IProjectRepository repository)
+
+        // Procurar Projeto por ID
+        public async Task<ProjectSender> GetProjectById(Guid id, [Service] GetProjectByIdQueryHandler handler)
         {
-            var project = await repository.GetByIdAsync(id);
+            var project = await handler.HandleAsync(id);
 
             if (project == null)
                 throw new GraphQLException($"O Projeto com o ID {id} não foi encontrado.");
 
-            return project.Adapt<ProjectResponse_DTO>();
+            return project;
         }
 
-        // Buscar Projetos de um Utilizador específico
-        public async Task<List<ProjectResponse_DTO>> GetProjectsByUser(
-            Guid userId, [Service] IProjectRepository repository)
+        // Procurar Projetos de um Utilizador
+        public async Task<IReadOnlyList<ProjectSender>> GetProjectsByUser(Guid userId, [Service] GetProjectsByUserQueryHandler handler)
         {
-            var projects = await repository.GetByUserAsync(userId);
-            return projects.Adapt<List<ProjectResponse_DTO>>();
+            return await handler.HandleAsync(userId);
         }
 
         // ==========================================
         // TAREFAS
         // ==========================================
 
-        public async Task<List<TaskResponse_DTO>> GetTasks(
-            [Service] ITaskRepository repository,
-            int page = 1, int size = 10)
+        // Listar Tarefas (paged)
+        public async Task<IReadOnlyList<TaskSender>> GetTasks([Service] ListTasksQueryHandler handler)
         {
-            var tasks = await repository.GetPagedAsync(page, size);
-            return tasks.Adapt<List<TaskResponse_DTO>>();
+            return await handler.HandleAsync();
         }
 
-        public async Task<TaskResponse_DTO> GetTaskById(
-            Guid id, [Service] ITaskRepository repository)
+
+        // Procurar Tarefa por ID
+        public async Task<TaskSender> GetTaskById(Guid id, [Service] GetTaskByIdQueryHandler handler)
         {
-            var task = await repository.GetByIdAsync(id);
+            var task = await handler.HandleAsync(id);
 
             if (task == null)
                 throw new GraphQLException($"A Tarefa com o ID {id} não foi encontrada.");
 
-            return task.Adapt<TaskResponse_DTO>();
+            return task;
         }
 
-        // Buscar Tarefas de um Projeto específico
-        public async Task<List<TaskResponse_DTO>> GetTasksByProject(Guid projectId, [Service] ITaskRepository repository)
+        // Procurar Tarefas de um Projeto
+        public async Task<IReadOnlyList<TaskSender>> GetTasksByProject(Guid projectId, [Service] GetTasksByProjectQueryHandler handler)
         {
-            var tasks = await repository.GetByProjectAsync(projectId);
-            return tasks.Adapt<List<TaskResponse_DTO>>();
+            return await handler.HandleAsync(projectId);
         }
 
-        // Buscar Tarefas de um Utilizador específico
-        public async Task<List<TaskResponse_DTO>> GetTasksByUser(Guid userId, [Service] ITaskRepository repository)
+        // Procurar Tarefas de um Utilizador
+        public async Task<IReadOnlyList<TaskSender>> GetTasksByUser(Guid userId, [Service] GetTasksByUserQueryHandler handler)
         {
-            var tasks = await repository.GetByUserAsync(userId);
-            return tasks.Adapt<List<TaskResponse_DTO>>();
+            return await handler.HandleAsync(userId);
         }
 
         // ==========================================
         // EQUIPAS (TEAMS)
         // ==========================================
 
-        public async Task<List<TeamResponse_DTO>> GetTeams(
-            [Service] ITeamRepository repository,
-            int page = 1, int size = 10)
+        // Listar Equipas (paged)
+        public async Task<IReadOnlyList<TeamSender>> GetTeams([Service] ListTeamsQueryHandler handler)
         {
-            var teams = await repository.GetPagedAsync(page, size);
-            return teams.Adapt<List<TeamResponse_DTO>>();
+            return await handler.HandleAsync();
         }
 
-        public async Task<TeamResponse_DTO> GetTeamById(
-            Guid id, [Service] ITeamRepository repository)
+        // Procurar Equipas de um Utilizador
+        public async Task<TeamSender> GetTeamById(Guid id, [Service] GetTeamByIdQueryHandler handler)
         {
-            var team = await repository.GetByIdAsync(id);
+            var team = await handler.HandleAsync(id);
 
             if (team == null)
                 throw new GraphQLException($"A Equipa com o ID {id} não foi encontrada.");
 
-            return team.Adapt<TeamResponse_DTO>();
+            return team;
         }
 
         // ==========================================
         // UTILIZADORES (USERS)
         // ==========================================
 
-        public async Task<List<UserResponse_DTO>> GetUsers(
-            [Service] IUserRepository repository,
-            int page = 1, int size = 10)
+        // Listar Utilizadores
+        public async Task<IReadOnlyList<UserResponse>> GetUsers([Service] ListUsersQueryHandler handler)
         {
-            var users = await repository.GetPagedAsync(page, size);
-            return users.Adapt<List<UserResponse_DTO>>();
+            return await handler.HandleAsync();
         }
 
-        public async Task<UserResponse_DTO> GetUserById(
-            Guid id, [Service] IUserRepository repository)
+        // Procurar Utilizador por ID
+        public async Task<UserResponse> GetUserById(Guid id, [Service] GetUserByIdQueryHandler handler)
         {
-            var user = await repository.GetByIdAsync(id);
+            var user = await handler.HandleAsync(id);
 
             if (user == null)
                 throw new GraphQLException($"O Utilizador com o ID {id} não foi encontrado.");
 
-            return user.Adapt<UserResponse_DTO>();
+            return user;
         }
     }
 }

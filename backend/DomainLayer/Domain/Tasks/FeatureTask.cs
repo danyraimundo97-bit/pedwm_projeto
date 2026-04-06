@@ -5,6 +5,7 @@ namespace DomainLayer.Domain.Tasks
     public class FeatureTask : TaskBase
     {
         public int StoryPoints { get; private set; }
+        public override TaskType Type => TaskType.Feature;
 
         private FeatureTask()
         {
@@ -16,8 +17,9 @@ namespace DomainLayer.Domain.Tasks
             string description,
             Guid projectId,
             int storyPoints,
+            //TaskType type,
             TaskStatus status)
-            : base(id, title, description, status, projectId, null, DateTime.UtcNow, null)
+            : base(id, title, description, TaskType.Feature, status, projectId, null, DateTime.UtcNow, null)
         {
             StoryPoints = storyPoints;
         }

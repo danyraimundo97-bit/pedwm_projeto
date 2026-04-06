@@ -1,5 +1,12 @@
 <Solution>
-  <Project Path="ApplicationLayer.Tests/ApplicationLayer.Tests.csproj" Id="fd3b7016-894d-45b0-a08e-9faf1b9b28bd" />
+  <Folder Name="/Tests/">
+    <Project Path="ApplicationLayer.Tests/ApplicationLayer.Tests.csproj" Id="fd3b7016-894d-45b0-a08e-9faf1b9b28bd">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
+    <Project Path="DomainLayer.Tests/DomainLayer.Tests.csproj" Id="389d1808-3a48-4003-8402-9832d0e710ff" />
+    <Project Path="InfrastructureLayer.Tests/InfrastructureLayer.Tests.csproj" Id="93d16e07-9f3c-4757-83e8-22502babb0cd" />
+    <Project Path="PresentationLayer.Tests/PresentationLayer.Tests.csproj" Id="1ab4d8a2-8edc-4dd8-a776-27e92411d68f" />
+  </Folder>
   <Project Path="ApplicationLayer/ApplicationLayer.csproj" Id="6a48388b-8cab-4b04-9d2b-e95495da41ac" />
   <Project Path="DomainLayer/DomainLayer.csproj" Id="ca975313-b537-4974-9404-cb7cd4236ffa" />
   <Project Path="InfrastructureLayer/InfrastructureLayer.csproj" Id="116a0942-393e-4014-b256-a3e09c131afc" />

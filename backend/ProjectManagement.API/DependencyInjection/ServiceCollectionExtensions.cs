@@ -26,23 +26,45 @@ namespace PresentationLayer.DependencyInjection
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite(sqliteConnectionString));
 
+            // NOTIFICATION
             services.AddSingleton<INotificationDeliveryStrategy, EmailDeliveryStrategy>();
             services.AddSingleton<INotificationService, NotificationService>();
 
+            //MAPPER
             services.AddScoped<Mapper, DomainEntityDtoMapper>();
+
+            // REPOSITORIES
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITeamRepository, TeamRepository>();
 
-
+            // QUERIES
             services.AddTransient<ListProjectsQueryHandler>();
+            services.AddTransient<ListTasksQueryHandler>();
+            services.AddTransient<ListTeamsQueryHandler>();
+            services.AddTransient<ListUsersQueryHandler>();
+
+            services.AddTransient<GetProjectByIdQueryHandler>();
+            services.AddTransient<GetProjectsByUserQueryHandler>();
+            services.AddTransient<GetTaskByIdQueryHandler>();
+            services.AddTransient<GetTasksByProjectQueryHandler>();
+            services.AddTransient<GetTasksByUserQueryHandler>();
+            services.AddTransient<GetTeamByIdQueryHandler>();
+            services.AddTransient<GetUserByIdQueryHandler>();
+
+            // MUTATIONS
             services.AddTransient<CreateProjectHandler>();
             services.AddTransient<CreateTaskHandler>();
             services.AddTransient<CreateUserHandler>();
             services.AddTransient<CreateTeamHandler>();
-            services.AddTransient<AssignUserToTaskHandler>();
 
+            services.AddTransient<AssignUserToTaskHandler>();
+            services.AddTransient<AssignUserToTeamHandler>();
+            services.AddTransient<AddHoursToProjectHandler>();
+            services.AddTransient<ChangeProjectStatusHandler>();
+
+            // SERVICES
             services.AddScoped<ISessionService, SessionService>();
 
             services.AddScoped<IProjectService, ProjectService>();
