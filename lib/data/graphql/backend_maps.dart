@@ -9,13 +9,13 @@ class BackendMaps {
   static String projectType(ProjectType t) {
     switch (t) {
       case ProjectType.standard:
-        return 'Standard';
+        return 'STANDARD';
       case ProjectType.sickLeave:
-        return 'SickLeave';
+        return 'SICK_LEAVE';
       case ProjectType.training:
-        return 'Training';
+        return 'TRAINING';
       case ProjectType.holiday:
-        return 'Holiday';
+        return 'HOLIDAY';
     }
   }
 
@@ -84,5 +84,14 @@ class BackendMaps {
   static ProjectType parseProjectType(String? raw) {
     if (raw == null || raw.isEmpty) return ProjectType.standard;
     return ProjectType.fromString(raw);
+  }
+
+  /// GraphQL <c>taskType</c> enum (Bug / Feature).
+  static TaskType parseTaskType(String? raw) {
+    if (raw == null || raw.isEmpty) return TaskType.Feature;
+    final s = raw.toLowerCase();
+    if (s.contains('bug')) return TaskType.Bug;
+    if (s.contains('feature')) return TaskType.Feature;
+    return TaskType.fromString(raw);
   }
 }

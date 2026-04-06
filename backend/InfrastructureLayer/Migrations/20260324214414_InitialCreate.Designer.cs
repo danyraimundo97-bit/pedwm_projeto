@@ -106,7 +106,7 @@ namespace InfrastructureLayer.Migrations
                 {
                     b.HasBaseType("DomainLayer.Domain.Projects.ProjectBase");
 
-                    b.Property<int>("BudgetHours")
+                    b.Property<int>("AllocatedHours")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ClientName")

@@ -87,8 +87,9 @@ Map<String, dynamic> _createProjectInput({
 }
 
 List<ProjectModel> _parseProjectsAndTasks(Map<String, dynamic>? data) {
-  final projectsRaw = data?['getProjects'] as List<dynamic>? ?? [];
-  final tasksRaw = data?['getTasks'] as List<dynamic>? ?? [];
+  final bundle = data?['getProjectsAndTasks'] as Map<String, dynamic>?;
+  final projectsRaw = bundle?['projects'] as List<dynamic>? ?? [];
+  final tasksRaw = bundle?['tasks'] as List<dynamic>? ?? [];
 
   final byProject = <String, List<TaskModel>>{};
   for (final raw in tasksRaw) {
@@ -96,8 +97,9 @@ List<ProjectModel> _parseProjectsAndTasks(Map<String, dynamic>? data) {
     final pid = t['projectId']?.toString();
     if (pid == null) continue;
 
-    final kind = t['__typename']?.toString() ?? '';
-    final taskType = kind.contains('Bug') ? TaskType.Bug : TaskType.Feature;
+    final taskType = BackendMaps.parseTaskType(
+      t['taskType']?.toString() ?? t['__typename']?.toString(),
+    );
 
     final estimate = taskType == TaskType.Feature
         ? ((t['storyPoints'] as num?)?.toInt() ?? 1)
