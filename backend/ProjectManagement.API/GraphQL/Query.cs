@@ -116,5 +116,13 @@ namespace PresentationLayer.GraphQL
 
             return user;
         }
+
+        public async Task<IReadOnlyList<HourLogResponse>> GetHourLogs(
+            DateTime from,
+            DateTime to,
+            [Service] ListHourLogsQueryHandler handler)
+        {
+            return await handler.HandleAsync(from, to);
+        }
     }
 }

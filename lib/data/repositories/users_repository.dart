@@ -8,19 +8,40 @@ import '../graphql/graphql_result.dart';
 
 const _kMockNetworkDelay = Duration(milliseconds: 400);
 
-Future<List<AppUser>> fetchUsersFromBackend() async {
-  await Future<void>.delayed(_kMockNetworkDelay);
-  return [
-    AppUser(id: 'u1', name: 'Jay Majors', email: 'jay@example.com', role: UserRole.projectManager),
-    AppUser(id: 'u2', name: 'Alex Dev', email: 'alex@example.com', role: UserRole.member),
-    AppUser(id: 'u3', name: 'Sam Admin', email: 'sam@example.com', role: UserRole.admin),
-  ];
+List<AppUser> _parseUsers(Map<String, dynamic>? data) {
+  final usersRaw = data?['users'] as List<dynamic>? ?? [];
+  return usersRaw.map((raw) {
+    final u = Map<String, dynamic>.from(raw as Map);
+    return AppUser(
+      id: u['id'].toString(),
+      name: u['name']?.toString() ?? '',
+      email: u['email']?.toString() ?? '',
+      role: BackendMaps.parseUserRole(u['role']?.toString()),
+    );
+  }).toList();
+}
+
+Future<List<AppUser>> fetchUsersFromBackend(GraphQLClient client) async {
+  final result = await client.query(
+    QueryOptions(
+      document: GraphqlOperations.usersQuery,
+      fetchPolicy: FetchPolicy.networkOnly,
+    ),
+  );
+  assertNoGraphQlException(result);
+  return _parseUsers(result.data);
 }
 
 Future<AppUser> fetchCurrentUserFromBackend() async {
   await Future<void>.delayed(_kMockNetworkDelay);
   //TODO: Fazer chamada Backend
-  return AppUser(id: '139591f2-0e7e-4ccb-a089-63bb96c1617b', name: 'Jay Majors', email: 'jay@example.com', role: UserRole.admin);
+  // Must match backend seeded [SuperUser.Id] so SignalR group `user-{id}` matches session notifications.
+  return AppUser(
+    id: '00000000-0000-0000-0000-000000000001',
+    name: 'Jay Majors',
+    email: 'jay@example.com',
+    role: UserRole.admin,
+  );
 }
 
 Future<void> createUserInBackend(

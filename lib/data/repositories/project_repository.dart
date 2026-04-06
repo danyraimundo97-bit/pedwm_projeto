@@ -7,39 +7,112 @@ import '../graphql/backend_maps.dart';
 import '../graphql/graphql_operations.dart';
 import '../graphql/graphql_result.dart';
 
-const _kMockNetworkDelay = Duration(milliseconds: 400);
-
-Future<List<MonthlyHoursStats>> fetchMonthlyHoursStatsFromBackend() async {
-  await Future<void>.delayed(_kMockNetworkDelay);
-  return [
-    MonthlyHoursStats(
-      month: DateTime.now(),
-      projectCount: 2,
-      taskCount: 4,
-      totalHours: 20,
-    ),
-    MonthlyHoursStats(
-      month: DateTime.now().subtract(const Duration(days: 30)),
-      projectCount: 6,
-      taskCount: 14,
-      totalHours: 40,
-    ),
-    MonthlyHoursStats(
-      month: DateTime.now().subtract(const Duration(days: 60)),
-      projectCount: 6,
-      taskCount: 10,
-      totalHours: 40,
-    ),
-  ];
+class _MonthAgg {
+  int totalHours = 0;
+  final Set<String> projectIds = {};
+  final Set<String> taskIds = {};
 }
 
-Future<List<TaskHoursInMonth>> fetchTaskHoursBreakdownForMonthFromBackend(DateTime month) async {
-  await Future<void>.delayed(_kMockNetworkDelay);
-  return [
-    TaskHoursInMonth(projectTitle: 'Project 1', taskTitle: 'Task 1', hours: 10),
-    TaskHoursInMonth(projectTitle: 'Project 2', taskTitle: 'Task 2', hours: 20),
-    TaskHoursInMonth(projectTitle: 'Project 3', taskTitle: 'Task 3', hours: 30),
-  ];
+DateTime _monthStartUtc(DateTime d) {
+  final u = d.toUtc();
+  return DateTime.utc(u.year, u.month, 1);
+}
+
+DateTime _monthEndUtc(DateTime d) {
+  final start = _monthStartUtc(d);
+  return DateTime.utc(start.year, start.month + 1, 0, 23, 59, 59, 999);
+}
+
+Future<List<Map<String, dynamic>>> _fetchHourLogsRaw(
+  GraphQLClient client,
+  DateTime fromUtc,
+  DateTime toUtc,
+) async {
+  final result = await client.query(
+    QueryOptions(
+      document: GraphqlOperations.hourLogsQuery,
+      variables: {
+        'from': fromUtc.toIso8601String(),
+        'to': toUtc.toIso8601String(),
+      },
+      fetchPolicy: FetchPolicy.networkOnly,
+    ),
+  );
+  assertNoGraphQlException(result);
+  final raw = result.data?['hourLogs'] as List<dynamic>? ?? [];
+  return raw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+}
+
+/// Last ~24 months of hour logs aggregated per calendar month (from `HourLogs` on the API).
+Future<List<MonthlyHoursStats>> fetchMonthlyHoursStatsFromBackend(GraphQLClient client) async {
+  final now = DateTime.now().toUtc();
+  final from = DateTime.utc(now.year - 2, now.month, 1);
+  final to = _monthEndUtc(now);
+  final logs = await _fetchHourLogsRaw(client, from, to);
+
+  final byMonth = <String, _MonthAgg>{};
+  for (final log in logs) {
+    final raw = log['loggedAtUtc'];
+    if (raw == null) continue;
+    final dt = DateTime.parse(raw.toString()).toUtc();
+    final key = '${dt.year}-${dt.month.toString().padLeft(2, '0')}';
+    final agg = byMonth.putIfAbsent(key, _MonthAgg.new);
+    final h = (log['hours'] as num?)?.round() ?? 0;
+    agg.totalHours += h;
+    agg.projectIds.add(log['projectId'].toString());
+    final tid = log['taskId'];
+    if (tid != null) {
+      agg.taskIds.add(tid.toString());
+    }
+  }
+
+  final list = byMonth.entries.map((e) {
+    final parts = e.key.split('-');
+    final y = int.parse(parts[0]);
+    final m = int.parse(parts[1]);
+    final month = DateTime.utc(y, m, 1);
+    final a = e.value;
+    return MonthlyHoursStats(
+      month: month,
+      projectCount: a.projectIds.length,
+      taskCount: a.taskIds.length,
+      totalHours: a.totalHours,
+    );
+  }).toList();
+
+  list.sort((a, b) => b.month.compareTo(a.month));
+  return list;
+}
+
+Future<List<TaskHoursInMonth>> fetchTaskHoursBreakdownForMonthFromBackend(
+  GraphQLClient client,
+  DateTime month,
+) async {
+  final from = _monthStartUtc(month);
+  final to = _monthEndUtc(month);
+  final logs = await _fetchHourLogsRaw(client, from, to);
+  final map = <String, int>{};
+  for (final log in logs) {
+    final pt = log['projectTitle']?.toString() ?? '';
+    final tt = log['taskTitle']?.toString() ?? '';
+    final key = '$pt\x00$tt';
+    final h = (log['hours'] as num?)?.round() ?? 0;
+    map[key] = (map[key] ?? 0) + h;
+  }
+  final list = map.entries
+      .map(
+        (e) {
+          final parts = e.key.split('\x00');
+          return TaskHoursInMonth(
+            projectTitle: parts.isNotEmpty ? parts[0] : '',
+            taskTitle: parts.length > 1 ? parts[1] : '',
+            hours: e.value,
+          );
+        },
+      )
+      .toList();
+  list.sort((a, b) => b.hours.compareTo(a.hours));
+  return list;
 }
 
 Map<String, dynamic> _createProjectInput({
@@ -87,9 +160,8 @@ Map<String, dynamic> _createProjectInput({
 }
 
 List<ProjectModel> _parseProjectsAndTasks(Map<String, dynamic>? data) {
-  final bundle = data?['getProjectsAndTasks'] as Map<String, dynamic>?;
-  final projectsRaw = bundle?['projects'] as List<dynamic>? ?? [];
-  final tasksRaw = bundle?['tasks'] as List<dynamic>? ?? [];
+  final projectsRaw = data?['projects'] as List<dynamic>? ?? [];
+  final tasksRaw = data?['tasks'] as List<dynamic>? ?? [];
 
   final byProject = <String, List<TaskModel>>{};
   for (final raw in tasksRaw) {
@@ -183,16 +255,19 @@ Future<void> addHoursToProjectInBackend(
   GraphQLClient client, {
   required String projectId,
   required double hours,
+  String? taskId,
 }) async {
+  final input = <String, dynamic>{
+    'projectId': projectId,
+    'hours': hours,
+  };
+  if (taskId != null && taskId.isNotEmpty) {
+    input['taskId'] = taskId;
+  }
   final result = await client.mutate(
     MutationOptions(
       document: GraphqlOperations.addHoursToProjectMutation,
-      variables: {
-        'input': {
-          'projectId': projectId,
-          'hours': hours,
-        },
-      },
+      variables: {'input': input},
     ),
   );
   assertNoGraphQlException(result);

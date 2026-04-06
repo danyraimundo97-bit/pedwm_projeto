@@ -38,10 +38,10 @@ namespace ApplicationLayer.Tests.Handlers
         {
             var command = new CreateTaskCommand();
             var fakeTask = new FeatureTaskBuilder().WithId(Guid.NewGuid()).WithTitle("Configurar BD").Build();
-            var fakeSender = new TaskSender { Title = "Configurar BD" };
+            var fakeSender = new TaskResponse { Title = "Configurar BD" };
 
             _taskServiceMock.Setup(s => s.CreateTaskAsync(command)).ReturnsAsync(fakeTask);
-            _mapperMock.Setup(m => m.ToTaskSender(fakeTask)).Returns(fakeSender);
+            _mapperMock.Setup(m => m.ToTaskResponse(fakeTask)).Returns(fakeSender);
 
             var result = await _sut.HandleAsync(command);
 

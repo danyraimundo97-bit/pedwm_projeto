@@ -1,30 +1,30 @@
+using ApplicationLayer.Repositories;
+using ApplicationLayer.Services;
 using InfrastructureLayer.Data;
 using InfrastructureLayer.Patterns.Singleton;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using PresentationLayer.DependencyInjection;
 using PresentationLayer.GraphQL;
+using PresentationLayer.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddBackendServices();
-// ==========================================================
-// CONFIGURAÇÃO DA BASE DE DADOS (SQLite)
-// ==========================================================
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=GestaoProjetos.db")); // O nome do ficheiro físico que vai ser criado!
+builder.Services.AddSignalR();
+
+// SQLite: project folder so Migrate() uses the same DB as dev (not cwd / bin-only copies).
+var sqliteDbPath = System.IO.Path.Combine(builder.Environment.ContentRootPath, "GestaoProjetos.db");
+builder.Services.AddBackendServices(sqliteConnectionString: $"Data Source={sqliteDbPath}");
 
 // ==========================================================
-//  INJEÇÃO DE DEPENDÊNCIAS
+//  INJEÇÃO DE DEPENDÊNCIAS (legado comentado — ver AddBackendServices)
 // ==========================================================
 
 // Factories
 //builder.Services.AddSingleton<ProjectFactory>();
 //builder.Services.AddSingleton<ProjectTaskFactory>();
 
-//// Strategy (Notificações)
-//builder.Services.AddSingleton<INotificationDeliveryStrategy, EmailDeliveryStrategy>();
-//builder.Services.AddSingleton<INotificationDeliveryStrategy, WebSocketDeliveryStrategy>();
-//builder.Services.AddSingleton<NotificationSender>();
+//// Strategy (Notificações) — ativos via AddBackendServices: Email + SignalR (Composite).
 
 //// Repositories
 //builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
@@ -71,11 +71,38 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Migrações + utilizador super (admin) em Users
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+
+    // Safety net: stale binary or wrong DB file can skip the HourLogs migration; idempotent on SQLite.
+    if (db.Database.ProviderName?.Contains("Sqlite", StringComparison.OrdinalIgnoreCase) == true)
+    {
+        db.Database.ExecuteSqlRaw(
+            """
+            CREATE TABLE IF NOT EXISTS "HourLogs" (
+                "Id" TEXT NOT NULL CONSTRAINT "PK_HourLogs" PRIMARY KEY,
+                "ProjectId" TEXT NOT NULL,
+                "TaskId" TEXT NULL,
+                "Hours" REAL NOT NULL,
+                "LoggedAtUtc" TEXT NOT NULL,
+                "UserId" TEXT NOT NULL
+            );
+            """);
+    }
+
+    var userRepo = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+    SuperUserSeeder.EnsureExistsAsync(userRepo).GetAwaiter().GetResult();
+}
+
 app.UseCors("FlutterWebDev");
 app.UseHttpsRedirection();
 
 LoggerService.Instance.LogInfo("--- ARRANQUE DA API COM GRAPHQL ---");
 
+app.MapHub<NotificationsHub>("/hubs/notifications");
 app.MapGraphQL();
 
 app.Run();

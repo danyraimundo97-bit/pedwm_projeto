@@ -101,6 +101,32 @@ namespace InfrastructureLayer.Migrations
                     b.ToTable("Teams");
                 });
 
+            modelBuilder.Entity("DomainLayer.Domain.Hours.HourLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("Hours")
+                        .HasColumnType("REAL");
+
+                    b.Property<DateTime>("LoggedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("TaskId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HourLogs");
+                });
+
             modelBuilder.Entity("DomainLayer.Domain.Users.User", b =>
                 {
                     b.Property<Guid>("Id")

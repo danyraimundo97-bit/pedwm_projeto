@@ -8,6 +8,7 @@ import 'providers/auth_provider.dart';
 import 'providers/project_provider.dart';
 import 'providers/teams_provider.dart';
 import 'providers/users_provider.dart';
+import 'providers/notifications_provider.dart';
 import 'data/graphql/graphql_client_factory.dart';
 import 'data/graphql/client.dart';
 
@@ -27,6 +28,7 @@ Future<void> main() async {
           ChangeNotifierProvider(create: (_) => UsersProvider(graphQLClient)),
           ChangeNotifierProvider(create: (_) => TeamsProvider(graphQLClient)),
           ChangeNotifierProvider(create: (_) => ProjectProvider(graphQLClient)),
+          ChangeNotifierProvider(create: (_) => NotificationsProvider()),
         ],
         child: const TimePlannerApp(),
       ),

@@ -28,6 +28,31 @@ class GraphqlOperations {
     }
   ''');
 
+  static final usersQuery = gql(r'''
+    query GetUsers {
+      users {
+        id
+        name
+        email
+        role
+      }
+    }
+  ''');
+
+  static final hourLogsQuery = gql(r'''
+    query HourLogs($from: DateTime!, $to: DateTime!) {
+      hourLogs(from: $from, to: $to) {
+        id
+        projectId
+        projectTitle
+        taskId
+        taskTitle
+        hours
+        loggedAtUtc
+      }
+    }
+  ''');
+
   static final createProjectMutation = gql(r'''
     mutation CreateProject($input: CreateProject_DTOInput!) {
       createProject(input: $input)

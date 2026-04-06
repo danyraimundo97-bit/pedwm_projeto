@@ -26,12 +26,12 @@ namespace ApplicationLayer.Handlers
             _notificationService = notificationService;
         }
 
-        public async Task<TaskSender> HandleAsync(CreateTaskCommand command)
+        public async Task<TaskResponse> HandleAsync(CreateTaskCommand command)
         {
             // Criar a tarefa (O Serviço aplica as regras de negócio)
             var task = await _taskService.CreateTaskAsync(command);
             //var task = TaskFromCommandFactory.Create(command);
-            var dto = _mapper.ToTaskSender(task);
+            var dto = _mapper.ToTaskResponse(task);
 
             var user = new UserResponse
             {

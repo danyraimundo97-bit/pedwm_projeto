@@ -29,13 +29,13 @@ namespace ApplicationLayer.Handlers
             _sessionService = sessionService;
         }
 
-        public async Task<ProjectSender> HandleAsync(CreateProjectCommand command)
+        public async Task<ProjectResponse> HandleAsync(CreateProjectCommand command)
         {
             // Criar o projeto (O Serviço aplica as regras de negócio)
             var project = await _projectService.CreateProjectAsync(command);
             //var project = ProjectFromCommandFactory.Create(command);
             //await _repository.SaveAsync(project);
-            var projectResponse = _mapper.ToProjectSender(project);
+            var projectResponse = _mapper.ToProjectResponse(project);
             Guid userId = _sessionService.GetCurrentUserID();
 
 

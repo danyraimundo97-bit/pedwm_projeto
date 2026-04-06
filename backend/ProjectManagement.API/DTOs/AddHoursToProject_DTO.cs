@@ -5,5 +5,7 @@ namespace PresentationLayer.DTOs
         public string ProjectId { get; set; } = string.Empty;
 
         public double Hours { get; set; }
+
+        public string? TaskId { get; set; }
     }
 }

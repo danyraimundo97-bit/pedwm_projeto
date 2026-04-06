@@ -7,7 +7,7 @@ using ApplicationLayer.Repositories;
 
 namespace ApplicationLayer.Queries
 {
-    /// <summary>Read-side: list all tasks as <see cref="TaskSender"/> DTOs for GraphQL.</summary>
+    /// <summary>Read-side: list all tasks as <see cref="TaskResponse"/> DTOs for GraphQL.</summary>
     public sealed class ListTasksQueryHandler
     {
         private const int ListPageSize = 10_000;
@@ -21,10 +21,10 @@ namespace ApplicationLayer.Queries
             _mapper = mapper;
         }
 
-        public async Task<IReadOnlyList<TaskSender>> HandleAsync()
+        public async Task<IReadOnlyList<TaskResponse>> HandleAsync()
         {
             var entities = await _repository.GetPagedAsync(page: 1, size: ListPageSize);
-            return entities.Select(_mapper.ToTaskSender).ToList();
+            return entities.Select(_mapper.ToTaskResponse).ToList();
         }
     }
 }

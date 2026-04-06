@@ -2,7 +2,7 @@ using DomainLayer.Domain.Projects;
 
 namespace ApplicationLayer.Models
 {
-    public sealed class ProjectSender
+    public sealed class ProjectResponse
     {
         public Guid Id { get; init; }
 

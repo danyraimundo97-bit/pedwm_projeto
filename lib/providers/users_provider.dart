@@ -17,7 +17,8 @@ class UsersProvider extends ChangeNotifier {
   List<AppUser> get users => List.unmodifiable(_users);
 
   Future<void> fetchUsers() async {
-    _users = await user_repo.fetchUsersFromBackend();
+    _users = await user_repo.fetchUsersFromBackend(_client);
+    debugPrint("users : $_users");
     notifyListeners();
   }
 

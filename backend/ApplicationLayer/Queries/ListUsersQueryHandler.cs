@@ -4,11 +4,16 @@ using System.Threading.Tasks;
 using ApplicationLayer.Mapping;
 using ApplicationLayer.Models;
 using ApplicationLayer.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace ApplicationLayer.Queries
 {
-    public class ListUsersQueryHandler
+    public sealed class ListUsersQueryHandler
     {
+        private const int ListPageSize = 10_000;
+
         private readonly IUserRepository _repository;
         private readonly Mapper _mapper;
 
@@ -20,8 +25,9 @@ namespace ApplicationLayer.Queries
 
         public async Task<IReadOnlyList<UserResponse>> HandleAsync()
         {
-            var entities = await _repository.GetPagedAsync(1, 100);
-            return entities.Select(_mapper.ToUserSender).ToList();
+            var entities = await _repository.GetPagedAsync(page: 1, size: ListPageSize);
+            return entities.Select(_mapper.ToUserResponse).ToList();
         }
+
     }
 }

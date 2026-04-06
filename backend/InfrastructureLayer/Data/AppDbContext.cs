@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using DomainLayer.Domain.Hours;
 using DomainLayer.Domain.Projects;
 using DomainLayer.Domain.Tasks;
 using DomainLayer.Domain.Users;
@@ -15,6 +16,7 @@ namespace InfrastructureLayer.Data
         public DbSet<TaskBase> Tasks { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Team> Teams { get; set; }
+        public DbSet<HourLog> HourLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

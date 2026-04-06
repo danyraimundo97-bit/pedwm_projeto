@@ -1,9 +1,5 @@
-﻿using DomainLayer.Domain.Builders;
+﻿using ApplicationLayer.Repositories;
 using DomainLayer.Domain.Users;
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace ApplicationLayer.Services
 {
@@ -11,22 +7,15 @@ namespace ApplicationLayer.Services
     {
         private User _user;
         private readonly IAppLogger _appLogger;
-        public SessionService(IAppLogger appLogger)
+
+        public SessionService(IAppLogger appLogger, IUserRepository userRepository)
         {
             _appLogger = appLogger;
-            _user = GetSU();
-        }
+            _user = userRepository.GetByIdAsync(SuperUser.Id).GetAwaiter().GetResult()
+                ?? throw new InvalidOperationException(
+                    "Super user is missing from the database. Ensure migrations ran and startup seeding completed.");
 
-        private User GetSU()
-        {
-            _appLogger.LogInfo("Session is from SuperUser");
-            UserBuilder userBuilder = new UserBuilder();
-            return userBuilder
-                .WithId(new Guid())
-                .WithRole(UserRole.Admin)
-                .WithName("Admin")
-                .WithEmail("Admin@test.com")
-                .Build();
+            _appLogger.LogInfo($"Session bound to super user '{_user.Name}' (id {SuperUser.Id}).");
         }
 
         public void ChangeUserSession(User user)
