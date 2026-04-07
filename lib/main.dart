@@ -11,6 +11,7 @@ import 'providers/users_provider.dart';
 import 'providers/notifications_provider.dart';
 import 'data/graphql/graphql_client_factory.dart';
 import 'data/graphql/client.dart';
+import 'data/graphql/graphql_config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
