@@ -8,31 +8,38 @@ namespace DomainLayer.Tests.Domain
 {
     public class TaskTests
     {
+        private static Guid AnyProject() => Guid.NewGuid();
+
         [Fact]
         public void FeatureTask_ShouldBeCreatedWithCorrectTaskType()
         {
-            var task = (FeatureTask)new FeatureTaskBuilder()
+            var task = new FeatureTaskBuilder()
+                .InProject(AnyProject())
                 .WithTitle("Desenvolver Login")
                 .Build();
 
-            task.Type.Should().Be(TaskType.Feature);
+            task.Should().BeOfType<FeatureTask>();
             task.Title.Should().Be("Desenvolver Login");
         }
 
         [Fact]
         public void BugTask_ShouldBeCreatedWithCorrectTaskType()
         {
-            var task = (BugTask)new BugTaskBuilder()
+            var task = new BugTaskBuilder()
+                .InProject(AnyProject())
                 .WithTitle("Erro no Logout")
                 .Build();
 
-            task.Type.Should().Be(TaskType.Bug);
+            task.Should().BeOfType<BugTask>();
         }
 
         [Fact]
         public void UpdateAssignedUser_ShouldChangeUserCorrectly()
         {
-            var task = new FeatureTaskBuilder().WithTitle("Tarefa").Build();
+            var task = new FeatureTaskBuilder()
+                .InProject(AnyProject())
+                .WithTitle("Tarefa")
+                .Build();
             var newUser = Guid.NewGuid();
 
             task.ChangeAssignee(newUser);
@@ -43,7 +50,10 @@ namespace DomainLayer.Tests.Domain
         [Fact]
         public void MarkAsCompleted_ShouldUpdateStatusAndDate()
         {
-            var task = new FeatureTaskBuilder().Build();
+            var task = new FeatureTaskBuilder()
+                .InProject(AnyProject())
+                .WithTitle("T")
+                .Build();
 
             task.MarkAsCompleted();
 

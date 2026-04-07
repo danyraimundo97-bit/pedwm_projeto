@@ -102,7 +102,12 @@ namespace InfrastructureLayer.Tests.Repositories
             var repository = new ProjectRepository(dbContext);
 
             var projectId = Guid.NewGuid();
-            var project = new ProjectBuilder().WithId(projectId).WithTitle("Projeto XPTO").Build();
+            var project = new ProjectBuilder()
+                .WithId(projectId)
+                .WithTitle("Projeto XPTO")
+                .WithDates(DateTime.UtcNow, DateTime.UtcNow.AddDays(1))
+                .ManagedBy(Guid.NewGuid())
+                .Build();
 
             dbContext.Projects.Add(project);
             await dbContext.SaveChangesAsync();
@@ -137,10 +142,11 @@ namespace InfrastructureLayer.Tests.Repositories
             var today = DateTime.Today;
 
             // Inserir 3 projetos com datas de início diferentes
+            var managerId = Guid.NewGuid();
             dbContext.Projects.AddRange(
-                new ProjectBuilder().WithId(Guid.NewGuid()).WithTitle("Mais Recente").WithDates(today.AddDays(5), today.AddDays(10)).Build(),
-                new ProjectBuilder().WithId(Guid.NewGuid()).WithTitle("Mais Antigo").WithDates(today.AddDays(-5), today.AddDays(10)).Build(),
-                new ProjectBuilder().WithId(Guid.NewGuid()).WithTitle("Intermédio").WithDates(today, today.AddDays(10)).Build()
+                new ProjectBuilder().WithId(Guid.NewGuid()).WithTitle("Mais Recente").WithDates(today.AddDays(5), today.AddDays(10)).ManagedBy(managerId).Build(),
+                new ProjectBuilder().WithId(Guid.NewGuid()).WithTitle("Mais Antigo").WithDates(today.AddDays(-5), today.AddDays(10)).ManagedBy(managerId).Build(),
+                new ProjectBuilder().WithId(Guid.NewGuid()).WithTitle("Intermédio").WithDates(today, today.AddDays(10)).ManagedBy(managerId).Build()
             );
             await dbContext.SaveChangesAsync();
 
@@ -170,25 +176,21 @@ namespace InfrastructureLayer.Tests.Repositories
             var project2Id = Guid.NewGuid();
             var project3Id = Guid.NewGuid(); // Projeto sem tarefas do user
 
+            var today = DateTime.Today;
+            var managerId = Guid.NewGuid();
             // Criar os Projetos
             dbContext.Projects.AddRange(
-                new ProjectBuilder().WithId(project1Id).WithTitle("Proj 1").Build(),
-                new ProjectBuilder().WithId(project2Id).WithTitle("Proj 2").Build(),
-                new ProjectBuilder().WithId(project3Id).WithTitle("Proj 3").Build()
+                new ProjectBuilder().WithId(project1Id).WithTitle("Proj 1").WithDates(today, today.AddDays(1)).ManagedBy(managerId).Build(),
+                new ProjectBuilder().WithId(project2Id).WithTitle("Proj 2").WithDates(today, today.AddDays(1)).ManagedBy(managerId).Build(),
+                new ProjectBuilder().WithId(project3Id).WithTitle("Proj 3").WithDates(today, today.AddDays(1)).ManagedBy(managerId).Build()
             );
 
             // Criar as Tarefas associadas aos projetos e utilizadores
-            var task1 = new FeatureTaskBuilder().WithId(Guid.NewGuid()).Build();
-            SetPrivateProperty(task1, "AssignedUserId", targetUserId);
-            SetPrivateProperty(task1, "ProjectId", project1Id);
+            var task1 = new FeatureTaskBuilder().WithId(Guid.NewGuid()).InProject(project1Id).WithTitle("T1").AssignedTo(targetUserId).Build();
 
-            var task2 = new FeatureTaskBuilder().WithId(Guid.NewGuid()).Build();
-            SetPrivateProperty(task2, "AssignedUserId", targetUserId);
-            SetPrivateProperty(task2, "ProjectId", project2Id);
+            var task2 = new FeatureTaskBuilder().WithId(Guid.NewGuid()).InProject(project2Id).WithTitle("T2").AssignedTo(targetUserId).Build();
 
-            var task3 = new FeatureTaskBuilder().WithId(Guid.NewGuid()).Build();
-            SetPrivateProperty(task3, "AssignedUserId", otherUserId); // Tarefa de outro user
-            SetPrivateProperty(task3, "ProjectId", project3Id);
+            var task3 = new FeatureTaskBuilder().WithId(Guid.NewGuid()).InProject(project3Id).WithTitle("T3").AssignedTo(otherUserId).Build(); // Tarefa de outro user
 
             dbContext.Tasks.AddRange(task1, task2, task3);
             await dbContext.SaveChangesAsync();
@@ -207,7 +209,12 @@ namespace InfrastructureLayer.Tests.Repositories
             var dbContext = GetDbContext();
             var repository = new ProjectRepository(dbContext);
 
-            var project = new ProjectBuilder().WithId(Guid.NewGuid()).Build();
+            var project = new ProjectBuilder()
+                .WithId(Guid.NewGuid())
+                .WithTitle("Só Projeto")
+                .WithDates(DateTime.UtcNow, DateTime.UtcNow.AddDays(1))
+                .ManagedBy(Guid.NewGuid())
+                .Build();
             dbContext.Projects.Add(project);
             await dbContext.SaveChangesAsync();
 
@@ -215,16 +222,6 @@ namespace InfrastructureLayer.Tests.Repositories
 
             result.Should().NotBeNull();
             result.Should().BeEmpty();
-        }
-
-        // --- Método Auxiliar ---
-        private void SetPrivateProperty(object instance, string propertyName, object value)
-        {
-            var property = instance.GetType().GetProperty(propertyName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (property != null)
-            {
-                property.SetValue(instance, value);
-            }
         }
     }
 }

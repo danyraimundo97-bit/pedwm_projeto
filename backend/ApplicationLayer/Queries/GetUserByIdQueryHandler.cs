@@ -22,7 +22,7 @@ namespace ApplicationLayer.Queries
             var entity = await _repository.GetByIdAsync(id);
             if (entity == null) return null;
 
-            return _mapper.ToUserSender(entity);
+            return _mapper.ToUserResponse(entity);
         }
     }
 }

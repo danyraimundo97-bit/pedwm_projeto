@@ -8,7 +8,6 @@ namespace DomainLayer.Domain.Tasks
         public string Title { get; private set; } = string.Empty;
 
         public string Description { get; private set; } = string.Empty;
-        public abstract TaskType Type { get; }
 
         public TaskStatus Status { get; protected set; } = TaskStatus.Todo;
 
@@ -28,7 +27,6 @@ namespace DomainLayer.Domain.Tasks
             Guid id,
             string title,
             string description,
-            //TaskType type,
             TaskStatus status,
             Guid projectId,
             Guid? assignedUserId,
@@ -38,7 +36,6 @@ namespace DomainLayer.Domain.Tasks
             Id = id;
             Title = title;
             Description = description;
-            // Type = type;
             Status = status;
             ProjectId = projectId;
             AssignedUserId = assignedUserId;

@@ -37,7 +37,11 @@ namespace ApplicationLayer.Tests.Handlers
         public async Task HandleAsync_ShouldSendNotification_WhenTaskCreated()
         {
             var command = new CreateTaskCommand();
-            var fakeTask = new FeatureTaskBuilder().WithId(Guid.NewGuid()).WithTitle("Configurar BD").Build();
+            var fakeTask = new FeatureTaskBuilder()
+                .InProject(Guid.NewGuid())
+                .WithId(Guid.NewGuid())
+                .WithTitle("Configurar BD")
+                .Build();
             var fakeSender = new TaskResponse { Title = "Configurar BD" };
 
             _taskServiceMock.Setup(s => s.CreateTaskAsync(command)).ReturnsAsync(fakeTask);

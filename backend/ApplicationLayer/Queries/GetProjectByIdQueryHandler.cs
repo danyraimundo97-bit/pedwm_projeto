@@ -17,12 +17,12 @@ namespace ApplicationLayer.Queries
             _mapper = mapper;
         }
 
-        public async Task<ProjectSender> HandleAsync(Guid id)
+        public async Task<ProjectResponse> HandleAsync(Guid id)
         {
             var entity = await _repository.GetByIdAsync(id);
             if (entity == null) return null; // Devolvemos null e o GraphQL lança o erro
 
-            return _mapper.ToProjectSender(entity);
+            return _mapper.ToProjectResponse(entity);
         }
     }
 }

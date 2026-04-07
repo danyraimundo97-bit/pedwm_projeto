@@ -49,10 +49,13 @@ namespace PresentationLayer.DependencyInjection
             services.AddScoped<ITeamRepository, TeamRepository>();
             services.AddScoped<IHourLogRepository, HourLogRepository>();
 
+            //QUERYS
             services.AddTransient<ListProjectsQueryHandler>();
             services.AddTransient<ListTasksQueryHandler>();
             services.AddTransient<ListTeamsQueryHandler>();
             services.AddTransient<ListUsersQueryHandler>();
+            services.AddTransient<ListHourLogsQueryHandler>();
+            
 
             services.AddTransient<GetProjectByIdQueryHandler>();
             services.AddTransient<GetProjectsByUserQueryHandler>();

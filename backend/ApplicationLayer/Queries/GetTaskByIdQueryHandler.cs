@@ -17,12 +17,12 @@ namespace ApplicationLayer.Queries
             _mapper = mapper;
         }
 
-        public async Task<TaskSender> HandleAsync(Guid id)
+        public async Task<TaskResponse> HandleAsync(Guid id)
         {
             var entity = await _repository.GetByIdAsync(id);
             if (entity == null) return null;
 
-            return _mapper.ToTaskSender(entity);
+            return _mapper.ToTaskResponse(entity);
         }
     }
 }

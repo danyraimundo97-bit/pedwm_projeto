@@ -22,7 +22,7 @@ namespace InfrastructureLayer.Tests.Mapping
         }
 
         [Fact]
-        public void ToProjectSender_ShouldMapAllFieldsCorrectly()
+        public void ToProjectResponse_ShouldMapAllFieldsCorrectly()
         {
             var projectId = Guid.NewGuid();
             var managerId = Guid.NewGuid();
@@ -33,7 +33,7 @@ namespace InfrastructureLayer.Tests.Mapping
                 .ManagedBy(managerId)
                 .Build();
 
-            var result = _sut.ToProjectSender(project);
+            var result = _sut.ToProjectResponse(project);
 
             result.Should().NotBeNull();
             result.Id.Should().Be(project.Id);
@@ -41,15 +41,16 @@ namespace InfrastructureLayer.Tests.Mapping
         }
 
         [Fact]
-        public async System.Threading.Tasks.Task ToTaskSender_ShouldMapTaskProperties()
+        public async System.Threading.Tasks.Task ToTaskResponse_ShouldMapTaskProperties()
         {
             var taskId = Guid.NewGuid();
             var task = new FeatureTaskBuilder()
+                .InProject(Guid.NewGuid())
                 .WithId(taskId)
                 .WithTitle("Desenvolver API")
                 .Build();
 
-            var result = _sut.ToTaskSender(task);
+            var result = _sut.ToTaskResponse(task);
 
             result.Should().NotBeNull();
             result.Id.Should().Be(taskId);
@@ -57,7 +58,7 @@ namespace InfrastructureLayer.Tests.Mapping
         }
 
         [Fact]
-        public void ToUserSender_ShouldMapUserToUserResponse()
+        public void ToUserResponse_ShouldMapUserToUserResponse()
         {
             var userId = Guid.NewGuid();
             var user = new UserBuilder()
@@ -66,7 +67,7 @@ namespace InfrastructureLayer.Tests.Mapping
                 .WithEmail("tiago@teste.com")
                 .Build();
 
-            var result = _sut.ToUserSender(user);
+            var result = _sut.ToUserResponse(user);
 
             result.Should().NotBeNull();
             result.Id.Should().Be(userId);
@@ -75,7 +76,7 @@ namespace InfrastructureLayer.Tests.Mapping
         }
 
         [Fact]
-        public void ToTeamSender_ShouldMapTeamCorrectly()
+        public void ToTeamResponse_ShouldMapTeamCorrectly()
         {
             var teamId = Guid.NewGuid();
             var team = new TeamBuilder()
@@ -83,7 +84,7 @@ namespace InfrastructureLayer.Tests.Mapping
                 .WithName("Backend Devs")
                 .Build();
 
-            var result = _sut.ToTeamSender(team);
+            var result = _sut.ToTeamResponse(team);
 
             result.Should().NotBeNull();
             result.Id.Should().Be(teamId);

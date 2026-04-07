@@ -68,7 +68,7 @@ namespace PresentationLayer.Tests.GraphQL
         // TESTE 2: Sucesso e Mapeamento Mapster
 
         [Fact]
-        public async Task GetProjectById_ShouldReturnProjectSender_WhenExists()
+        public async Task GetProjectById_ShouldReturnProjectResponse_WhenExists()
         {
             var projectId = Guid.NewGuid();
 
@@ -79,10 +79,10 @@ namespace PresentationLayer.Tests.GraphQL
                 .ManagedBy(Guid.NewGuid())
                 .Build();
 
-            var fakeSender = new ProjectSender { Id = projectId, Title = "Website XPTO" };
+            var fakeSender = new ProjectResponse { Id = projectId, Title = "Website XPTO" };
 
             _projectRepoMock.Setup(repo => repo.GetByIdAsync(projectId)).ReturnsAsync(fakeProject);
-            _mapperMock.Setup(m => m.ToProjectSender(fakeProject)).Returns(fakeSender);
+            _mapperMock.Setup(m => m.ToProjectResponse(fakeProject)).Returns(fakeSender);
 
             var handler = new GetProjectByIdQueryHandler(_projectRepoMock.Object, _mapperMock.Object);
 
@@ -90,7 +90,7 @@ namespace PresentationLayer.Tests.GraphQL
             var result = await _sut.GetProjectById(projectId, handler);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<ProjectSender>();
+            result.Should().BeOfType<ProjectResponse>();
             result.Title.Should().Be("Website XPTO");
         }
 
@@ -101,10 +101,10 @@ namespace PresentationLayer.Tests.GraphQL
         public async Task GetProjects_ShouldReturnMappedList_WhenCalled()
         {
             var fakeList = new List<ProjectBase>{new ProjectBuilder().WithId(Guid.NewGuid()).WithTitle("Proj 1").WithDates(DateTime.Now, DateTime.Now).ManagedBy(Guid.NewGuid()).Build()};
-            var fakeSender = new ProjectSender { Title = "Proj 1" };
+            var fakeSender = new ProjectResponse { Title = "Proj 1" };
 
-            _projectRepoMock.Setup(repo => repo.GetPagedAsync(1, 100)).ReturnsAsync(fakeList);
-            _mapperMock.Setup(m => m.ToProjectSender(It.IsAny<ProjectBase>())).Returns(fakeSender);
+            _projectRepoMock.Setup(repo => repo.GetPagedAsync(1, It.IsAny<int>())).ReturnsAsync(fakeList);
+            _mapperMock.Setup(m => m.ToProjectResponse(It.IsAny<ProjectBase>())).Returns(fakeSender);
 
             var handler = new ListProjectsQueryHandler(_projectRepoMock.Object, _mapperMock.Object);
 
@@ -123,10 +123,10 @@ namespace PresentationLayer.Tests.GraphQL
         {
             var userId = Guid.NewGuid();
             var fakeList = new List<ProjectBase>{new ProjectBuilder().WithId(Guid.NewGuid()).WithTitle("Proj User").WithDates(DateTime.Now, DateTime.Now).ManagedBy(userId).Build()};
-            var fakeSender = new ProjectSender { Title = "Proj User" };
+            var fakeSender = new ProjectResponse { Title = "Proj User" };
 
             _projectRepoMock.Setup(repo => repo.GetByUserAsync(userId)).ReturnsAsync(fakeList);
-            _mapperMock.Setup(m => m.ToProjectSender(It.IsAny<ProjectBase>())).Returns(fakeSender);
+            _mapperMock.Setup(m => m.ToProjectResponse(It.IsAny<ProjectBase>())).Returns(fakeSender);
 
             var handler = new GetProjectsByUserQueryHandler(_projectRepoMock.Object, _mapperMock.Object);
 
@@ -162,21 +162,25 @@ namespace PresentationLayer.Tests.GraphQL
         // TESTE 2: Sucesso e Mapeamento Mapster
 
         [Fact]
-        public async Task GetTaskById_ShouldReturnTaskSender_WhenExists()
+        public async Task GetTaskById_ShouldReturnTaskResponse_WhenExists()
         {
             var taskId = Guid.NewGuid();
-            var fakeTask = new FeatureTaskBuilder().WithId(taskId).WithTitle("Criar API").Build();
-            var fakeSender = new TaskSender { Id = taskId, Title = "Criar API" };
+            var fakeTask = new FeatureTaskBuilder()
+                .InProject(Guid.NewGuid())
+                .WithId(taskId)
+                .WithTitle("Criar API")
+                .Build();
+            var fakeSender = new TaskResponse { Id = taskId, Title = "Criar API" };
 
             _taskRepoMock.Setup(repo => repo.GetByIdAsync(taskId)).ReturnsAsync(fakeTask);
-            _mapperMock.Setup(m => m.ToTaskSender(fakeTask)).Returns(fakeSender);
+            _mapperMock.Setup(m => m.ToTaskResponse(fakeTask)).Returns(fakeSender);
 
             var handler = new GetTaskByIdQueryHandler(_taskRepoMock.Object, _mapperMock.Object);
 
             var result = await _sut.GetTaskById(taskId, handler);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<TaskSender>();
+            result.Should().BeOfType<TaskResponse>();
             result.Title.Should().Be("Criar API");
         }
 
@@ -186,10 +190,10 @@ namespace PresentationLayer.Tests.GraphQL
         [Fact]
         public async Task GetTasks_ShouldReturnMappedList_WhenCalled()
         {
-            var fakeList = new List<TaskBase> { new FeatureTaskBuilder().WithTitle("Task A").Build() };
+            var fakeList = new List<TaskBase> { new FeatureTaskBuilder().InProject(Guid.NewGuid()).WithTitle("Task A").Build() };
 
-            _taskRepoMock.Setup(repo => repo.GetPagedAsync(1, 100)).ReturnsAsync(fakeList);
-            _mapperMock.Setup(m => m.ToTaskSender(It.IsAny<TaskBase>())).Returns(new TaskSender());
+            _taskRepoMock.Setup(repo => repo.GetPagedAsync(1, It.IsAny<int>())).ReturnsAsync(fakeList);
+            _mapperMock.Setup(m => m.ToTaskResponse(It.IsAny<TaskBase>())).Returns(new TaskResponse());
 
             var handler = new ListTasksQueryHandler(_taskRepoMock.Object, _mapperMock.Object);
 
@@ -206,10 +210,10 @@ namespace PresentationLayer.Tests.GraphQL
         public async Task GetTasksByProject_ShouldReturnMappedList_WhenCalled()
         {
             var projectId = Guid.NewGuid();
-            var fakeList = new List<TaskBase> { new FeatureTaskBuilder().WithTitle("Task B").Build() };
+            var fakeList = new List<TaskBase> { new FeatureTaskBuilder().InProject(projectId).WithTitle("Task B").Build() };
 
             _taskRepoMock.Setup(repo => repo.GetByProjectAsync(projectId)).ReturnsAsync(fakeList);
-            _mapperMock.Setup(m => m.ToTaskSender(It.IsAny<TaskBase>())).Returns(new TaskSender());
+            _mapperMock.Setup(m => m.ToTaskResponse(It.IsAny<TaskBase>())).Returns(new TaskResponse());
 
             var handler = new GetTasksByProjectQueryHandler(_taskRepoMock.Object, _mapperMock.Object);
             
@@ -223,10 +227,10 @@ namespace PresentationLayer.Tests.GraphQL
         public async Task GetTasksByUser_ShouldReturnMappedList_WhenCalled()
         {
             var userId = Guid.NewGuid();
-            var fakeList = new List<TaskBase> { new FeatureTaskBuilder().WithTitle("Task Do User").Build() };
+            var fakeList = new List<TaskBase> { new FeatureTaskBuilder().InProject(Guid.NewGuid()).WithTitle("Task Do User").Build() };
 
             _taskRepoMock.Setup(repo => repo.GetByUserAsync(userId)).ReturnsAsync(fakeList);
-            _mapperMock.Setup(m => m.ToTaskSender(It.IsAny<TaskBase>())).Returns(new TaskSender());
+            _mapperMock.Setup(m => m.ToTaskResponse(It.IsAny<TaskBase>())).Returns(new TaskResponse());
 
             var handler = new GetTasksByUserQueryHandler(_taskRepoMock.Object, _mapperMock.Object);
             
@@ -262,21 +266,21 @@ namespace PresentationLayer.Tests.GraphQL
         // TESTE 2: Sucesso e Mapeamento Mapster
 
         [Fact]
-        public async Task GetTeamById_ShouldReturnTeamSender_WhenExists()
+        public async Task GetTeamById_ShouldReturnTeamResponse_WhenExists()
         {
             var teamId = Guid.NewGuid();
             var fakeTeam = new TeamBuilder().WithId(teamId).WithName("Data Science").Build();
-            var fakeSender = new TeamSender { Id = teamId, Name = "Data Science" };
+            var fakeSender = new TeamResponse { Id = teamId, Name = "Data Science" };
 
             _teamRepoMock.Setup(repo => repo.GetByIdAsync(teamId)).ReturnsAsync(fakeTeam);
-            _mapperMock.Setup(m => m.ToTeamSender(fakeTeam)).Returns(fakeSender);
+            _mapperMock.Setup(m => m.ToTeamResponse(fakeTeam)).Returns(fakeSender);
 
             var handler = new GetTeamByIdQueryHandler(_teamRepoMock.Object, _mapperMock.Object);
             
             var result = await _sut.GetTeamById(teamId, handler);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<TeamSender>();
+            result.Should().BeOfType<TeamResponse>();
             result.Name.Should().Be("Data Science");
         }
 
@@ -289,7 +293,7 @@ namespace PresentationLayer.Tests.GraphQL
             var fakeList = new List<Team> { new TeamBuilder().WithName("Equipa Alpha").Build() };
 
             _teamRepoMock.Setup(repo => repo.GetPagedAsync(1, 100)).ReturnsAsync(fakeList);
-            _mapperMock.Setup(m => m.ToTeamSender(It.IsAny<Team>())).Returns(new TeamSender());
+            _mapperMock.Setup(m => m.ToTeamResponse(It.IsAny<Team>())).Returns(new TeamResponse());
 
             var handler = new ListTeamsQueryHandler(_teamRepoMock.Object, _mapperMock.Object);
             
@@ -332,7 +336,7 @@ namespace PresentationLayer.Tests.GraphQL
             var fakeResponse = new UserResponse { Id = userId, Name = "Tiago", Email = "tiago@teste.com" };
 
             _userRepoMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync(fakeUser);
-            _mapperMock.Setup(m => m.ToUserSender(fakeUser)).Returns(fakeResponse);
+            _mapperMock.Setup(m => m.ToUserResponse(fakeUser)).Returns(fakeResponse);
 
             var handler = new GetUserByIdQueryHandler(_userRepoMock.Object, _mapperMock.Object);
             
@@ -351,8 +355,8 @@ namespace PresentationLayer.Tests.GraphQL
         {
             var fakeList = new List<User> { new UserBuilder().WithName("Rita").Build() };
 
-            _userRepoMock.Setup(repo => repo.GetPagedAsync(1, 100)).ReturnsAsync(fakeList);
-            _mapperMock.Setup(m => m.ToUserSender(It.IsAny<User>())).Returns(new UserResponse());
+            _userRepoMock.Setup(repo => repo.GetPagedAsync(1, It.IsAny<int>())).ReturnsAsync(fakeList);
+            _mapperMock.Setup(m => m.ToUserResponse(It.IsAny<User>())).Returns(new UserResponse());
 
             var handler = new ListUsersQueryHandler(_userRepoMock.Object, _mapperMock.Object);
             var result = await _sut.GetUsers(handler);

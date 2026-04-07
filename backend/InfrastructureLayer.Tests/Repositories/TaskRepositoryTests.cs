@@ -39,6 +39,7 @@ namespace InfrastructureLayer.Tests.Repositories
 
             var taskId = Guid.NewGuid();
             var task = new FeatureTaskBuilder()
+                .InProject(Guid.NewGuid())
                 .WithId(taskId)
                 .WithTitle("Nova Tarefa")
                 .Build();
@@ -59,6 +60,7 @@ namespace InfrastructureLayer.Tests.Repositories
 
             var taskId = Guid.NewGuid();
             var originalTask = new FeatureTaskBuilder()
+                .InProject(Guid.NewGuid())
                 .WithId(taskId)
                 .WithTitle("Título Antigo")
                 .Build();
@@ -70,6 +72,7 @@ namespace InfrastructureLayer.Tests.Repositories
             dbContext.ChangeTracker.Clear();
 
             var updatedTask = new FeatureTaskBuilder()
+                .InProject(Guid.NewGuid())
                 .WithId(taskId)
                 .WithTitle("Título Atualizado")
                 .Build();
@@ -93,9 +96,9 @@ namespace InfrastructureLayer.Tests.Repositories
             var repository = new TaskRepository(dbContext);
 
             // Inserir 3 tarefas (ordem por ID gerado)
-            var task1 = new FeatureTaskBuilder().WithTitle("Task A").Build();
-            var task2 = new FeatureTaskBuilder().WithTitle("Task B").Build();
-            var task3 = new FeatureTaskBuilder().WithTitle("Task C").Build();
+            var task1 = new FeatureTaskBuilder().InProject(Guid.NewGuid()).WithTitle("Task A").Build();
+            var task2 = new FeatureTaskBuilder().InProject(Guid.NewGuid()).WithTitle("Task B").Build();
+            var task3 = new FeatureTaskBuilder().InProject(Guid.NewGuid()).WithTitle("Task C").Build();
 
             dbContext.Tasks.AddRange(task1, task2, task3);
             await dbContext.SaveChangesAsync();
@@ -122,7 +125,11 @@ namespace InfrastructureLayer.Tests.Repositories
             var repository = new TaskRepository(dbContext);
 
             var taskId = Guid.NewGuid();
-            var task = new FeatureTaskBuilder().WithId(taskId).Build();
+            var task = new FeatureTaskBuilder()
+                .InProject(Guid.NewGuid())
+                .WithId(taskId)
+                .WithTitle("T")
+                .Build();
 
             dbContext.Tasks.Add(task);
             await dbContext.SaveChangesAsync();
@@ -142,8 +149,11 @@ namespace InfrastructureLayer.Tests.Repositories
             var taskId = Guid.NewGuid();
             var projectId = Guid.NewGuid();
 
-            var task = new FeatureTaskBuilder().WithId(taskId).Build();
-            SetPrivateProperty(task, "ProjectId", projectId); // Associar ao projeto
+            var task = new FeatureTaskBuilder()
+                .InProject(projectId)
+                .WithId(taskId)
+                .WithTitle("T")
+                .Build();
 
             dbContext.Tasks.Add(task);
             await dbContext.SaveChangesAsync();
@@ -182,11 +192,9 @@ namespace InfrastructureLayer.Tests.Repositories
             var targetProjectId = Guid.NewGuid();
             var otherProjectId = Guid.NewGuid();
 
-            var task1 = new FeatureTaskBuilder().WithId(Guid.NewGuid()).Build();
-            SetPrivateProperty(task1, "ProjectId", targetProjectId);
+            var task1 = new FeatureTaskBuilder().InProject(targetProjectId).WithId(Guid.NewGuid()).WithTitle("A").Build();
 
-            var task2 = new FeatureTaskBuilder().WithId(Guid.NewGuid()).Build();
-            SetPrivateProperty(task2, "ProjectId", otherProjectId);
+            var task2 = new FeatureTaskBuilder().InProject(otherProjectId).WithId(Guid.NewGuid()).WithTitle("B").Build();
 
             dbContext.Tasks.AddRange(task1, task2);
             await dbContext.SaveChangesAsync();
@@ -206,11 +214,9 @@ namespace InfrastructureLayer.Tests.Repositories
             var targetUserId = Guid.NewGuid();
             var otherUserId = Guid.NewGuid();
 
-            var task1 = new FeatureTaskBuilder().WithId(Guid.NewGuid()).Build();
-            SetPrivateProperty(task1, "AssignedUserId", targetUserId);
+            var task1 = new FeatureTaskBuilder().InProject(Guid.NewGuid()).WithId(Guid.NewGuid()).WithTitle("U1").AssignedTo(targetUserId).Build();
 
-            var task2 = new FeatureTaskBuilder().WithId(Guid.NewGuid()).Build();
-            SetPrivateProperty(task2, "AssignedUserId", otherUserId);
+            var task2 = new FeatureTaskBuilder().InProject(Guid.NewGuid()).WithId(Guid.NewGuid()).WithTitle("U2").AssignedTo(otherUserId).Build();
 
             dbContext.Tasks.AddRange(task1, task2);
             await dbContext.SaveChangesAsync();
@@ -219,16 +225,6 @@ namespace InfrastructureLayer.Tests.Repositories
 
             result.Should().HaveCount(1);
             result.First().Id.Should().Be(task1.Id);
-        }
-
-        // --- Método Auxiliar ---
-        private void SetPrivateProperty(object instance, string propertyName, object value)
-        {
-            var property = instance.GetType().GetProperty(propertyName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (property != null)
-            {
-                property.SetValue(instance, value);
-            }
         }
     }
 }

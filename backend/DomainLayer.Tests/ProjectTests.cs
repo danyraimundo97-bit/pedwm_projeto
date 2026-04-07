@@ -15,6 +15,7 @@ namespace DomainLayer.Tests.Domain
                 .WithId(Guid.NewGuid())
                 .WithTitle("Sistema de Gestão")
                 .WithDates(DateTime.Now, DateTime.Now.AddDays(10))
+                .ManagedBy(Guid.NewGuid())
                 .Build();
 
             project.Status.Should().Be(ProjectStatus.Active);
@@ -24,7 +25,11 @@ namespace DomainLayer.Tests.Domain
         [Fact]
         public void UpdateStatus_ShouldChangeProjectStatus_WhenValidStatusIsProvided()
         {
-            var project = new ProjectBuilder().WithTitle("Projeto Teste").Build();
+            var project = new ProjectBuilder()
+                .WithTitle("Projeto Teste")
+                .WithDates(DateTime.UtcNow, DateTime.UtcNow.AddDays(1))
+                .ManagedBy(Guid.NewGuid())
+                .Build();
 
             project.ChangeStatus(ProjectStatus.Completed);
 
@@ -36,10 +41,11 @@ namespace DomainLayer.Tests.Domain
         {
             Action act = () => new ProjectBuilder()
                 .WithTitle("") // Título inválido
+                .ManagedBy(Guid.NewGuid())
                 .Build();
 
-            act.Should().Throw<ArgumentException>()
-                .WithMessage("*título*");
+            act.Should().Throw<InvalidOperationException>()
+                .WithMessage("*WithTitle*");
         }
 
         [Fact]
@@ -51,18 +57,22 @@ namespace DomainLayer.Tests.Domain
             Action act = () => new ProjectBuilder()
                 .WithTitle("Projeto Impossível")
                 .WithDates(startDate, endDate)
+                .ManagedBy(Guid.NewGuid())
                 .Build();
 
-            act.Should().Throw<ArgumentException>()
-                .WithMessage("*data*");
+            act.Should().Throw<InvalidOperationException>()
+                .WithMessage("*End date*");
         }
 
         [Fact]
         public void Project_ShouldNotAllowEmptyTitle()
         {
-            Action act = () => new ProjectBuilder().WithTitle("").Build();
+            Action act = () => new ProjectBuilder()
+                .WithTitle("")
+                .ManagedBy(Guid.NewGuid())
+                .Build();
 
-            act.Should().Throw<ArgumentException>();
+            act.Should().Throw<InvalidOperationException>();
         }
     }
 }

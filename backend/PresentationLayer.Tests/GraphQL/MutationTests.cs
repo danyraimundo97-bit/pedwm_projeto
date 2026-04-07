@@ -4,6 +4,7 @@ using ApplicationLayer.Mapping;
 using ApplicationLayer.Models;
 using ApplicationLayer.Services;
 using DomainLayer.Domain.Builders;
+using DomainLayer.Domain.Notifications;
 using FluentAssertions;
 using HotChocolate;
 using Moq;
@@ -41,6 +42,8 @@ namespace PresentationLayer.Tests.GraphQL
             _mapperMock = new Mock<Mapper>();
             _notificationMock = new Mock<INotificationService>();
             _sessionMock = new Mock<ISessionService>();
+            _sessionMock.Setup(s => s.GetCurrentUserID()).Returns(Guid.NewGuid());
+            _notificationMock.Setup(n => n.DeliverAsync(It.IsAny<Notification>())).Returns(Task.CompletedTask);
         }
 
         // =================================================================
@@ -52,7 +55,7 @@ namespace PresentationLayer.Tests.GraphQL
         {
             var input = new CreateProject_DTO { Title = "Novo Website" };
             var fakeProjectId = Guid.NewGuid();
-            var fakeSender = new ProjectSender { Id = fakeProjectId, Title = "Novo Website" };
+            var fakeSender = new ProjectResponse { Id = fakeProjectId, Title = "Novo Website" };
 
             var handler = new CreateProjectHandler(_projectServiceMock.Object, _mapperMock.Object, _notificationMock.Object, _sessionMock.Object);
 
@@ -64,11 +67,11 @@ namespace PresentationLayer.Tests.GraphQL
                 .ManagedBy(Guid.NewGuid())
                 .Build();
 
-            // Simular que o Handler vai ter sucesso e devolver o ProjectSender
+            // Simular que o Handler vai ter sucesso e devolver o ProjectResponse
             _projectServiceMock.Setup(s => s.CreateProjectAsync(It.IsAny<CreateProjectCommand>()))
                 .ReturnsAsync(fakeProject);
 
-            _mapperMock.Setup(m => m.ToProjectSender(It.IsAny<DomainLayer.Domain.Projects.ProjectBase>()))
+            _mapperMock.Setup(m => m.ToProjectResponse(It.IsAny<DomainLayer.Domain.Projects.ProjectBase>()))
                 .Returns(fakeSender);
 
             var result = await _sut.CreateProject(input, handler);
@@ -120,14 +123,18 @@ namespace PresentationLayer.Tests.GraphQL
         {
             var input = new CreateTask_DTO { Title = "Nova Tarefa" };
             var fakeTaskId = Guid.NewGuid();
-            var fakeSender = new TaskSender { Id = fakeTaskId, Title = "Nova Tarefa" };
+            var fakeSender = new TaskResponse { Id = fakeTaskId, Title = "Nova Tarefa" };
 
             var handler = new CreateTaskHandler(_taskServiceMock.Object, _mapperMock.Object, _notificationMock.Object);
 
-            var fakeTask = new FeatureTaskBuilder().WithId(fakeTaskId).WithTitle("Nova Tarefa").Build();
+            var fakeTask = new FeatureTaskBuilder()
+                .InProject(Guid.NewGuid())
+                .WithId(fakeTaskId)
+                .WithTitle("Nova Tarefa")
+                .Build();
 
             _taskServiceMock.Setup(s => s.CreateTaskAsync(It.IsAny<CreateTaskCommand>())).ReturnsAsync(fakeTask);
-            _mapperMock.Setup(m => m.ToTaskSender(It.IsAny<DomainLayer.Domain.Tasks.TaskBase>())).Returns(fakeSender);
+            _mapperMock.Setup(m => m.ToTaskResponse(It.IsAny<DomainLayer.Domain.Tasks.TaskBase>())).Returns(fakeSender);
 
             var result = await _sut.CreateTask(input, handler);
 

@@ -19,10 +19,10 @@ namespace ApplicationLayer.Queries
             _mapper = mapper;
         }
 
-        public async Task<IReadOnlyList<TaskSender>> HandleAsync(Guid projectId)
+        public async Task<IReadOnlyList<TaskResponse>> HandleAsync(Guid projectId)
         {
             var entities = await _repository.GetByProjectAsync(projectId);
-            return entities.Select(_mapper.ToTaskSender).ToList();
+            return entities.Select(_mapper.ToTaskResponse).ToList();
         }
     }
 }

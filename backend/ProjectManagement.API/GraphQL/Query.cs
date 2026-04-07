@@ -18,14 +18,14 @@ namespace PresentationLayer.GraphQL
 
 
         // Listar Projetos (paged)
-        public async Task<IReadOnlyList<ProjectSender>> GetProjects([Service] ListProjectsQueryHandler handler)
+        public async Task<IReadOnlyList<ProjectResponse>> GetProjects([Service] ListProjectsQueryHandler handler)
         {
             return await handler.HandleAsync();
         }
 
 
         // Procurar Projeto por ID
-        public async Task<ProjectSender> GetProjectById(Guid id, [Service] GetProjectByIdQueryHandler handler)
+        public async Task<ProjectResponse> GetProjectById(Guid id, [Service] GetProjectByIdQueryHandler handler)
         {
             var project = await handler.HandleAsync(id);
 
@@ -36,7 +36,7 @@ namespace PresentationLayer.GraphQL
         }
 
         // Procurar Projetos de um Utilizador
-        public async Task<IReadOnlyList<ProjectSender>> GetProjectsByUser(Guid userId, [Service] GetProjectsByUserQueryHandler handler)
+        public async Task<IReadOnlyList<ProjectResponse>> GetProjectsByUser(Guid userId, [Service] GetProjectsByUserQueryHandler handler)
         {
             return await handler.HandleAsync(userId);
         }
@@ -46,14 +46,14 @@ namespace PresentationLayer.GraphQL
         // ==========================================
 
         // Listar Tarefas (paged)
-        public async Task<IReadOnlyList<TaskSender>> GetTasks([Service] ListTasksQueryHandler handler)
+        public async Task<IReadOnlyList<TaskResponse>> GetTasks([Service] ListTasksQueryHandler handler)
         {
             return await handler.HandleAsync();
         }
 
 
         // Procurar Tarefa por ID
-        public async Task<TaskSender> GetTaskById(Guid id, [Service] GetTaskByIdQueryHandler handler)
+        public async Task<TaskResponse> GetTaskById(Guid id, [Service] GetTaskByIdQueryHandler handler)
         {
             var task = await handler.HandleAsync(id);
 
@@ -64,13 +64,13 @@ namespace PresentationLayer.GraphQL
         }
 
         // Procurar Tarefas de um Projeto
-        public async Task<IReadOnlyList<TaskSender>> GetTasksByProject(Guid projectId, [Service] GetTasksByProjectQueryHandler handler)
+        public async Task<IReadOnlyList<TaskResponse>> GetTasksByProject(Guid projectId, [Service] GetTasksByProjectQueryHandler handler)
         {
             return await handler.HandleAsync(projectId);
         }
 
         // Procurar Tarefas de um Utilizador
-        public async Task<IReadOnlyList<TaskSender>> GetTasksByUser(Guid userId, [Service] GetTasksByUserQueryHandler handler)
+        public async Task<IReadOnlyList<TaskResponse>> GetTasksByUser(Guid userId, [Service] GetTasksByUserQueryHandler handler)
         {
             return await handler.HandleAsync(userId);
         }
@@ -80,13 +80,13 @@ namespace PresentationLayer.GraphQL
         // ==========================================
 
         // Listar Equipas (paged)
-        public async Task<IReadOnlyList<TeamSender>> GetTeams([Service] ListTeamsQueryHandler handler)
+        public async Task<IReadOnlyList<TeamResponse>> GetTeams([Service] ListTeamsQueryHandler handler)
         {
             return await handler.HandleAsync();
         }
 
         // Procurar Equipas de um Utilizador
-        public async Task<TeamSender> GetTeamById(Guid id, [Service] GetTeamByIdQueryHandler handler)
+        public async Task<TeamResponse> GetTeamById(Guid id, [Service] GetTeamByIdQueryHandler handler)
         {
             var team = await handler.HandleAsync(id);
 

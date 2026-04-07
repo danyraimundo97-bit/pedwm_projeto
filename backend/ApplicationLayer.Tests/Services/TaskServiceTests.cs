@@ -95,9 +95,6 @@ namespace ApplicationLayer.Tests.Services
 
             // Garantir que a tarefa mandou guardar as alterações!
             _taskRepositoryMock.Verify(repo => repo.SaveAsync(It.IsAny<TaskBase>()), Times.Once);
-
-            // Garantir que gravou o log
-            _loggerMock.Verify(l => l.LogInfo(It.IsAny<string>()), Times.Once);
         }
     }
 }

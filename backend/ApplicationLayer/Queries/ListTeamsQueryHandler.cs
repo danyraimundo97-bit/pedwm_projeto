@@ -18,10 +18,10 @@ namespace ApplicationLayer.Queries
             _mapper = mapper;
         }
 
-        public async Task<IReadOnlyList<TeamSender>> HandleAsync()
+        public async Task<IReadOnlyList<TeamResponse>> HandleAsync()
         {
             var entities = await _repository.GetPagedAsync(1, 100);
-            return entities.Select(_mapper.ToTeamSender).ToList();
+            return entities.Select(_mapper.ToTeamResponse).ToList();
         }
     }
 }
