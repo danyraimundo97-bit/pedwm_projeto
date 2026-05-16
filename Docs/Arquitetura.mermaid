@@ -1,0 +1,44 @@
+%% Diagrama lógico da solução (PEDWM TP1)
+%% Camada Web = ProjectManagement.API (GraphQL + SignalR).
+
+flowchart TB
+    subgraph client["Cliente — Flutter (Dart)"]
+        UI[UI / Providers]
+        GQL[graphql_flutter]
+        SR[cliente SignalR]
+    end
+
+    subgraph web["Camada Web / Presentation — ProjectManagement.API"]
+        HC[HotChocolate — /graphql]
+        HUB[SignalR — NotificationsHub]
+    end
+
+    subgraph app["Application Layer"]
+        QH[Query Handlers]
+        CH[Command Handlers]
+        SVC[Serviços de aplicação]
+    end
+
+    subgraph infra["Infrastructure Layer"]
+        EF[EF Core — AppDbContext]
+        DB[(SQLite)]
+        STRAT[Estratégias de notificação]
+    end
+
+    subgraph domain["Domain Layer"]
+        ENT[Entidades e Builders]
+    end
+
+    UI --> GQL
+    UI --> SR
+    GQL <-->|POST HTTP HttpLink| HC
+    SR <-->|WebSockets| HUB
+    HC --> QH
+    HC --> CH
+    HUB --> STRAT
+    CH --> SVC
+    QH --> EF
+    CH --> EF
+    SVC --> ENT
+    EF --> ENT
+    EF --> DB

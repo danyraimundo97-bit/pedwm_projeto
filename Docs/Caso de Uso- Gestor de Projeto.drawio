@@ -1,0 +1,116 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6">
+  <diagram name="Página-1" id="D-led4MnbCPD4heJYLdX">
+    <mxGraphModel dx="2593" dy="1529" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-1" parent="1" style="rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Início" vertex="1">
+          <mxGeometry height="39" width="64" x="201" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-2" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Utilizador GP: abrir ecrã de novo projeto" vertex="1">
+          <mxGeometry height="78" width="260" x="103" y="109" as="geometry" />
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-3" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Utilizador GP: preencher título, datas, orçamento, equipa e gestor" vertex="1">
+          <mxGeometry height="102" width="260" x="103" y="237" as="geometry" />
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-4" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Utilizador GP: submeter" vertex="1">
+          <mxGeometry height="54" width="233" x="354" y="389" as="geometry" />
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-5" parent="1" style="rhombus;strokeWidth=2;whiteSpace=wrap;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Formulário válido?" vertex="1">
+          <mxGeometry height="185" width="185" x="295" y="493" as="geometry" />
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-6" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Sistema: mutation GraphQL createProject" vertex="1">
+          <mxGeometry height="78" width="260" x="258" y="752" as="geometry" />
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-7" parent="1" style="rhombus;strokeWidth=2;whiteSpace=wrap;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="API aceita pedido?" vertex="1">
+          <mxGeometry height="185" width="185" x="295" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-8" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Utilizador GP: ver erro e corrigir" vertex="1">
+          <mxGeometry height="78" width="260" x="20" y="1152" as="geometry" />
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-9" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Sistema: CreateProjectHandler — validar e gravar projeto" vertex="1">
+          <mxGeometry height="102" width="260" x="330" y="1140" as="geometry" />
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-10" parent="1" style="whiteSpace=wrap;strokeWidth=2;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Utilizador GP: projeto aparece na lista" vertex="1">
+          <mxGeometry height="78" width="260" x="330" y="1292" as="geometry" />
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-11" parent="1" style="rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Fim — projeto criado" vertex="1">
+          <mxGeometry height="39" width="175" x="372" y="1420" as="geometry" />
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-12" edge="1" parent="1" source="iX6WTUB4wriCT8QcmCDr-1" style="curved=1;startArrow=none;endArrow=block;exitX=0.49;exitY=1;entryX=0.5;entryY=0;rounded=0;" target="iX6WTUB4wriCT8QcmCDr-2" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-13" edge="1" parent="1" source="iX6WTUB4wriCT8QcmCDr-2" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;" target="iX6WTUB4wriCT8QcmCDr-3" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-14" edge="1" parent="1" source="iX6WTUB4wriCT8QcmCDr-3" style="curved=1;startArrow=none;endArrow=block;exitX=1;exitY=0.91;entryX=0.5;entryY=0;rounded=0;" target="iX6WTUB4wriCT8QcmCDr-4" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="364" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-15" edge="1" parent="1" source="iX6WTUB4wriCT8QcmCDr-4" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.85;entryY=0;rounded=0;" target="iX6WTUB4wriCT8QcmCDr-5" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="468" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-16" edge="1" parent="1" source="iX6WTUB4wriCT8QcmCDr-5" style="curved=1;startArrow=none;endArrow=block;exitX=0;exitY=0.12;entryX=0.5;entryY=1;rounded=0;" target="iX6WTUB4wriCT8QcmCDr-3" value="Não">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="233" y="468" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-17" edge="1" parent="1" source="iX6WTUB4wriCT8QcmCDr-5" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0.01;rounded=0;" target="iX6WTUB4wriCT8QcmCDr-6" value="Sim">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-18" edge="1" parent="1" source="iX6WTUB4wriCT8QcmCDr-6" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1.01;entryX=0.5;entryY=0;rounded=0;" target="iX6WTUB4wriCT8QcmCDr-7" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-19" edge="1" parent="1" source="iX6WTUB4wriCT8QcmCDr-7" style="curved=1;startArrow=none;endArrow=block;exitX=0;exitY=0.92;entryX=0.64;entryY=0;rounded=0;" target="iX6WTUB4wriCT8QcmCDr-8" value="Não">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="233" y="1103" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-20" edge="1" parent="1" source="iX6WTUB4wriCT8QcmCDr-8" style="curved=1;startArrow=none;endArrow=block;exitX=0.47;exitY=0;entryX=0.24;entryY=1;rounded=0;" target="iX6WTUB4wriCT8QcmCDr-3" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="133" y="1103" />
+              <mxPoint x="133" y="364" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-21" edge="1" parent="1" source="iX6WTUB4wriCT8QcmCDr-7" style="curved=1;startArrow=none;endArrow=block;exitX=0.78;exitY=1;entryX=0.5;entryY=0;rounded=0;" target="iX6WTUB4wriCT8QcmCDr-9" value="Sim">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="460" y="1103" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-22" edge="1" parent="1" source="iX6WTUB4wriCT8QcmCDr-9" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;" target="iX6WTUB4wriCT8QcmCDr-10" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="iX6WTUB4wriCT8QcmCDr-23" edge="1" parent="1" source="iX6WTUB4wriCT8QcmCDr-10" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=-0.01;rounded=0;" target="iX6WTUB4wriCT8QcmCDr-11" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

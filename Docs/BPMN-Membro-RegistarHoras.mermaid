@@ -1,0 +1,21 @@
+%% BPMN (notação aproximada em Mermaid): fluxo de uma ação — Membro regista horas num projeto.
+
+flowchart TB
+    e0([Início])
+
+    e0 --> A[Utilizador: abrir detalhe do projeto]
+    A --> B[Utilizador: indicar horas a registar]
+    B --> C[Utilizador: confirmar registo]
+
+    C --> G1{Valor válido?}
+    G1 -->|Não| B
+
+    G1 -->|Sim| T1[Sistema: mutation GraphQL addHoursToProject]
+    T1 --> G2{Operação concluída?}
+    G2 -->|Não| E1[Utilizador: ver erro]
+    E1 --> B
+
+    G2 -->|Sim| T2[Sistema: AddHoursToProjectHandler — atualizar registo de horas]
+    T2 --> T3[Sistema: notificação SignalR para interessados — se aplicável]
+    T3 --> D[Utilizador: vê horas atualizadas / feedback]
+    D --> e1([Fim — horas registadas])

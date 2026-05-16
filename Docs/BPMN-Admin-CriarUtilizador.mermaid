@@ -1,0 +1,21 @@
+%% BPMN (notação aproximada em Mermaid): fluxo de uma ação — Administrador cria utilizador.
+%% ( ) = evento | [ ] = tarefa | { } = gateway exclusivo (XOR)
+
+flowchart TB
+    e0([Início])
+
+    e0 --> A[Utilizador: abrir gestão de utilizadores]
+    A --> B[Utilizador: preencher nome, email e papel]
+    B --> C[Utilizador: confirmar criação]
+
+    C --> G1{Dados válidos?}
+    G1 -->|Não| B
+
+    G1 -->|Sim| T1[Sistema: enviar mutation GraphQL createUser]
+    T1 --> G2{Resposta sem erros?}
+    G2 -->|Não| E1[Utilizador: ver mensagem de erro]
+    E1 --> B
+
+    G2 -->|Sim| T2[Sistema: CreateUserHandler + repositório — persistir na BD]
+    T2 --> D[Utilizador: vê confirmação]
+    D --> e1([Fim — utilizador criado])

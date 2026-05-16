@@ -1,0 +1,20 @@
+%% BPMN (notação aproximada em Mermaid): fluxo de uma ação — GP cria projeto.
+
+flowchart TB
+    e0([Início])
+
+    e0 --> A[Utilizador GP: abrir ecrã de novo projeto]
+    A --> B[Utilizador GP: preencher título, datas, orçamento, equipa e gestor]
+    B --> C[Utilizador GP: submeter]
+
+    C --> G1{Formulário válido?}
+    G1 -->|Não| B
+
+    G1 -->|Sim| T1[Sistema: mutation GraphQL createProject]
+    T1 --> G2{API aceita pedido?}
+    G2 -->|Não| E1[Utilizador GP: ver erro e corrigir]
+    E1 --> B
+
+    G2 -->|Sim| T2[Sistema: CreateProjectHandler — validar e gravar projeto]
+    T2 --> D[Utilizador GP: projeto aparece na lista]
+    D --> e1([Fim — projeto criado])
